@@ -45,7 +45,7 @@ Source: brief Section 2. [C]
 ### Course pages
 
 - FR-C1 One page per language, listing lessons in order with their objectives. [C]
-- FR-C2 A course with no published lessons yet says so plainly and points to a course that has lessons, instead of showing empty or dead links. [A]
+- FR-C2 A course with no published lessons yet says so plainly, lists its planned topics as plain text marked as planned and subject to change, and links to no lesson that does not exist. [C, decision D20]
 
 ### Lessons
 

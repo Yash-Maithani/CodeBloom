@@ -229,7 +229,7 @@ One primary button per view region. Labels say exactly what happens ("Check answ
 
 Each note explains one line or a short range of lines and carries a small round number marker (`accent` background, `on-accent` numeral). The same number appears in the code gutter beside the line it explains. Numbering is used because notes follow the code's order.
 
-**Wide screens (1024px and up):** notes sit in a column to the right of the code, each aligned with the top of its line. If two notes would overlap, the later one moves down; the shared number keeps the link clear. Hovering or focusing a note highlights its line with `accent-tint` and a 3px `accent` bar at the left of the line, and the reverse works from the gutter marker.
+**Wide screens (1024px and up):** notes sit in a column to the right of the code, each aligned with the top of its line. If two notes would overlap, the later one moves down; the shared number keeps the link clear. Hovering a note with a pointer highlights its line with `accent-tint` and a 3px `accent` bar at the left of the line, and the reverse works from the gutter marker. This is an extra for pointer users only: notes are not focusable (they are static text, and extra tab stops slow keyboard users down), and the shared number plus the line number in the screen reader list carry the same link without it (decision D19).
 
 **Narrow screens (below 1024px):** each note is shown directly under the line it explains, inside the code block, as an annotation row: sans-serif text on `sheet`, a 3px `accent` left bar and the number marker. A "Hide notes" button in the header collapses all notes to read the clean program; its label then changes to "Show notes". Because the label carries the state, the button does not also use `aria-pressed`. Notes are shown by default. The choice may be remembered for the visit.
 
@@ -269,7 +269,7 @@ Used for course and language entries only. `sheet` background, 1px `rule` border
 ### Navigation and footer
 
 - Top bar: wordmark left, language courses and key links right, `paper` background with a `rule` bottom border.
-- Below 768px: a "Menu" button (icon plus label) opens a disclosure panel; focus moves into it and Escape closes it.
+- While the navigation has three links or fewer and they fit at 360px, they stay visible at every width with no menu button (decision D18). When the navigation grows past that: below 768px a "Menu" button (icon plus label) opens a disclosure panel; focus moves into it and Escape closes it.
 - Skip link "Skip to content" as the first focusable element.
 - Footer: plain links (courses, about, privacy, terms once they exist). No social proof, no newsletter box unless one really exists.
 
