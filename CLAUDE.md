@@ -76,7 +76,7 @@ Target WCAG 2.1 AA. Product requirements are in `SPEC.md`; visual rules (contras
 
 ## Quality gates
 
-Run the checks that exist and read the actual output before reporting. Scripts: `npm run lint`, `npm run typecheck`, `npm run build`, `npm run test:e2e` (Playwright smoke test), `npm run check:examples` (runs the example files in `content/examples/` and compares output), `npm run test:runner` (tests that runner), `npm run verify:browser` (checks tokens, contrast and fonts in a real browser; run `npm run build` first). Cloud sessions install dependencies through the SessionStart hook in `.claude/`.
+Run the checks that exist and read the actual output before reporting. Scripts: `npm run lint`, `npm run typecheck`, `npm run build`, `npm run test:e2e` (all Playwright tests in `tests/e2e/`), `npm run check:examples` (runs the example files in `content/examples/` and compares output), `npm run test:runner` (tests that runner), `npm run verify:browser` (checks tokens, contrast and fonts in a real browser; run `npm run build` first). Cloud sessions install dependencies through the SessionStart hook in `.claude/`.
 
 - Never skip, delete or weaken a test, warning or acceptance criterion to get a pass.
 - If something cannot be tested, say so and record it in `PROGRESS.md`.
