@@ -25,6 +25,8 @@ import { chromium } from "@playwright/test";
 const ROOT = fileURLToPath(new URL("../", import.meta.url));
 const PORT = 3101;
 const BASE = `http://127.0.0.1:${PORT}/`;
+// The token page moved here from / in Milestone 1, when / became the homepage.
+const TOKENS_PAGE = `${BASE}dev/tokens`;
 const SCREENSHOTS = `${ROOT}screenshots/`;
 const WIDTHS = [360, 1440];
 const THEMES = ["light", "dark"];
@@ -239,7 +241,7 @@ async function runScenario(browser, design, { label, theme, systemScheme, width,
     if (/\.(woff2?|ttf|otf)(\?|$)/.test(r.url()) || /fonts\.(googleapis|gstatic)\.com/.test(r.url())) fontRequests.push(r.url());
   });
 
-  await page.goto(BASE, { waitUntil: "networkidle" });
+  await page.goto(TOKENS_PAGE, { waitUntil: "networkidle" });
   if (forceAttribute) await page.evaluate((t) => document.documentElement.setAttribute("data-theme", t), theme);
   await page.evaluate(() => document.fonts.ready);
 

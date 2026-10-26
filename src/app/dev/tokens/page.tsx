@@ -1,7 +1,17 @@
-// Development page. It only proves that the design tokens and fonts from
-// DESIGN.md render. It is replaced by the real homepage in Milestone 1.
+// Development page at /dev/tokens. It only proves that the design tokens and
+// fonts from DESIGN.md render, and `npm run verify:browser` checks it.
+// It is linked from nowhere and asks search engines not to index it. That is
+// not access control: anyone with the address can open it. Delete it before
+// launch (Milestone 7).
 // Class names are written out in full on purpose: Tailwind finds classes by
 // scanning the source for complete strings, so they cannot be built dynamically.
+
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Design tokens check",
+  robots: { index: false, follow: false },
+};
 
 const colorTokens = [
   { name: "paper", role: "Page background", swatch: "bg-paper" },
@@ -56,7 +66,7 @@ const typeScale = [
   { token: "text-2xl", note: "30px, h2", className: "text-2xl" },
 ];
 
-export default function Page() {
+export default function TokensPage() {
   return (
     <main className="mx-auto w-full max-w-site px-4 py-12 sm:px-6 md:py-16 lg:px-8">
       <header className="max-w-measure">
