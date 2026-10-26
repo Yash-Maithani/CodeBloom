@@ -31,6 +31,29 @@ test("passes when the real output matches", async () => {
   assert.equal(result.results.length, 1);
 });
 
+test("passes when the example and its expected output were saved with Windows line endings", async () => {
+  const { root, languages } = await fixture({
+    "python/crlf.py": 'print("one")\r\nprint("two")\r\n',
+    "python/crlf.expected.txt": "one\r\ntwo\r\n",
+  });
+  const result = await checkExamples({ root, languages });
+  assert.deepEqual(result.problems, []);
+  assert.equal(result.ok, true);
+});
+
+test("line endings are the only thing normalized: a missing blank line or trailing space still fails", async () => {
+  const blankLine = await fixture({
+    "python/b.py": 'print("one")\nprint()\nprint("two")\n',
+    "python/b.expected.txt": "one\r\ntwo\r\n",
+  });
+  assert.equal((await checkExamples(blankLine)).ok, false);
+  const trailingSpace = await fixture({
+    "python/t.py": 'print("one ")\n',
+    "python/t.expected.txt": "one\r\n",
+  });
+  assert.equal((await checkExamples(trailingSpace)).ok, false);
+});
+
 test("fails when the output differs", async () => {
   const { root, languages } = await fixture({
     "python/bad.py": 'print("hi")\n',

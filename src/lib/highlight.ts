@@ -15,6 +15,7 @@
 
 import { createHighlighter, type ThemeRegistrationRaw } from "shiki";
 import type { CodeLanguage } from "@/lib/examples";
+import { normalizeLineEndings } from "./line-endings.ts";
 
 /** The only syntax roles DESIGN.md uses (section 7, "Syntax colors"). */
 export type TokenKind = "plain" | "keyword" | "literal" | "comment";
@@ -124,19 +125,23 @@ function moveEdgeSpacesOut(tokens: CodeToken[]): CodeToken[] {
 }
 
 /**
- * Turns source code into lines of tokens. The tokens of each line, joined
- * together, are exactly that line of the source, and every line has at least
- * one token. A mismatch stops the build instead of showing the wrong code.
+ * Turns source code into lines of tokens. Line endings are normalized to \n
+ * first (Shiki does the same), so code that arrives with Windows line endings
+ * gives the same tokens as code with \n. After that, the tokens of each line,
+ * joined together, are exactly that line of the normalized source, and every
+ * line has at least one token. A mismatch stops the build instead of showing
+ * the wrong code.
  */
 export async function highlight(code: string, language: CodeLanguage): Promise<CodeToken[][]> {
+  const source = normalizeLineEndings(code);
   const highlighter = await getHighlighter();
-  const { tokens } = highlighter.codeToTokens(code, {
+  const { tokens } = highlighter.codeToTokens(source, {
     lang: language,
     theme: "codebloom-roles",
     includeExplanation: "scopeName",
   });
 
-  const sourceLines = code.split("\n");
+  const sourceLines = source.split("\n");
   if (tokens.length !== sourceLines.length) {
     throw new Error(`highlight(${language}): expected ${sourceLines.length} lines, Shiki returned ${tokens.length}`);
   }

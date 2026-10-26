@@ -7,6 +7,7 @@ import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import { CODE_LANGUAGES } from "./examples.ts";
 import { highlight, roleOf, type TokenKind } from "./highlight.ts";
+import { normalizeLineEndings } from "./line-endings.ts";
 
 type Language = keyof typeof CODE_LANGUAGES;
 
@@ -117,6 +118,51 @@ test("roleOf: a comment beats keywords inside it, literals beat keyword prefixes
   assert.equal(roleOf([], "   "), "plain");
 });
 
+// Line endings. The expected values are computed here, not by the code under test.
+const independentlyNormalized = (text: string) => text.replace(/\r\n|\r/g, "\n");
+const rebuilt = (lines: Awaited<ReturnType<typeof highlight>>) =>
+  lines.map((tokens) => tokens.map((token) => token.text).join("")).join("\n");
+
+const SAMPLES: Record<Language, string> = {
+  c: '#include <stdio.h>\nint main(void) {\n    printf("hi\\n"); // done\n    return 0;\n}',
+  cpp: 'auto p = new int(3);\nstd::cout << R"(raw)" << "x";\n',
+  java: '/** Adds. */\npublic class Hello {\n    String t = "x";\n}',
+  python: 'age = 17\nif age >= 18:\n    print("adult")  \n\nelse:\n    print("no")',
+};
+
+for (const language of Object.keys(SAMPLES) as Language[]) {
+  const lf = SAMPLES[language];
+  const variants: Record<string, string> = {
+    "CRLF": lf.replace(/\n/g, "\r\n"),
+    "CRLF with a trailing \\r on the final line": `${lf.replace(/\n/g, "\r\n")}\r`,
+    "lone \\r line endings": lf.replace(/\n/g, "\r"),
+    "mixed endings": lf.replace(/\n/g, (_, index: number) => (index % 2 ? "\r\n" : "\n")),
+  };
+  for (const [name, source] of Object.entries(variants)) {
+    test(`${language}: ${name} gives the same tokens as LF and rebuilds the normalized source exactly`, async () => {
+      const lines = await highlight(source, language);
+      assert.equal(rebuilt(lines), independentlyNormalized(source));
+      assert.ok(!rebuilt(lines).includes("\r"));
+      // Same line count and the same colors as the equivalent LF source.
+      const expectedLf = independentlyNormalized(source);
+      assert.deepEqual(lines, await highlight(expectedLf, language));
+    });
+  }
+}
+
+test("a trailing \\r on the final line is a line ending, not a character shown at the end of the code", async () => {
+  const lines = await highlight("age = 17\r\nprint(age)\r", "python");
+  assert.deepEqual(
+    lines.map((tokens) => tokens.map((token) => token.text).join("")),
+    ["age = 17", "print(age)", ""],
+  );
+});
+
+test("only line endings change: trailing spaces, blank lines and tabs survive CRLF input", async () => {
+  const lines = await highlight("x = 1  \r\n\r\n\r\nif x:\r\n\tpass \r\n", "python");
+  assert.equal(rebuilt(lines), "x = 1  \n\n\nif x:\n\tpass \n");
+});
+
 test("every line keeps its exact text, including blank lines, indentation and tabs", async () => {
   const code = ["def f():", "", "\treturn 1", "    ", "# end"].join("\n");
   const lines = await highlight(code, "python");
@@ -131,7 +177,7 @@ test("every line keeps its exact text, including blank lines, indentation and ta
 test("the real example files highlight without error and rebuild exactly", async () => {
   for (const [language, { extension }] of Object.entries(CODE_LANGUAGES) as Array<[Language, { extension: string }]>) {
     const file = language === "java" ? "Hello" : "hello";
-    const code = readFileSync(`content/examples/${language}/${file}${extension}`, "utf8").replace(/\n$/, "");
+    const code = normalizeLineEndings(readFileSync(`content/examples/${language}/${file}${extension}`, "utf8")).replace(/\n$/, "");
     const lines = await highlight(code, language);
     assert.equal(lines.map((tokens) => tokens.map((t) => t.text).join("")).join("\n"), code, `${language} example`);
   }

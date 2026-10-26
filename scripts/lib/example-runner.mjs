@@ -62,6 +62,12 @@ export const LANGUAGES = {
 
 const EXPECTED_SUFFIX = ".expected.txt";
 
+// Windows line endings (\r\n) and old Mac ones (\r) become \n before output is
+// compared, so an expected file saved on Windows still matches. Nothing else is
+// touched. The same rule lives in src/lib/line-endings.ts; this script runs as
+// plain Node and does not read TypeScript, so it keeps its own one-line copy.
+const normalizeLineEndings = (text) => text.replace(/\r\n?/g, "\n");
+
 function runProcess(command, args, { cwd, env, timeoutMs }) {
   return new Promise((resolve) => {
     const child = spawn(command, args, {
@@ -204,8 +210,8 @@ async function checkOne(example, timeoutMs) {
         return finishedWith(false, `exited with code ${last.code ?? last.signal} while running: ${what}\n${last.stderr.trimEnd()}`);
       }
     }
-    const expected = (await readFile(example.expected, "utf8")).replace(/\r\n/g, "\n");
-    const actual = last.stdout.replace(/\r\n/g, "\n");
+    const expected = normalizeLineEndings(await readFile(example.expected, "utf8"));
+    const actual = normalizeLineEndings(last.stdout);
     if (actual !== expected) {
       return finishedWith(false, `output differs\n  expected: ${JSON.stringify(expected)}\n  actual:   ${JSON.stringify(actual)}`);
     }

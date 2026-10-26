@@ -1,11 +1,12 @@
 import { readFileSync } from "node:fs";
 import { expect, test } from "@playwright/test";
+import { normalizeLineEndings } from "../../src/lib/line-endings.ts";
 
 // Syntax colors on the homepage example (DESIGN.md section 7, "Syntax colors"):
 // keywords in ink at weight 700, strings and numbers in syntax-literal,
 // everything else ink. The code must also stay readable with no color at all.
 
-const exampleCode = readFileSync("content/examples/python/vote.py", "utf8").replace(/\n$/, "");
+const exampleCode = normalizeLineEndings(readFileSync("content/examples/python/vote.py", "utf8")).replace(/\n$/, "");
 
 type Span = { text: string; color: string; weight: string; style: string };
 

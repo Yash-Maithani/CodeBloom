@@ -1,11 +1,12 @@
 import { readFileSync } from "node:fs";
 import { expect, test } from "@playwright/test";
+import { normalizeLineEndings } from "../../src/lib/line-endings.ts";
 
 // Checks that nothing on the site pretends a feature exists when it does not,
 // and that every button does what it says.
 
-const exampleCode = readFileSync("content/examples/python/vote.py", "utf8").replace(/\n$/, "");
-const exampleOutput = readFileSync("content/examples/python/vote.expected.txt", "utf8").replace(/\n$/, "");
+const exampleCode = normalizeLineEndings(readFileSync("content/examples/python/vote.py", "utf8")).replace(/\n$/, "");
+const exampleOutput = normalizeLineEndings(readFileSync("content/examples/python/vote.expected.txt", "utf8")).replace(/\n$/, "");
 const COURSE_PAGES = ["/courses/c", "/courses/cpp", "/courses/java", "/courses/python"];
 
 test("the homepage example shows the checked code and its real output", async ({ page }) => {

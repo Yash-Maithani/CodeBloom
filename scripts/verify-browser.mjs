@@ -348,7 +348,8 @@ async function runScenario(browser, design, { label, theme, systemScheme, width,
 
 // ---------- main ----------
 
-const design = parseDesign(await readFile(`${ROOT}DESIGN.md`, "utf8"));
+// A Windows checkout may save DESIGN.md with \r\n line endings; the parser expects \n.
+const design = parseDesign((await readFile(`${ROOT}DESIGN.md`, "utf8")).replace(/\r\n?/g, "\n"));
 check("DESIGN.md", "parsed 18 light colors, 18 dark colors", Object.keys(design.colors.light).length === 18 && Object.keys(design.colors.dark).length === 18, `${Object.keys(design.colors.light).length} / ${Object.keys(design.colors.dark).length}`);
 check("DESIGN.md", "parsed contrast pairs, type scale, spacing and radius", design.contrast.length > 0 && Object.keys(design.type).length === 9 && design.spacing?.length === 9 && !!design.radius && design.motion.fast === 120, `pairs ${design.contrast.length}, type ${Object.keys(design.type).length}, spacing ${design.spacing?.length}, radius ${JSON.stringify(design.radius)}`);
 
