@@ -1,0 +1,54 @@
+import type { Metadata } from "next";
+import {
+  Atkinson_Hyperlegible_Mono,
+  Atkinson_Hyperlegible_Next,
+  Literata,
+} from "next/font/google";
+import "./globals.css";
+
+// next/font downloads these font files at build time and serves them from our
+// own domain, so visitors' browsers never contact Google. All three are
+// licensed under the SIL Open Font License 1.1. Roles are in DESIGN.md section 4.
+const literata = Literata({
+  subsets: ["latin"],
+  weight: "600",
+  display: "swap",
+  variable: "--font-literata",
+});
+
+const atkinson = Atkinson_Hyperlegible_Next({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  display: "swap",
+  variable: "--font-atkinson",
+});
+
+// Italic is loaded because code comments are italic (DESIGN.md section 7).
+const atkinsonMono = Atkinson_Hyperlegible_Mono({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  style: ["normal", "italic"],
+  display: "swap",
+  variable: "--font-atkinson-mono",
+});
+
+export const metadata: Metadata = {
+  title: "CodeBloom design tokens check",
+  description:
+    "Development page that checks CodeBloom's design tokens and fonts. Not the homepage.",
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html
+      lang="en"
+      className={`${literata.variable} ${atkinson.variable} ${atkinsonMono.variable}`}
+    >
+      <body>{children}</body>
+    </html>
+  );
+}

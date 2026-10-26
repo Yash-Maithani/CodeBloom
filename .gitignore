@@ -1,0 +1,33 @@
+# dependencies
+/node_modules
+
+# next.js build output
+/.next/
+/out/
+/build
+next-env.d.ts
+*.tsbuildinfo
+
+# test and browser-check output
+/test-results/
+/playwright-report/
+/blob-report/
+/screenshots/
+
+# temporary build output (example runner and scratch files)
+/tmp/
+*.tmp
+*.class
+*.o
+*.out
+
+# environment files and secrets
+.env*
+*.pem
+
+# logs and OS files
+npm-debug.log*
+.DS_Store
+
+# per-user Claude Code settings (the shared .claude/settings.json is committed)
+.claude/settings.local.json
