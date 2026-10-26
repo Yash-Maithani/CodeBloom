@@ -46,7 +46,7 @@ const story = [
 export default async function HomePage() {
   // Read at build time from the checked example files (see content/home-example.ts).
   const example = await readExample(homeExample.language, homeExample.file);
-  const lines = highlight(example.code);
+  const lines = await highlight(example.code, example.language);
   checkNotes(homeExample.notes, lines.length, `${homeExample.language}/${homeExample.file}`);
 
   return (

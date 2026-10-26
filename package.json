@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit",
     "test:e2e": "npm run build && playwright test",
     "test:runner": "node --test \"scripts/**/*.test.mjs\"",
+    "test:unit": "node --test \"src/**/*.test.ts\"",
     "check:examples": "node scripts/check-examples.mjs",
     "verify:browser": "node scripts/verify-browser.mjs"
   },
@@ -17,7 +18,8 @@
     "lucide-react": "^1.61.0",
     "next": "^16.4.3",
     "react": "^19.3.0",
-    "react-dom": "^19.3.0"
+    "react-dom": "^19.3.0",
+    "shiki": "4.5.0"
   },
   "devDependencies": {
     "@playwright/test": "1.63.0",
