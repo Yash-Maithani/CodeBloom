@@ -60,8 +60,8 @@
   --text-3xl--line-height: 1.15;
   --text-4xl: 3rem;
   --text-4xl--line-height: 1.1;
-  /* DESIGN.md calls this size "code". It is named "mono" here because
-     text-code would clash with the code surface color (bg-code, text-code). */
+  /* Code size, text-mono (decision D12). Not "code", because text-code would
+     clash with the code surface color (bg-code, text-code). */
   --text-mono: 0.9375rem;
   --text-mono--line-height: 1.6;
 

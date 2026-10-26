@@ -25,6 +25,8 @@ import { chromium } from "@playwright/test";
 const ROOT = fileURLToPath(new URL("../", import.meta.url));
 const PORT = 3101;
 const BASE = `http://127.0.0.1:${PORT}/`;
+// The token page moved here from / in Milestone 1, when / became the homepage.
+const TOKENS_PAGE = `${BASE}dev/tokens`;
 const SCREENSHOTS = `${ROOT}screenshots/`;
 const WIDTHS = [360, 1440];
 const THEMES = ["light", "dark"];
@@ -239,7 +241,7 @@ async function runScenario(browser, design, { label, theme, systemScheme, width,
     if (/\.(woff2?|ttf|otf)(\?|$)/.test(r.url()) || /fonts\.(googleapis|gstatic)\.com/.test(r.url())) fontRequests.push(r.url());
   });
 
-  await page.goto(BASE, { waitUntil: "networkidle" });
+  await page.goto(TOKENS_PAGE, { waitUntil: "networkidle" });
   if (forceAttribute) await page.evaluate((t) => document.documentElement.setAttribute("data-theme", t), theme);
   await page.evaluate(() => document.fonts.ready);
 
@@ -248,7 +250,7 @@ async function runScenario(browser, design, { label, theme, systemScheme, width,
   const probes = design.contrast.map(({ fg, bg }) => ({ fg, bg }));
   const cssVars = [
     ...Object.keys(design.type).flatMap((t) => {
-      const name = t === "code" ? "mono" : t.replace("text-", "");
+      const name = t.replace("text-", "");
       return [`--text-${name}`, `--text-${name}--line-height`];
     }),
     ...design.spacing.map((px) => `--spacing-${px / 4}`),
@@ -298,11 +300,11 @@ async function runScenario(browser, design, { label, theme, systemScheme, width,
   const num = (v) => parseFloat(v);
   const sizeFailures = [];
   for (const [token, spec] of Object.entries(design.type)) {
-    const name = token === "code" ? "mono" : token.replace("text-", "");
+    const name = token.replace("text-", "");
     if (Math.abs(num(m.vars[`--text-${name}`]) - spec.rem) > 1e-6) sizeFailures.push(`${token}: ${m.vars[`--text-${name}`]} vs ${spec.rem}rem`);
     if (Math.abs(num(m.vars[`--text-${name}--line-height`]) - spec.lineHeight) > 1e-6) sizeFailures.push(`${token} line height: ${m.vars[`--text-${name}--line-height`]} vs ${spec.lineHeight}`);
   }
-  check(group, `${Object.keys(design.type).length} type sizes match DESIGN.md (code size is named "mono")`, sizeFailures.length === 0, sizeFailures.join("; "));
+  check(group, `${Object.keys(design.type).length} type sizes match DESIGN.md`, sizeFailures.length === 0, sizeFailures.join("; "));
   const spaceFailures = design.spacing.filter((px) => Math.abs(num(m.vars[`--spacing-${px / 4}`]) * 16 - px) > 1e-6);
   check(group, `${design.spacing.length} spacing steps match DESIGN.md`, spaceFailures.length === 0, `wrong: ${spaceFailures}`);
   const radiusFailures = Object.entries(design.radius).filter(([name, px]) => num(m.vars[`--radius-${name}`]) !== px);
@@ -346,7 +348,8 @@ async function runScenario(browser, design, { label, theme, systemScheme, width,
 
 // ---------- main ----------
 
-const design = parseDesign(await readFile(`${ROOT}DESIGN.md`, "utf8"));
+// A Windows checkout may save DESIGN.md with \r\n line endings; the parser expects \n.
+const design = parseDesign((await readFile(`${ROOT}DESIGN.md`, "utf8")).replace(/\r\n?/g, "\n"));
 check("DESIGN.md", "parsed 18 light colors, 18 dark colors", Object.keys(design.colors.light).length === 18 && Object.keys(design.colors.dark).length === 18, `${Object.keys(design.colors.light).length} / ${Object.keys(design.colors.dark).length}`);
 check("DESIGN.md", "parsed contrast pairs, type scale, spacing and radius", design.contrast.length > 0 && Object.keys(design.type).length === 9 && design.spacing?.length === 9 && !!design.radius && design.motion.fast === 120, `pairs ${design.contrast.length}, type ${Object.keys(design.type).length}, spacing ${design.spacing?.length}, radius ${JSON.stringify(design.radius)}`);
 

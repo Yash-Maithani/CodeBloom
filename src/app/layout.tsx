@@ -32,10 +32,22 @@ const atkinsonMono = Atkinson_Hyperlegible_Mono({
   variable: "--font-atkinson-mono",
 });
 
+// Pages set their own title; the template adds "| CodeBloom" to it.
 export const metadata: Metadata = {
-  title: "CodeBloom design tokens check",
+  // Provisional icon: an SVG for modern browsers and a 32px PNG as fallback,
+  // both in public/. The final favicon is a launch item (brief Section 16).
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/icon-32.png", type: "image/png", sizes: "32x32" },
+    ],
+  },
+  title: {
+    default: "CodeBloom: programming explained line by line",
+    template: "%s | CodeBloom",
+  },
   description:
-    "Development page that checks CodeBloom's design tokens and fonts. Not the homepage.",
+    "Beginner programming lessons in C, C++, Java and Python, with plain-English notes beside the code. The first lessons are being written.",
 };
 
 export default function RootLayout({

@@ -13,7 +13,10 @@ test("home route opens, shows its heading and loads the three fonts", async ({
   expect(response?.status()).toBe(200);
   await expect(page).toHaveTitle(/CodeBloom/);
   await expect(
-    page.getByRole("heading", { level: 1, name: "Design tokens check" }),
+    page.getByRole("heading", {
+      level: 1,
+      name: "Learn to program with patient, line-by-line explanations",
+    }),
   ).toBeVisible();
 
   const loadedFamilies = await page.evaluate(async () => {
@@ -34,4 +37,11 @@ test("home route opens, shows its heading and loads the three fonts", async ({
   }
 
   expect(problems).toEqual([]);
+});
+
+test("the token check page still opens and asks not to be indexed", async ({ page }) => {
+  const response = await page.goto("/dev/tokens");
+  expect(response?.status()).toBe(200);
+  await expect(page.getByRole("heading", { level: 1, name: "Design tokens check" })).toBeVisible();
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex, nofollow");
 });

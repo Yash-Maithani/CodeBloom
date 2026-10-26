@@ -1,0 +1,22 @@
+# Line endings: text files are checked out with LF on every operating system,
+# whatever core.autocrlf says on a developer's machine. The site and its tests
+# compare code character by character, and a stray \r breaks that.
+* text=auto eol=lf
+
+# Shell scripts must be LF or Linux refuses to run them.
+*.sh text eol=lf
+
+# Binary files: never converted, never diffed as text.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.avif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+*.pdf binary
+*.zip binary

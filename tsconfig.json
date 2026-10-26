@@ -5,6 +5,7 @@
     "allowJs": false,
     "skipLibCheck": true,
     "strict": true,
+    "allowImportingTsExtensions": true,
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
@@ -14,7 +15,7 @@
     "jsx": "react-jsx",
     "incremental": true,
     "plugins": [{ "name": "next" }],
-    "paths": { "@/*": ["./src/*"] }
+    "paths": { "@/*": ["./src/*"], "@content/*": ["./content/*"] }
   },
   "include": [
     "next-env.d.ts",
