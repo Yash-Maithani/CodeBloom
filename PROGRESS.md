@@ -36,6 +36,8 @@ Last updated: 2026-10-26
 | Syntax colors in code blocks (D21) | Verified in browser | Shiki 4.5.0, server only. `src/lib/highlight.ts` maps Shiki scope names to the four `DESIGN.md` roles; `CodeBlock` is unchanged |
 | Highlighter unit tests | Tested | `src/lib/highlight.test.ts`, 9 tests, `npm run test:unit` |
 | Provisional favicon (D27) | Verified in browser | `public/icon.svg` and `public/icon-32.png`. Final favicon is still a launch item |
+| Windows line-ending fix (D29) | Tested | `.gitattributes`; one normalizer used by the example loader, the highlighter and `check:examples`; 27 new regression tests. Tested on a CRLF copy under Node 20 on Linux, not on real Windows |
+| ESLint 9 and Node requirement (D30, D31) | Tested | Peer warnings gone; `engines` now says Node 22.18 or newer; `test:runner` works on Node 20 and 22 |
 
 ## In progress
 
@@ -56,7 +58,7 @@ Nothing beyond owner review of Milestone 1.
 | next | 16.4.3 | Latest at scaffold time. App Router, Turbopack default |
 | react, react-dom | 19.3.0 | What `create-next-app` 16.4.3 installs |
 | typescript | 5.9.3 | See D8 |
-| eslint | 10.13.0 | See D8 |
+| eslint | 9.39.5 | Moved down from 10.13.0, see D30. npm prints a deprecation notice for it |
 | eslint-config-next | 16.4.3 | Same version as `next` |
 | tailwindcss, @tailwindcss/postcss | 4.3.3 | Tailwind's documented PostCSS setup, see D9 |
 | postcss | 8.5.31 | Required by the Tailwind plugin |
@@ -64,7 +66,7 @@ Nothing beyond owner review of Milestone 1.
 | @types/node | 22.20.5 | Matches the Node 22 in use |
 | lucide-react | 1.61.0 | Icons (ISC). Added in Milestone 1, see D22 |
 | shiki | 4.5.0 (exact) | Syntax highlighting, server only (MIT, 4 MB plus 14 MB of grammars and themes in `node_modules`, none sent to browsers). See D21 |
-| Node, npm | 22.22.0, 10.9.4 | `engines` asks for Node 22.13 or newer |
+| Node, npm | 22.22.0, 10.9.4 | `engines` asks for Node 22.18 or newer, see D31 |
 
 Official sources read: Next.js installation and ESLint pages (Node 20.9 minimum, TypeScript 5.1 minimum, ESLint 9 and 10 supported, Node 22.13 or newer needed for ESLint 10) and the Tailwind Next.js guide.
 
@@ -81,6 +83,10 @@ The OFL allows free use, self-hosting and embedding in a website; the font files
 
 ## Known limitations
 
+- `check:examples` is verified on Linux only. On Windows expect it to fail or misbehave: it starts `python3` (Windows normally has `python` or `py`), runs the compiled C and C++ programs without an `.exe` extension, assumes `gcc`, `g++`, `javac` and `java` are installed and on PATH, and stops a hung example by killing a Unix process group, which Windows does not have (it falls back to killing only the first process). Run it in WSL or a cloud session. Nothing in this project has been run on real Windows; the Windows checks so far are a simulation (a CRLF copy of the tree, Node 20, on Linux).
+- Node 20 is not supported. Per the Node.js release schedule it reached end of life on 2026-04-30. `engines` asks for Node 22.18 or newer because `npm run test:unit` uses Node's built-in TypeScript support, which starts at 22.18.0 (measured: 22.17.1 fails, 22.18.0 passes). On Node 20 `npm ci` prints an `EBADENGINE` warning. With Node 20 the site, build, lint, typecheck, browser tests, `check:examples`, `test:runner` and `verify:browser` all passed in the simulation; only `test:unit` cannot run.
+- `npm ci` prints a deprecation notice for ESLint 9.39.5 ("no longer supported"). It is the newest ESLint 9 (npm's `maintenance` tag), and it is the one that carries the notice. See D30 for the trade-off.
+- A Windows working copy that was checked out before `.gitattributes` existed keeps CRLF files until Git rewrites them. The site no longer depends on that (D29), but a fresh clone gets LF.
 - Build warning, still printed: Next.js says "Failed to find font override values" for Atkinson Hyperlegible Next and Mono, so it cannot generate size-matched fallback fonts. Measured in Milestone 1: Lighthouse CLS is 0 on every page, mobile and desktop. With every font file delayed by 2 seconds in Playwright, CLS is 0.0368 (home), 0.0478 (courses) and 0.0164 (course page) at 360px, and 0.0201, 0.0138 and 0.0022 at 1440px. All are below the 0.1 "good" threshold, so no fix was made. Not silenced.
 - A direct request to `/favicon.ico` still returns 404. Browsers that find the icon links do not make it, and Lighthouse no longer reports it. A crawler or old browser that asks for it anyway would get a 404.
 - Lighthouse mobile performance varies between runs in this container, with no code change in between: homepage 74, 96, 98 and 97 in Milestone 1, then 86 (before the favicon) and 96 (after) in the Shiki session. Total blocking time moves between about 110 and 770 ms. Desktop is steady at 100.
@@ -133,6 +139,11 @@ The OFL allows free use, self-hosting and embedding in a website; the font files
 | 2026-10-26 | Provisional favicon, Lighthouse 13.5.0 before and after | Before: best practices 96 on all six runs (home, courses, course page; mobile and desktop); the only console error was the `/favicon.ico` 404. After: best practices 100 on all six, console errors none, accessibility 100 and SEO 100 unchanged. Performance: desktop 100 on all three pages; mobile 96 (home), 98 (courses), 95 (course page), within the known run-to-run variance. CLS 0 everywhere. |
 | 2026-10-26 | `design:accessibility-review` approach with axe-core 4.14.0 (outside the repo) | 28 scans (`/`, `/courses`, four course pages, 404; light and dark; 360 and 1440 px): 0 violations, 0 items needing review. Syntax colors use only existing tokens, so no new contrast pairs exist; `syntax-literal` on `code` is documented at 6.46:1 light and 9.46:1 dark and is checked by `verify:browser`. |
 | 2026-10-26 | Final gates on the Shiki and favicon code | `lint` exit 0, `typecheck` exit 0 (from a clean build folder), `build` exit 0 with all routes static and the two known font warnings, `test:e2e` 45 of 45, `check:examples` 5 of 5, `test:runner` 10 of 10, `test:unit` 9 of 9, `verify:browser` 114 of 114, `npm audit` 0 vulnerabilities (all and production only). |
+| 2026-10-26 | Windows crash reproduced (owner report) | Converted the homepage example to CRLF and ran `npm run build`: `highlight(python): line 1 changed while splitting. source: "age = 17\r" rebuilt: "age = 17"`. Cause: Shiki treats `\r\n` as one line break and drops the `\r`, so the highlighter's own safety check (every rebuilt line must equal its source line) refused the input, correctly, but a harmless line-ending difference should not stop the build. The repository itself was already all LF (60 text files, 1 binary). |
+| 2026-10-26 | Line-ending regression tests (`npm run test:unit`, 36 tests) | 27 new: the loader with LF, CRLF, no final newline, final line ending in a lone `\r`, old-Mac `\r`, mixed endings, trailing spaces, blank lines and tabs; CRLF copies of the real example files must load identically to the LF originals; for all four languages, CRLF, CRLF plus a trailing `\r`, lone `\r` and mixed endings must give the same tokens as LF and rebuild the normalized source exactly (expected values written independently of the code under test). Negative control: with the normalizer turned into a no-op, 25 of 36 failed, including the owner's exact error message; restored, 36 of 36 pass. `test:runner` gained 2 tests (12 total): CRLF source and expected files pass; a missing blank line or a trailing space still fails. |
+| 2026-10-26 | `.gitattributes` checked in a scratch repository | Cloned with `core.autocrlf=true` and `core.eol=crlf`, as on Windows. Without the file: example and shell script check out as CRLF. With it: LF everywhere, the PNG is untouched and byte-identical. Renormalizing the committed tree changes 0 stored files, so adding the file causes no diff noise. |
+| 2026-10-26 | ESLint peer ranges verified | `eslint-plugin-import` 2.32.0 declares peer ESLint up to ^9, `eslint-plugin-jsx-a11y` 6.10.2 up to ^9, `eslint-plugin-react` 7.37.5 up to ^9.7. These are the latest releases, so none widens to 10. `npm ls` reported ESLint 10.13.0 as invalid for all three. `eslint-config-next` itself accepts `>=9`; `react-hooks` and `typescript-eslint` already include 10. After moving to ESLint 9.39.5: `npm ls` reports 0 invalid or peer problems and lint exits 0. |
+| 2026-10-26 | Windows simulation: CRLF copy of the whole tree, Node 20.20.2, Linux | `npm ci` exit 0 with two notices only (`EBADENGINE` for Node 22.18 and the ESLint 9 deprecation). `lint`, `typecheck`, `build` (homepage renders), `test:e2e` 45 of 45, `check:examples` 5 of 5, `test:runner` 12 of 12, `verify:browser` 114 of 114 all exit 0. Found and fixed on the way: `test:runner` used a glob that `node --test` only understands from Node 21 on (now an explicit file path, tested on Node 20.20.2 and 22.22.0); `test:unit` cannot run on Node 20, and its real minimum is Node 22.18.0 (measured), not the 22.13 that `engines` said. |
 
 ### What `verify:browser` covers
 
@@ -157,7 +168,7 @@ Screenshots are saved to `screenshots/` (`light-360.png`, `light-1440.png`, `dar
 | D5 | 2026-10-26 | Literata, Atkinson Hyperlegible Next and Mono | Legibility of easily confused characters for beginners reading code. |
 | D6 | 2026-10-26 | No `ARCHITECTURE.md`, lesson guide or testing guide yet | Would be guesswork before code exists; decisions are logged here. |
 | D7 | 2026-10-26 | Owner Git workflow: commits authored by Yash-Maithani, no Claude attribution, Claude never opens or updates pull requests | Owner instruction for Milestone 0b; recorded in `CLAUDE.md`. |
-| D8 | 2026-10-26 | TypeScript 5.9.3 and ESLint 10.13.0, not TypeScript 7.0.2 | Next.js requires TypeScript 5.1 or newer and `typescript-eslint` (used by `eslint-config-next`) supports TypeScript below 6.1, so version 7 is outside the supported range. Next.js docs list ESLint 9 and 10 as supported; the ESLint 9 release that `create-next-app` installs prints a "no longer supported" deprecation notice, so 10 was chosen. `npm ci` and lint run clean. If a future `eslint-config-next` breaks on ESLint 10, fall back to 9. |
+| D8 | 2026-10-26 | TypeScript 5.9.3 and ESLint 10.13.0, not TypeScript 7.0.2 | Next.js requires TypeScript 5.1 or newer and `typescript-eslint` (used by `eslint-config-next`) supports TypeScript below 6.1, so version 7 is outside the supported range. Next.js docs list ESLint 9 and 10 as supported; the ESLint 9 release that `create-next-app` installs prints a "no longer supported" deprecation notice, so 10 was chosen. `npm ci` and lint run clean. If a future `eslint-config-next` breaks on ESLint 10, fall back to 9. The ESLint half of this decision was reversed by D30. |
 | D9 | 2026-10-26 | Tailwind through `@tailwindcss/postcss`, not the `@tailwindcss/turbopack` loader that `create-next-app` 16.4.3 sets up | Tailwind's own Next.js guide documents PostCSS; it works with any bundler. Costs one extra package (`postcss`). |
 | D10 | 2026-10-26 | `@playwright/test` pinned to exactly 1.63.0 | The pre-installed Chromium belongs to that version; a newer version would not find it. Raise the pin together with the environment. |
 | D11 | 2026-10-26 | Cache Components and `AGENTS.md` from the `create-next-app` defaults were not adopted | Not needed yet (SPEC: static by default, no premature features); `AGENTS.md` would duplicate `CLAUDE.md`. |
@@ -178,6 +189,9 @@ Screenshots are saved to `screenshots/` (`light-360.png`, `light-1440.png`, `dar
 | D26 | 2026-10-26 | `CodeBlock` is a client component; code is split into lines on the server | Needed for Copy code, Hide notes and hover. A highlighter would run on the server and pass tokens in. |
 | D27 | 2026-10-26 | Provisional favicon: `public/icon.svg` plus `public/icon-32.png` (rendered from the SVG with the pre-installed Chromium), linked from the root layout metadata | Owner approved. A green "C" on a `paper` tile with an `ink` border, using three `DESIGN.md` light-theme tokens (`paper`, `ink`, `accent`); no gradient, no emoji. The SVG cannot read CSS variables, so the three hex values are written in it with a comment naming the tokens. It stops the `/favicon.ico` error. The final favicon stays a launch item (brief Section 16). |
 | D28 | 2026-10-26 | Unit tests run with Node's built-in test runner and TypeScript type stripping (`npm run test:unit`); `allowImportingTsExtensions` added to `tsconfig.json` | No test framework dependency. The setting only lets test files write `./highlight.ts`; `noEmit` is already on, so it changes nothing in the build. |
+| D29 | 2026-10-26 | Line endings: `.gitattributes` (`* text=auto eol=lf`, binary files listed) plus one rule, `\r\n` and a lone `\r` become `\n`, applied wherever repository text is read: the example loader, the highlighter input, `check:examples`, the e2e tests and the `DESIGN.md` parser in `verify:browser` | Owner bug report on Windows (autocrlf). The attributes file fixes new checkouts; the normalizer makes the site safe regardless. Only line endings change: spaces, tabs, blank lines and a final newline are kept. `src/lib/line-endings.ts` and `scripts/lib/example-runner.mjs` each hold the one-line rule, because the script runs as plain Node and does not read TypeScript. The highlighter's exact-rebuild safety check stays. |
+| D30 | 2026-10-26 | ESLint 9.39.5 instead of 10.13.0 (supersedes the ESLint part of D8) | Owner instruction, after verifying the facts: the latest `eslint-plugin-import`, `jsx-a11y` and `react` declare peer ESLint only up to ^9, so ESLint 10 produced peer warnings on every install. Costs: ESLint 9.39.5, the newest 9.x, is marked deprecated, so `npm ci` prints one "no longer supported" notice instead of three peer warnings. Benefit: ESLint 9 runs on Node 20.9 and newer, while ESLint 10 needs 20.19 or newer. Revisit when those three plugins publish ESLint 10 support. |
+| D31 | 2026-10-26 | `engines` set to Node 22.18 or newer; `test:runner` runs an explicit file instead of a glob | The old floor (22.13) was chosen for ESLint 10 and was wrong once `test:unit` relied on built-in TypeScript support (22.18.0 and up, measured). The glob form works only on Node 21 and newer; the explicit path works on Node 20 and 22 and on Windows. A new file in `scripts/` must be added to the script. Node 20 stays unsupported (end of life since 2026-04-30). |
 
 ## Environment (verified 2026-10-26, cloud session)
 
@@ -196,6 +210,7 @@ Owner reviews Milestone 1 and opens the pull request. After the owner merges it:
 ## Resuming work
 
 ```
+# Needs Node 22.18 or newer. Windows: use WSL for check:examples (see Known limitations).
 npm ci                      # install exactly what package-lock.json says
 npm run dev                 # development server on http://localhost:3000
 npm run lint
