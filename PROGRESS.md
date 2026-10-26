@@ -6,7 +6,7 @@ Last updated: 2026-10-26
 
 ## Current milestone
 
-**Milestone 1: design system components and homepage.** Implemented, Tested and Verified in browser (Chromium only; light and dark; 360, 768 and 1440px; keyboard only). One part waits for the owner: syntax colors in code blocks (decision D21). Code currently shows without colors, which `DESIGN.md` allows. Awaiting owner review and a pull request opened by the owner. Nothing is Deployed.
+**Milestone 1: design system components and homepage.** Implemented, Tested and Verified in browser (Chromium only; light and dark; 360, 768 and 1440px; keyboard only). Includes two owner-approved follow-ups: syntax colors with Shiki (D21) and a provisional favicon (D27). Awaiting owner review and a pull request opened by the owner. Nothing is Deployed.
 
 ## Completed work
 
@@ -32,17 +32,20 @@ Last updated: 2026-10-26
 | 404 page | Verified in browser | Header, footer and two links |
 | Components: header, navigation, footer, course card, note callout, code block with margin notes | Verified in browser | `src/components/` |
 | Token page moved to `/dev/tokens` | Tested | Linked from nowhere, `noindex, nofollow`. noindex is not access control: anyone with the address can open it. Delete before launch |
-| 34 Playwright tests | Tested | Navigation crawl, honesty, keyboard, layout and themes, smoke |
+| 45 Playwright tests | Tested | Navigation crawl, honesty, keyboard, layout and themes, smoke, syntax roles, favicon links, and a guard that no Shiki code reaches the browser |
+| Syntax colors in code blocks (D21) | Verified in browser | Shiki 4.5.0, server only. `src/lib/highlight.ts` maps Shiki scope names to the four `DESIGN.md` roles; `CodeBlock` is unchanged |
+| Highlighter unit tests | Tested | `src/lib/highlight.test.ts`, 9 tests, `npm run test:unit` |
+| Provisional favicon (D27) | Verified in browser | `public/icon.svg` and `public/icon-32.png`. Final favicon is still a launch item |
 
 ## In progress
 
-Syntax colors for code blocks: waiting for the owner's choice between Shiki and an in-house highlighter (D21). Only `src/lib/highlight.ts` changes once decided.
+Nothing beyond owner review of Milestone 1.
 
 ## Outstanding tasks
 
-1. Owner decides D21 (syntax highlighter), then Claude adds syntax colors and reruns the checks.
-2. Owner reviews Milestone 1 and opens the pull request.
-3. A favicon. The browser asks for `/favicon.ico` and gets a 404, which Lighthouse counts as a console error. The final favicon is a launch item (brief Section 16); the owner may want an interim one sooner.
+1. Owner reviews Milestone 1, including syntax colors and the provisional favicon, and opens the pull request.
+2. Launch items still open (brief Section 16): the final favicon, social sharing metadata, and removing `/dev/tokens`.
+3. Optional, needs approval as a dependency: the small `server-only` package, which would turn an accidental client import of the highlighter into a build error (today the bundle test catches it).
 4. See the SessionStart hook install dependencies in a brand-new cloud session (so far it has run on a resumed session, where it correctly skipped the install).
 5. Owner answers the open decisions in `SPEC.md` Section 10 as each milestone needs them.
 
@@ -60,6 +63,7 @@ Syntax colors for code blocks: waiting for the owner's choice between Shiki and 
 | @playwright/test | 1.63.0 (exact) | Matches the pre-installed Chromium, see D10 |
 | @types/node | 22.20.5 | Matches the Node 22 in use |
 | lucide-react | 1.61.0 | Icons (ISC). Added in Milestone 1, see D22 |
+| shiki | 4.5.0 (exact) | Syntax highlighting, server only (MIT, 4 MB plus 14 MB of grammars and themes in `node_modules`, none sent to browsers). See D21 |
 | Node, npm | 22.22.0, 10.9.4 | `engines` asks for Node 22.13 or newer |
 
 Official sources read: Next.js installation and ESLint pages (Node 20.9 minimum, TypeScript 5.1 minimum, ESLint 9 and 10 supported, Node 22.13 or newer needed for ESLint 10) and the Tailwind Next.js guide.
@@ -78,9 +82,12 @@ The OFL allows free use, self-hosting and embedding in a website; the font files
 ## Known limitations
 
 - Build warning, still printed: Next.js says "Failed to find font override values" for Atkinson Hyperlegible Next and Mono, so it cannot generate size-matched fallback fonts. Measured in Milestone 1: Lighthouse CLS is 0 on every page, mobile and desktop. With every font file delayed by 2 seconds in Playwright, CLS is 0.0368 (home), 0.0478 (courses) and 0.0164 (course page) at 360px, and 0.0201, 0.0138 and 0.0022 at 1440px. All are below the 0.1 "good" threshold, so no fix was made. Not silenced.
-- The browser's automatic `/favicon.ico` request returns 404 (no favicon yet). Lighthouse reports it under "errors in console".
-- Lighthouse mobile scores vary between runs in this container: the first homepage run scored 74 (total blocking time 768 ms); three reruns scored 96, 98 and 97 (113 to 164 ms).
-- Syntax colors are not shown yet (D21).
+- A direct request to `/favicon.ico` still returns 404. Browsers that find the icon links do not make it, and Lighthouse no longer reports it. A crawler or old browser that asks for it anyway would get a 404.
+- Lighthouse mobile performance varies between runs in this container, with no code change in between: homepage 74, 96, 98 and 97 in Milestone 1, then 86 (before the favicon) and 96 (after) in the Shiki session. Total blocking time moves between about 110 and 770 ms. Desktop is steady at 100.
+- The comment role is covered by unit tests only. The homepage example has no comment, so the browser tests check keywords and literals.
+- A client component that imports `src/lib/highlight.ts` would not fail the build; the bundle test catches it (shown by a negative control). See Outstanding tasks for the optional `server-only` guard.
+- Keywords come from an explicit scope list in `highlight.ts`. A keyword the list misses stays plain, which is harmless; a type name such as Java's `String` is never bold. Add scopes when a lesson shows a missed keyword.
+- `npm run test:unit` prints a Node warning (`MODULE_TYPELESS_PACKAGE_JSON`) because `package.json` has no `"type"` field. It is harmless. Setting `"type": "module"` was not done because it changes how every config file loads.
 - The example runner is not a sandbox. It runs repository files with the permissions of whoever runs it. It is safe for reviewed files only. See `CLAUDE.md` Security.
 - Italic Atkinson Mono is loaded (4 Mono files in total) because code comments are italic. File weight is not optimized yet.
 - Dark-theme token values appear twice in `globals.css` (system preference and forced `data-theme`), because CSS cannot share one rule between them. The verify script checks both paths.
@@ -109,7 +116,7 @@ The OFL allows free use, self-hosting and embedding in a website; the font files
 | 2026-10-26 | `npm audit`, `npm ls` | 0 vulnerabilities, no invalid or missing packages. |
 | 2026-10-26 | Document hygiene | No em or en dashes in authored files. No raw hex values outside `globals.css`. `CODEBLOOM_MASTER_BRIEF.md`, `SPEC.md` and `DESIGN.md` unchanged. |
 | 2026-10-26 | SessionStart hook on resume (Milestone 1 session) | Ran automatically at resume: "node_modules already matches package-lock.json, install skipped." Earlier in the same container it did not run, because the checkout then predated `.claude/`; run by hand it installed 366 packages in 18.5 s, then skipped on the second run. |
-| 2026-10-26 | Shiki 4.5.0 evaluated in a scratch folder (not in the repo) | Correct tokens for C, C++, Java and Python, including C++ raw strings, Java text blocks, Python f-strings and triple-quoted strings, and comment markers inside strings. 45 packages, 23 MB in `node_modules`, highlighter start 37 ms. Decision D21 pending. |
+| 2026-10-26 | Shiki 4.5.0 evaluated in a scratch folder (not in the repo) | Correct tokens for C, C++, Java and Python, including C++ raw strings, Java text blocks, Python f-strings and triple-quoted strings, and comment markers inside strings. 45 packages, 23 MB in `node_modules`, highlighter start 37 ms. Decision D21 was then approved by the owner (see the Shiki rows below). |
 | 2026-10-26 | `design:ux-copy` on all Milestone 1 copy | Lead changed to future tense ("Lessons will explain"); example caption "An example of how lessons explain code"; lesson step 3 says "run", not "compiled and run", because Python is not compiled like C or Java; copy button "Copy code" with a failure message that says what to do. Owner's story kept word for word. |
 | 2026-10-26 | `frontend-design:frontend-design` | Composition: left-aligned stacked hero with the annotated code block as the one bold element; plain numerals for lesson steps so they are not confused with note markers; 2 by 2 course cards. |
 | 2026-10-26 | `website-design:landing-page` | Built the homepage, courses page, course pages and 404 to `DESIGN.md`. |
@@ -118,6 +125,14 @@ The OFL allows free use, self-hosting and embedding in a website; the font files
 | 2026-10-26 | Lighthouse 13.5.0 (outside the repo), Playwright Chromium | Desktop: performance 100, accessibility 100, best practices 96, SEO 100 on all three pages; CLS 0. Mobile: performance 74 then 96, 98, 97 on reruns (home), 98 (courses), 96 (course page); accessibility 100; CLS 0 everywhere. Best practices 96 is the favicon 404. |
 | 2026-10-26 | Final gates on the Milestone 1 code | `lint` 0 problems, `typecheck` 0 errors, `build` all routes static (two known font warnings), `test:e2e` 34 of 34 passed, `check:examples` 5 of 5, `test:runner` 10 of 10, `verify:browser` 114 of 114 (now on `/dev/tokens`), `npm audit --omit=dev` 0 vulnerabilities, no server-only code in client chunks. |
 | 2026-10-26 | Negative control for the navigation tests | Added a footer link to a page that does not exist: the crawl test and the link test both failed; the link was removed. |
+| 2026-10-26 | Shiki 4.5.0 installed (exact), `src/lib/highlight.ts` rewritten | Probed the real scope names for C, C++, Java and Python before writing the mapping. Findings that shaped it: the `f` of an f-string and the `0x` of a hex number are `storage.type` scopes inside literals; Java type names such as `String` are plain `storage.type`; word operators (`new`, `and`, `not`, `instanceof`) are scoped as operators; Javadoc tags carry keyword scopes inside comments; the Java imported package name is scoped as a modifier. Rules: comment beats literal beats keyword, symbols stay plain, keywords come from an explicit list. Edge spaces are moved out of styled spans. The tokens of every line are checked to rebuild the source line exactly, or the build stops. |
+| 2026-10-26 | `npm run test:unit` | 9 of 9 passed: C directives, suffixes, escapes and comments; C++ `new` and raw strings; Java types, `instanceof`, Javadoc, text blocks and imports; Python f-strings, hex, `#` inside a string, `and`/`not`/`None`; scope rules; exact line rebuild with blank lines and tabs; all example files; unknown language fails loudly. A wider hand review of structs, templates, namespaces, interfaces, records, lambdas, `with`, `try` and `global` found one false bold (the Java import name), now fixed and tested. |
+| 2026-10-26 | Syntax roles in the browser (`syntax.spec.ts`) | Homepage example, light and dark: keywords `if` and `else` are weight 700 in `ink`; `17`, `18` and both strings use the `syntax-literal` color read from the token; everything else is plain. With forced colors active the code text is identical and keywords stay bold. |
+| 2026-10-26 | Guard against Shiki in the browser (`bundle.spec.ts`) | Passes: no Shiki or scope-table marker in any file under `.next/static`, and none in any script downloaded across 8 routes. Positive control passes (markers exist in Shiki's Python grammar and in the server build). Negative control: making `CodeBlock` import the highlighter as a value failed the disk scan on dozens of chunks, then was reverted. The browser-download test alone did not fail in that control, because grammar files download only when `highlight()` runs in the browser; the disk scan is the stricter check. |
+| 2026-10-26 | Client JavaScript size, previous commit against now | 13 files, 574.6 KB before and 575.8 KB with Shiki and the icon links. Homepage HTML grew from 47,364 to 48,359 bytes (more spans for colors). About 7 MB of grammar code exists only in the server build output. |
+| 2026-10-26 | Provisional favicon, Lighthouse 13.5.0 before and after | Before: best practices 96 on all six runs (home, courses, course page; mobile and desktop); the only console error was the `/favicon.ico` 404. After: best practices 100 on all six, console errors none, accessibility 100 and SEO 100 unchanged. Performance: desktop 100 on all three pages; mobile 96 (home), 98 (courses), 95 (course page), within the known run-to-run variance. CLS 0 everywhere. |
+| 2026-10-26 | `design:accessibility-review` approach with axe-core 4.14.0 (outside the repo) | 28 scans (`/`, `/courses`, four course pages, 404; light and dark; 360 and 1440 px): 0 violations, 0 items needing review. Syntax colors use only existing tokens, so no new contrast pairs exist; `syntax-literal` on `code` is documented at 6.46:1 light and 9.46:1 dark and is checked by `verify:browser`. |
+| 2026-10-26 | Final gates on the Shiki and favicon code | `lint` exit 0, `typecheck` exit 0 (from a clean build folder), `build` exit 0 with all routes static and the two known font warnings, `test:e2e` 45 of 45, `check:examples` 5 of 5, `test:runner` 10 of 10, `test:unit` 9 of 9, `verify:browser` 114 of 114, `npm audit` 0 vulnerabilities (all and production only). |
 
 ### What `verify:browser` covers
 
@@ -155,12 +170,14 @@ Screenshots are saved to `screenshots/` (`light-360.png`, `light-1440.png`, `dar
 | D18 | 2026-10-26 | No menu button while the navigation has three links or fewer | Owner approved. Saves a client component; recorded in `DESIGN.md`. |
 | D19 | 2026-10-26 | Margin-note hover highlighting is a pointer-only extra; notes are not focusable | Owner approved. Line numbers and the screen reader notes list work fully without it. |
 | D20 | 2026-10-26 | Course pages without lessons list planned topics as plain text | Owner approved; `SPEC.md` FR-C2 reworded. |
-| D21 | 2026-10-26 | Syntax highlighter: Shiki at build time or in-house. Pending | Owner asked for a comparison first. Claude recommends Shiki (see the Milestone 1 report). Not installed. |
+| D21 | 2026-10-26 | Syntax highlighting with Shiki 4.5.0 (exact version), at build and server time only. Shiki reads the code; a small table in `src/lib/highlight.ts` maps its scope names to the four `DESIGN.md` roles, and `CodeBlock` turns each role into an existing token. No color value was added or changed | Owner approved. Correct for strings, comments and numbers in all four languages, which an in-house highlighter would have to rebuild per language. Costs one package (MIT, no account, no paid plan; 18 MB in `node_modules`, none sent to browsers). Shiki's own color themes are not used. |
 | D22 | 2026-10-26 | `lucide-react` added | Owner approved. Used for two icons (note callout, copy failure). Tree-shaken per icon. |
 | D23 | 2026-10-26 | Public pages live in the `(site)` route group with the header and footer; `/dev/tokens` sits outside it; the root `not-found.tsx` adds the header and footer itself | Keeps the token page bare, so `verify:browser` still checks the focus ring on its first Tab stop. |
 | D24 | 2026-10-26 | Course data in `content/courses.ts`, imported as `@content/...` (new path alias in `tsconfig.json`) | One typed list drives cards, footer links and course pages; adding a language is one entry. |
 | D25 | 2026-10-26 | The homepage example is read at build time from `content/examples/python/vote.py` and its `.expected.txt` | The code and output on the page are the files `check:examples` really runs. Notes are checked at build time against the line count. |
 | D26 | 2026-10-26 | `CodeBlock` is a client component; code is split into lines on the server | Needed for Copy code, Hide notes and hover. A highlighter would run on the server and pass tokens in. |
+| D27 | 2026-10-26 | Provisional favicon: `public/icon.svg` plus `public/icon-32.png` (rendered from the SVG with the pre-installed Chromium), linked from the root layout metadata | Owner approved. A green "C" on a `paper` tile with an `ink` border, using three `DESIGN.md` light-theme tokens (`paper`, `ink`, `accent`); no gradient, no emoji. The SVG cannot read CSS variables, so the three hex values are written in it with a comment naming the tokens. It stops the `/favicon.ico` error. The final favicon stays a launch item (brief Section 16). |
+| D28 | 2026-10-26 | Unit tests run with Node's built-in test runner and TypeScript type stripping (`npm run test:unit`); `allowImportingTsExtensions` added to `tsconfig.json` | No test framework dependency. The setting only lets test files write `./highlight.ts`; `noEmit` is already on, so it changes nothing in the build. |
 
 ## Environment (verified 2026-10-26, cloud session)
 
@@ -174,7 +191,7 @@ Node 22.22.0, npm 10.9.4, Python 3.13, gcc and g++ 13.3, OpenJDK and javac 21. P
 
 ## Next recommended task
 
-Owner decides D21, then Claude adds syntax colors in `src/lib/highlight.ts` and reruns all checks. After the owner merges Milestone 1: Milestone 2, lesson architecture, planned in a new session. It starts with the open decisions it needs (lesson file format, first language) and acceptance criteria in `SPEC.md` Section 9.
+Owner reviews Milestone 1 and opens the pull request. After the owner merges it: Milestone 2, lesson architecture, planned in a new session. It starts with the open decisions it needs (lesson file format, first language) and acceptance criteria in `SPEC.md` Section 9.
 
 ## Resuming work
 
@@ -187,6 +204,7 @@ npm run build
 npm run test:e2e            # builds, then runs all Playwright tests in tests/e2e/
 npm run check:examples      # compiles and runs content/examples/ and compares output
 npm run test:runner         # tests for that runner
+npm run test:unit           # tests for the syntax highlighter
 npm run verify:browser      # needs a build first; saves screenshots/ (not committed)
 ```
 
