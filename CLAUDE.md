@@ -76,7 +76,7 @@ Target WCAG 2.1 AA. Product requirements are in `SPEC.md`; visual rules (contras
 
 ## Quality gates
 
-Run the checks that exist and read the actual output before reporting. Planned scripts, created in Milestone 0b: `npm run lint`, `npm run typecheck`, `npm run build`, `npm run test:e2e` (Playwright), `npm run check:examples` (runs lesson code and compares output).
+Run the checks that exist and read the actual output before reporting. Scripts: `npm run lint`, `npm run typecheck`, `npm run build`, `npm run test:e2e` (Playwright smoke test), `npm run check:examples` (runs the example files in `content/examples/` and compares output), `npm run test:runner` (tests that runner), `npm run verify:browser` (checks tokens, contrast and fonts in a real browser; run `npm run build` first). Cloud sessions install dependencies through the SessionStart hook in `.claude/`.
 
 - Never skip, delete or weaken a test, warning or acceptance criterion to get a pass.
 - If something cannot be tested, say so and record it in `PROGRESS.md`.
@@ -104,15 +104,22 @@ Do not use `design:design-handoff` or Figma skills unless the owner asks. UXKIN 
 - Browser checks: the pre-installed Playwright and Chromium. Do not reinstall Playwright.
 - Code review before a milestone PR: `/code-review`; for auth, input handling or execution work also `/security-review`.
 - Library docs: fetch official documentation; do not rely on memory for APIs or versions.
-- GitHub: use the GitHub MCP tools. The `gh` CLI is not available.
+- GitHub: use the GitHub MCP tools for reading. The `gh` CLI is not available.
 
 ## Git and branch safety
 
-- `main` is stable. Never commit to, push to, or merge into it. The owner merges reviewed pull requests.
-- Use the branch the session provides; otherwise branch from current `main` with a descriptive name per milestone.
+The owner's Git workflow below overrides brief Sections 4 and 15 wherever they conflict.
+
+- `main` is stable. Never commit to, push to, or merge into it.
+- Never create, update or merge pull requests. The owner opens and merges them. Use the GitHub tools to read only.
+- Commit and push only to the branch the session provides. Before every commit, run `git branch --show-current` and stop if it prints `main`.
+- Before any commit, set the repository's local identity and confirm it:
+  `git config user.name "Yash-Maithani"`, `git config user.email "145788116+Yash-Maithani@users.noreply.github.com"`, then run `git config user.name` and `git config user.email`.
+- Every commit is authored by Yash-Maithani. No `Co-Authored-By` trailers, "Generated with Claude Code" lines or any other Claude attribution in commits.
 - No force-push, reset, rebase of shared branches, branch deletion, or discarding uncommitted work without explicit approval.
 - Small, focused commits with clear messages.
-- After every push, verify the remote (`git ls-remote origin <branch>`) before saying work is saved.
+- After every push: verify the remote with `git ls-remote origin <branch>`, show `git log -1 --format="%an <%ae>"` as proof of the author, and confirm `main` has not moved (`git ls-remote origin main`, compared with the value before the push).
+- Report the branch, commit hash, changed files, verification results, and the exact steps for the owner to open the pull request.
 - If a push or branch creation fails, report the exact error and stop.
 
 ## Security

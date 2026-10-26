@@ -1,0 +1,207 @@
+@import "tailwindcss";
+
+/*
+ * CodeBloom design tokens. DESIGN.md is the source of truth: every value below
+ * comes from it. Change DESIGN.md first (with the owner's approval), then this file.
+ * `npm run verify:browser` compares these values with DESIGN.md in a real browser.
+ *
+ * How the pieces fit together:
+ *   1. @theme turns each token into a CSS variable and a Tailwind class
+ *      (for example --color-paper gives bg-paper, text-paper, border-paper).
+ *   2. Colors are defined for the light theme here, then redefined for dark below.
+ *      Components only ever use the token name, so they follow the theme automatically.
+ *   3. `static` keeps every token in the CSS output even if no class uses it yet.
+ */
+
+@theme static {
+  /* Remove Tailwind's default palette, sizes, spacing and radii so only
+     DESIGN.md values exist. An unlisted class such as p-5 produces nothing. */
+  --color-*: initial;
+  --text-*: initial;
+  --spacing: initial;
+  --radius-*: initial;
+  --shadow-*: initial;
+  --container-*: initial;
+
+  /* Color, light theme (DESIGN.md section 3) */
+  --color-paper: #f8f7f2;
+  --color-sheet: #ffffff;
+  --color-code: #f1f2ec;
+  --color-ink: #1e2320;
+  --color-ink-muted: #4f5752;
+  --color-rule: #d5d7cf;
+  --color-rule-strong: #767d78;
+  --color-accent: #1b5e45;
+  --color-accent-hover: #134634;
+  --color-accent-tint: #e3efe8;
+  --color-on-accent: #ffffff;
+  --color-success: #1a5a9e;
+  --color-success-tint: #e6eef8;
+  --color-error: #a8261b;
+  --color-error-tint: #fbeae7;
+  --color-warning: #7f5300;
+  --color-warning-tint: #faf0da;
+  --color-syntax-literal: #7f4a10;
+
+  /* Type scale (DESIGN.md section 4): size, then line height */
+  --text-xs: 0.875rem;
+  --text-xs--line-height: 1.45;
+  --text-sm: 1rem;
+  --text-sm--line-height: 1.5;
+  --text-base: 1.125rem;
+  --text-base--line-height: 1.7;
+  --text-lg: 1.3125rem;
+  --text-lg--line-height: 1.45;
+  --text-xl: 1.5rem;
+  --text-xl--line-height: 1.35;
+  --text-2xl: 1.875rem;
+  --text-2xl--line-height: 1.25;
+  --text-3xl: 2.375rem;
+  --text-3xl--line-height: 1.15;
+  --text-4xl: 3rem;
+  --text-4xl--line-height: 1.1;
+  /* DESIGN.md calls this size "code". It is named "mono" here because
+     text-code would clash with the code surface color (bg-code, text-code). */
+  --text-mono: 0.9375rem;
+  --text-mono--line-height: 1.6;
+
+  /* Spacing (DESIGN.md section 5): 4px base. The number is the count of
+     4px steps, so p-4 is 16px. Only these steps exist. */
+  --spacing-0: 0;
+  --spacing-1: 0.25rem;
+  --spacing-2: 0.5rem;
+  --spacing-3: 0.75rem;
+  --spacing-4: 1rem;
+  --spacing-6: 1.5rem;
+  --spacing-8: 2rem;
+  --spacing-12: 3rem;
+  --spacing-16: 4rem;
+  --spacing-24: 6rem;
+
+  /* Widths (DESIGN.md section 5): prose column, lesson layout, site container.
+     The prose column is named "measure" (the typographic word for line length)
+     because Tailwind has a built-in max-w-prose of 65ch that would override it. */
+  --container-measure: 68ch;
+  --container-lesson: 75rem;
+  --container-site: 80rem;
+
+  /* Radius (DESIGN.md section 6). "round" is only for the margin-note number
+     markers. Pill-shaped buttons are banned. */
+  --radius-control: 4px;
+  --radius-button: 6px;
+  --radius-panel: 8px;
+  --radius-round: 9999px;
+
+  /* One shadow, for floating layers only (DESIGN.md section 6) */
+  --shadow-float: 0 4px 16px rgb(30 35 32 / 0.12);
+
+  /* Motion (DESIGN.md section 8) */
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 300ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --default-transition-duration: var(--duration-fast);
+  --default-transition-timing-function: var(--ease-standard);
+
+  /* Breakpoints (DESIGN.md section 5): sm 640, md 768, lg 1024, xl 1280 */
+  --breakpoint-*: initial;
+  --breakpoint-sm: 40rem;
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 64rem;
+  --breakpoint-xl: 80rem;
+}
+
+/* Font stacks. The --font-* variables on the left of each fallback list are
+   set by next/font in layout.tsx. Fallbacks come from DESIGN.md section 4. */
+@theme static inline {
+  --font-*: initial;
+  --font-heading: var(--font-literata), Georgia, serif;
+  --font-sans: var(--font-atkinson), system-ui, sans-serif;
+  --font-mono: var(--font-atkinson-mono), ui-monospace, monospace;
+}
+
+:root {
+  color-scheme: light;
+}
+
+/*
+ * Dark theme. It follows the system setting unless the page forces a theme
+ * with data-theme="light" or data-theme="dark" on <html>. A visible toggle
+ * is an open decision in SPEC.md; this hook only exists so a theme can be
+ * forced explicitly (for tests now, for a toggle later).
+ * The dark values appear twice because CSS cannot share one rule between a
+ * media query and an attribute selector. Keep both blocks identical.
+ */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --color-paper: #161a18;
+    --color-sheet: #1e2321;
+    --color-code: #121614;
+    --color-ink: #e7eae5;
+    --color-ink-muted: #a9b1ab;
+    --color-rule: #343b37;
+    --color-rule-strong: #7d867f;
+    --color-accent: #7cc4a2;
+    --color-accent-hover: #9ad4b8;
+    --color-accent-tint: #1f3a2f;
+    --color-on-accent: #0f1f18;
+    --color-success: #8db8ec;
+    --color-success-tint: #1a2b3f;
+    --color-error: #f29a8e;
+    --color-error-tint: #3d1f1b;
+    --color-warning: #e3b661;
+    --color-warning-tint: #3a2e15;
+    --color-syntax-literal: #e2b27a;
+    --shadow-float: none;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-paper: #161a18;
+  --color-sheet: #1e2321;
+  --color-code: #121614;
+  --color-ink: #e7eae5;
+  --color-ink-muted: #a9b1ab;
+  --color-rule: #343b37;
+  --color-rule-strong: #7d867f;
+  --color-accent: #7cc4a2;
+  --color-accent-hover: #9ad4b8;
+  --color-accent-tint: #1f3a2f;
+  --color-on-accent: #0f1f18;
+  --color-success: #8db8ec;
+  --color-success-tint: #1a2b3f;
+  --color-error: #f29a8e;
+  --color-error-tint: #3d1f1b;
+  --color-warning: #e3b661;
+  --color-warning-tint: #3a2e15;
+  --color-syntax-literal: #e2b27a;
+  --shadow-float: none;
+}
+
+/* Reduced motion (DESIGN.md section 8): every transition becomes instant.
+   Components take their timing from these tokens, so this one rule covers them. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-base: 0ms;
+    --duration-slow: 0ms;
+  }
+}
+
+@layer base {
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    line-height: var(--text-sm--line-height);
+  }
+
+  /* Focus ring (DESIGN.md section 7): 2px ink, 2px offset, never removed. */
+  :focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+  }
+}
