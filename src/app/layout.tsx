@@ -34,6 +34,14 @@ const atkinsonMono = Atkinson_Hyperlegible_Mono({
 
 // Pages set their own title; the template adds "| CodeBloom" to it.
 export const metadata: Metadata = {
+  // Provisional icon: an SVG for modern browsers and a 32px PNG as fallback,
+  // both in public/. The final favicon is a launch item (brief Section 16).
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/icon-32.png", type: "image/png", sizes: "32x32" },
+    ],
+  },
   title: {
     default: "CodeBloom: programming explained line by line",
     template: "%s | CodeBloom",

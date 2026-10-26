@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <title>CodeBloom</title>
+  <!-- PROVISIONAL favicon. The final icon is a launch item (brief Section 16).
+       A favicon is a standalone file and cannot read the site's CSS variables,
+       so the three DESIGN.md light-theme tokens are written out here:
+       paper #F8F7F2, ink #1E2320, accent #1B5E45. Change them only with DESIGN.md. -->
+  <rect x="1" y="1" width="30" height="30" rx="6" fill="#F8F7F2" stroke="#1E2320" stroke-width="2"/>
+  <path d="M21.75 11.18 A7.5 7.5 0 1 0 21.75 20.82" fill="none" stroke="#1B5E45" stroke-width="4.5" stroke-linecap="round"/>
+</svg>
