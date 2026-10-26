@@ -248,7 +248,7 @@ async function runScenario(browser, design, { label, theme, systemScheme, width,
   const probes = design.contrast.map(({ fg, bg }) => ({ fg, bg }));
   const cssVars = [
     ...Object.keys(design.type).flatMap((t) => {
-      const name = t === "code" ? "mono" : t.replace("text-", "");
+      const name = t.replace("text-", "");
       return [`--text-${name}`, `--text-${name}--line-height`];
     }),
     ...design.spacing.map((px) => `--spacing-${px / 4}`),
@@ -298,11 +298,11 @@ async function runScenario(browser, design, { label, theme, systemScheme, width,
   const num = (v) => parseFloat(v);
   const sizeFailures = [];
   for (const [token, spec] of Object.entries(design.type)) {
-    const name = token === "code" ? "mono" : token.replace("text-", "");
+    const name = token.replace("text-", "");
     if (Math.abs(num(m.vars[`--text-${name}`]) - spec.rem) > 1e-6) sizeFailures.push(`${token}: ${m.vars[`--text-${name}`]} vs ${spec.rem}rem`);
     if (Math.abs(num(m.vars[`--text-${name}--line-height`]) - spec.lineHeight) > 1e-6) sizeFailures.push(`${token} line height: ${m.vars[`--text-${name}--line-height`]} vs ${spec.lineHeight}`);
   }
-  check(group, `${Object.keys(design.type).length} type sizes match DESIGN.md (code size is named "mono")`, sizeFailures.length === 0, sizeFailures.join("; "));
+  check(group, `${Object.keys(design.type).length} type sizes match DESIGN.md`, sizeFailures.length === 0, sizeFailures.join("; "));
   const spaceFailures = design.spacing.filter((px) => Math.abs(num(m.vars[`--spacing-${px / 4}`]) * 16 - px) > 1e-6);
   check(group, `${design.spacing.length} spacing steps match DESIGN.md`, spaceFailures.length === 0, `wrong: ${spaceFailures}`);
   const radiusFailures = Object.entries(design.radius).filter(([name, px]) => num(m.vars[`--radius-${name}`]) !== px);

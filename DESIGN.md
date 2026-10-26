@@ -125,11 +125,11 @@ Root size 16px. Sizes in rem.
 | `text-2xl` | 1.875 (30px) | 1.25 | h2 |
 | `text-3xl` | 2.375 (38px) | 1.15 | h1 on course and lesson pages |
 | `text-4xl` | 3 (48px) | 1.1 | Homepage headline only; 2.375rem below 768px |
-| `code` | 0.9375 (15px) | 1.6 | Code and output |
+| `text-mono` | 0.9375 (15px) | 1.6 | Code and output. Not named `text-code`, which would clash with the `code` color token |
 
 Rules:
 
-- Prose line length 60 to 72 characters (`max-width: 68ch`).
+- Prose line length 60 to 72 characters: token `max-w-measure` (68ch). Not `max-w-prose`, which is Tailwind's built-in 65ch.
 - Headings and body are left-aligned. Center only short, single-line elements inside a component.
 - Sentence case everywhere. No all-caps labels. Emphasize with weight 700 sparingly, never by coloring one word of a headline.
 - Code never wraps by default, because wrapping can disguise Python indentation. Long lines scroll horizontally inside the code block.
@@ -140,7 +140,7 @@ Rules:
 - **Component padding:** 12 to 16 inside controls, 24 inside panels.
 - **Section spacing:** 64 on desktop, 48 below 768px.
 - **Page gutter:** 16 below 640px, 24 up to 1024px, 32 above.
-- **Containers:** prose column `68ch`; lesson layout (code plus notes) up to 1200px; site container up to 1280px.
+- **Containers:** prose column `max-w-measure` (68ch); lesson layout (code plus notes) up to 1200px; site container up to 1280px.
 
 ### Breakpoints
 
