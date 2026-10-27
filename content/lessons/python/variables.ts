@@ -55,6 +55,18 @@ export const pythonVariables: LessonSource = {
       ],
     },
   },
+  visuals: {
+    change: {
+      example: "python/variables_change",
+      title: "Step through it: watch the value of `apples`",
+      notes: {
+        1: "Python creates the variable `apples` and gives it the value 3.",
+        2: "`print` looks up the value of `apples` and shows it. The variables do not change.",
+        3: "Python works out `apples + 2` using the current value, 3, which gives 5. Then `apples` refers to 5.",
+        4: "The same instruction as line 2, but `apples` now refers to 5, so the output is different.",
+      },
+    },
+  },
   mistakes: [
     {
       title: "Changing the spelling of a name",

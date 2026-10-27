@@ -10,6 +10,8 @@ To create a variable, write a name, `=` and a value. You do not write a type: Py
 
 Line 4 is the same instruction as line 2, but `apples` now has a different value, so the output changes.
 
+{{visual change}}
+
 ## Types in Python
 
 You never wrote a type in that example, but Python still knows the type of every value. You can ask for it with `type()`.

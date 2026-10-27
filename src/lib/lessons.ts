@@ -13,9 +13,9 @@ import type { Course } from "@content/courses";
 import { checkNotes, type CodeNote } from "./code-notes.ts";
 import { CODE_LANGUAGES, readExample, type CodeLanguage } from "./examples.ts";
 import { highlight, type CodeToken } from "./highlight.ts";
-import type { Analogy, LessonExample, LessonSource, Mistake, PracticeQuestion } from "./lesson-types.ts";
+import type { Analogy, LessonExample, LessonSource, Mistake, PracticeQuestion, Visual } from "./lesson-types.ts";
 import { linksIn, parseInline, parseProse, type ProseBlock } from "./prose.ts";
-import { assertVerified, readRecord, type ExpectationKind, type VerificationRecord } from "./verified.ts";
+import { assertTraceVerified, assertVerified, readRecord, type ExpectationKind, type VerificationRecord } from "./verified.ts";
 
 /** An example ready for CodeBlock: code split into tokens, notes, and the recorded result. */
 export type RenderedExample = {
@@ -40,9 +40,36 @@ export type RenderedQuestion = {
   options: RenderedOption[];
 };
 
+/** A variable after a step, as the trace recorded it, plus what changed on this step. */
+export type StepVariable = { name: string; value: string; type: string; changed: boolean; previous?: string };
+
+/** One line that ran, with the state just after it. Everything here comes from the trace. */
+export type RenderedStep = {
+  line: number;
+  /** The source text of that line, without its indentation */
+  code: string;
+  variables: StepVariable[];
+  /** Everything printed so far, without the final newline */
+  output: string;
+  /** The line that ran before, when the program jumped over lines to get here */
+  jumpedFrom?: number;
+  note?: string;
+};
+
+export type RenderedVisual = {
+  id: string;
+  title: string;
+  languageLabel: string;
+  lines: CodeToken[][];
+  steps: RenderedStep[];
+};
+
+type TraceFile = { steps: Array<{ line: number; variables: Array<{ name: string; value: string; type: string }>; output: string }> };
+
 export type LessonBlock =
   | { type: "prose"; block: Exclude<ProseBlock, { type: "placeholder" }> }
   | { type: "example"; example: RenderedExample }
+  | { type: "visual"; visual: RenderedVisual }
   | { type: "analogy"; analogy: Analogy };
 
 export type LoadedLesson = {
@@ -133,6 +160,83 @@ export async function buildLessons({ courses, sources, contentRoot, recordPath }
       };
     };
 
+    // A step-through visual: every line, value and output comes from the verified trace.
+    const renderVisual = async (id: string, visual: Visual, where: string): Promise<RenderedVisual> => {
+      plainOnly(visual.title, `${where}, title`);
+      const [language, file, extra] = visual.example.split("/");
+      if (language !== "python" || language !== course.slug || !file || extra !== undefined) {
+        throw new Error(`${where}: example must be "python/<name>" in a Python lesson, not "${visual.example}"`);
+      }
+      const loaded = await readExample("python", file, examplesFolder);
+      if (loaded.kind !== "output") throw new Error(`${where}: ${visual.example} is a ${loaded.kind} example; a visual needs an output example`);
+      const traceFile = path.join(examplesFolder, "python", `${file}.trace.json`);
+      const traceText = await readFile(/*turbopackIgnore: true*/ traceFile, "utf8").catch(() => {
+        throw new Error(`${where}: ${visual.example} has no trace file ${file}.trace.json`);
+      });
+      if (published) {
+        await assertVerified(record!, visual.example, loaded.kind, loaded.sourceFile, loaded.expectationFile);
+        await assertTraceVerified(record!, visual.example, traceFile);
+      }
+      const trace = JSON.parse(traceText) as TraceFile;
+      const sourceLines = loaded.code.split("\n");
+      if (!Array.isArray(trace.steps) || trace.steps.length === 0) throw new Error(`${where}: the trace has no steps`);
+      for (const step of trace.steps) {
+        if (!Number.isInteger(step.line) || step.line < 1 || step.line > sourceLines.length) throw new Error(`${where}: the trace names line ${step.line}, which the example does not have`);
+      }
+      const final = trace.steps[trace.steps.length - 1].output.replace(/\r\n?/g, "\n").replace(/\n$/, "");
+      if (final !== loaded.expectedOutput) throw new Error(`${where}: the trace's final output differs from the verified output of ${visual.example}`);
+
+      const count = trace.steps.length;
+      const notes = visual.notes ?? {};
+      const branches = visual.branches ?? {};
+      for (const key of [...Object.keys(notes), ...Object.keys(branches)].map(Number)) {
+        if (!Number.isInteger(key) || key < 1 || key > count) throw new Error(`${where}: step ${key} does not exist; the trace has ${count} steps`);
+      }
+      Object.entries(notes).forEach(([key, text]) => plainOnly(text, `${where}, note for step ${key}`));
+      const indent = (text: string) => text.length - text.trimStart().length;
+      trace.steps.forEach((step, index) => {
+        const number = index + 1;
+        const text = sourceLines[step.line - 1];
+        const isCondition = /^\s*(if|elif)\b.*:\s*(#.*)?$/.test(text);
+        const declared = branches[number];
+        if (declared !== undefined && !isCondition) throw new Error(`${where}: step ${number} runs line ${step.line}, which is not an if or elif line, so it cannot declare a branch`);
+        if (isCondition && notes[number] !== undefined && declared === undefined) {
+          throw new Error(`${where}: step ${number} checks a condition and has a note, so it must declare whether the condition was true`);
+        }
+        if (declared !== undefined) {
+          // True means the next line that ran is the first line inside the block.
+          let body = step.line;
+          while (body < sourceLines.length && sourceLines[body].trim() === "") body += 1;
+          const firstInside = indent(sourceLines[body] ?? "") > indent(text) ? body + 1 : undefined;
+          const next = trace.steps[index + 1]?.line;
+          const real = next !== undefined && next === firstInside;
+          if (real !== declared) {
+            throw new Error(`${where}: step ${number} declares the condition was ${declared}, but the trace shows it was ${real} (next line ${next ?? "none"})`);
+          }
+        }
+      });
+
+      let previous: StepVariable[] = [];
+      const steps: RenderedStep[] = trace.steps.map((step, index) => {
+        const variables = step.variables.map((variable) => {
+          const before = previous.find((other) => other.name === variable.name);
+          const changed = !before || before.value !== variable.value || before.type !== variable.type;
+          return { ...variable, changed, ...(before && changed ? { previous: before.value } : {}) };
+        });
+        previous = variables;
+        const lastLine = trace.steps[index - 1]?.line;
+        return {
+          line: step.line,
+          code: sourceLines[step.line - 1].trim(),
+          variables,
+          output: step.output.replace(/\r\n?/g, "\n").replace(/\n$/, ""),
+          ...(lastLine !== undefined && step.line !== lastLine + 1 ? { jumpedFrom: lastLine } : {}),
+          ...(notes[index + 1] !== undefined ? { note: notes[index + 1] } : {}),
+        };
+      });
+      return { id, title: visual.title, languageLabel: CODE_LANGUAGES.python.label, lines: await highlight(loaded.code, "python"), steps };
+    };
+
     let concept: ProseBlock[] | undefined;
     if (source.concept) {
       if (!SLUG.test(source.concept)) throw new Error(`${name}: concept must be a slug, not "${source.concept}"`);
@@ -151,6 +255,7 @@ export async function buildLessons({ courses, sources, contentRoot, recordPath }
       throw new Error(`${name}: prose file ${mdFile} does not exist`);
     });
     const placed = new Set<string>();
+    const visualsPlaced = new Set<string>();
     let analogyPlaced = false;
     const body: LessonBlock[] = [];
     for (const block of parseProse(markdown, mdFile, { headings: true, placeholders: true })) {
@@ -161,6 +266,12 @@ export async function buildLessons({ courses, sources, contentRoot, recordPath }
         if (analogyPlaced) throw new Error(`${mdFile}: {{analogy}} is placed more than once`);
         analogyPlaced = true;
         body.push({ type: "analogy", analogy: source.analogy });
+      } else if (block.kind === "visual") {
+        const visual = source.visuals?.[block.id];
+        if (!visual) throw new Error(`${mdFile}: {{visual ${block.id}}} has no matching entry in visuals`);
+        if (visualsPlaced.has(block.id)) throw new Error(`${mdFile}: {{visual ${block.id}}} is placed more than once`);
+        visualsPlaced.add(block.id);
+        body.push({ type: "visual", visual: await renderVisual(block.id, visual, `${name}, visual "${block.id}"`) });
       } else {
         const example = source.examples[block.id];
         if (!example) throw new Error(`${mdFile}: {{example ${block.id}}} has no matching entry in examples`);
@@ -170,6 +281,8 @@ export async function buildLessons({ courses, sources, contentRoot, recordPath }
       }
     }
     if (source.analogy && !analogyPlaced) throw new Error(`${mdFile}: the lesson has an analogy, so the prose must place it once with {{analogy}}`);
+    const unplacedVisuals = Object.keys(source.visuals ?? {}).filter((id) => !visualsPlaced.has(id));
+    if (unplacedVisuals.length > 0) throw new Error(`${mdFile}: visuals never placed with {{visual <id>}}: ${unplacedVisuals.join(", ")}`);
     const unplaced = Object.keys(source.examples).filter((id) => !placed.has(id));
     if (unplaced.length > 0) throw new Error(`${mdFile}: examples never placed with {{example <id>}}: ${unplaced.join(", ")}`);
     if (placed.size === 0) throw new Error(`${name}: needs at least one runnable example`);

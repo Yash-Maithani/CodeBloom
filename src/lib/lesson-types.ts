@@ -73,6 +73,24 @@ export type ChoiceQuestion = QuestionBase & {
 /** A practice question (SPEC.md FR-P1 to FR-P5). Its solution can always be opened. */
 export type PracticeQuestion = PredictOutputQuestion | ChoiceQuestion;
 
+/**
+ * A step-through visual of a Python example (SPEC.md FR-V1 to FR-V3). Every
+ * line, value and output shown comes from the example's verified trace,
+ * content/examples/<file>.trace.json. Only the notes are written by hand.
+ */
+export type Visual = {
+  /** "python/<name>": an output example that has a .trace.json */
+  example: string;
+  title: string;
+  /** Optional explanation for a step, keyed by step number (1 = the first line that ran) */
+  notes?: Record<number, string>;
+  /**
+   * For a step that runs an `if` or `elif` line: whether its condition was true.
+   * Checked against the trace. Required when that step has a note.
+   */
+  branches?: Record<number, boolean>;
+};
+
 export type LessonSource = {
   /** Course slug from content/courses.ts, which is also the code language */
   course: string;
@@ -87,6 +105,8 @@ export type LessonSource = {
   analogy?: Analogy;
   /** Runnable examples, placed in the .md with {{example <key>}} */
   examples: Record<string, LessonExample>;
+  /** Step-through visuals, placed in the .md with {{visual <key>}} */
+  visuals?: Record<string, Visual>;
   mistakes: Mistake[];
   practice: PracticeQuestion[];
   /** At least two short points */

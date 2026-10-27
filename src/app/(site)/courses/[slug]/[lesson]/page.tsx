@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AnalogyCallout } from "@/components/callout";
 import { Container } from "@/components/container";
-import { LessonCodeBlock, LessonNav, Mistakes, Practice } from "@/components/lesson-parts";
+import { LessonCodeBlock, LessonNav, Mistakes, Practice, VisualBlock } from "@/components/lesson-parts";
 import { InlineText, ProseBlocks } from "@/components/prose";
 import { backLinkStyles, textLinkStyles } from "@/components/styles";
 import { neighbours, sameConceptElsewhere, type LoadedLesson } from "@/lib/lessons";
@@ -91,6 +91,13 @@ export default async function LessonPage(props: LessonPageProps) {
             return (
               <div key={index} className="max-w-measure">
                 <ProseBlocks blocks={[block.block]} />
+              </div>
+            );
+          }
+          if (block.type === "visual") {
+            return (
+              <div key={index} className="mt-8">
+                <VisualBlock visual={block.visual} />
               </div>
             );
           }

@@ -3,6 +3,7 @@
 
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
+import { execFileSync } from "node:child_process";
 import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -120,7 +121,8 @@ async function build({ sources, files, verified = [], topics }: Fixture) {
   for (const id of verified) {
     const kind = all[`examples/${id}.expected.txt`] !== undefined ? "output" : "run-error";
     const expectation = kind === "output" ? `examples/${id}.expected.txt` : `examples/${id}.run-error.txt`;
-    record[id] = { kind, source: sha(all[`examples/${id}.py`]), expected: sha(all[expectation]) };
+    const trace = all[`examples/${id}.trace.json`];
+    record[id] = { kind, source: sha(all[`examples/${id}.py`]), expected: sha(all[expectation]), ...(trace !== undefined ? { trace: sha(trace) } : {}) };
   }
   await writeFile(path.join(root, "record.json"), JSON.stringify({ examples: record }));
   const course: Course = {
@@ -318,4 +320,85 @@ test("practice: a published lesson's question examples go through the publish ga
     { sources: [lesson({ status: "published", practice: [predictQuestion({ example: { file: "python/other", notes: [] } })] })], files: { "examples/python/other.py": "print(2)\n", "examples/python/other.expected.txt": "2\n" }, verified: ["python/show"] },
     /python\/other has never been verified/,
   );
+});
+
+// ---------- step-through visuals (Milestone 4) ----------
+
+const BRANCH_SOURCE = 'x = 1\nif x > 5:\n    print("big")\nprint("done")\n';
+
+/** A real trace, made by the project's tracer, of a source file. */
+async function realTrace(source: string): Promise<string> {
+  const folder = await mkdtemp(path.join(tmpdir(), "codebloom-trace-"));
+  folders.push(folder);
+  await writeFile(path.join(folder, "b.py"), source);
+  return execFileSync("python3", ["-I", "-B", "scripts/lib/python-trace.py", path.join(folder, "b.py")], { encoding: "utf8" });
+}
+
+const visualFiles = async (overrides: Record<string, string> = {}) => ({
+  "examples/python/b.py": BRANCH_SOURCE,
+  "examples/python/b.expected.txt": "done\n",
+  "examples/python/b.trace.json": await realTrace(BRANCH_SOURCE),
+  "lessons/python/one.md": "Intro.\n\n{{example show}}\n\n{{visual b}}\n",
+  ...overrides,
+});
+
+const withVisual = (visual: Record<string, unknown> = {}, overrides: Partial<LessonSource> = {}) =>
+  lesson({ visuals: { b: { example: "python/b", title: "Step through `b`", ...visual } }, ...overrides } as Partial<LessonSource>);
+
+test("visual: steps, changes and jumps come from the real trace", async () => {
+  const { run } = await build({ sources: [withVisual({ notes: { 2: "It is `False`." }, branches: { 2: false } })], files: await visualFiles() });
+  const [loaded] = await run();
+  const block = loaded.body.find((b) => b.type === "visual");
+  assert.ok(block && block.type === "visual");
+  const steps = block.visual.steps;
+  assert.deepEqual(steps.map((s) => s.line), [1, 2, 4]);
+  assert.deepEqual(steps[0].variables, [{ name: "x", value: "1", type: "int", changed: true }]);
+  assert.equal(steps[1].variables[0].changed, false);
+  assert.equal(steps[2].jumpedFrom, 2);
+  assert.deepEqual(steps.map((s) => s.output), ["", "", "done"]);
+  assert.equal(steps[1].note, "It is `False`.");
+  assert.equal(steps[1].code, "if x > 5:");
+});
+
+test("visual: a wrong branch declaration stops the build", async () => {
+  await rejects(
+    { sources: [withVisual({ notes: { 2: "It is `True`." }, branches: { 2: true } })], files: await visualFiles() },
+    /step 2 declares the condition was true, but the trace shows it was false \(next line 4\)/,
+  );
+});
+
+test("visual: branches only on if lines, and a note on an if step needs its branch", async () => {
+  await rejects({ sources: [withVisual({ branches: { 1: true } })], files: await visualFiles() }, /step 1 runs line 1, which is not an if or elif line/);
+  await rejects({ sources: [withVisual({ notes: { 2: "Checks it." } })], files: await visualFiles() }, /step 2 checks a condition and has a note, so it must declare/);
+});
+
+test("visual: notes and branches must name real steps", async () => {
+  await rejects({ sources: [withVisual({ notes: { 4: "No such step." } })], files: await visualFiles() }, /step 4 does not exist; the trace has 3 steps/);
+  await rejects({ sources: [withVisual({ notes: { 1: "A `broken note." } })], files: await visualFiles() }, /note for step 1: a backtick is not closed/);
+});
+
+test("visual: the trace must exist, fit the example and end with its verified output", async () => {
+  await rejects({ sources: [withVisual()], files: await visualFiles({ "examples/python/b.trace.json": "" }) }, /Unexpected end of JSON|has no steps/);
+  const files = await visualFiles();
+  delete (files as Record<string, string>)["examples/python/b.trace.json"];
+  await rejects({ sources: [withVisual()], files }, /has no trace file b.trace.json/);
+  const trace = (await visualFiles())["examples/python/b.trace.json"];
+  await rejects({ sources: [withVisual()], files: await visualFiles({ "examples/python/b.trace.json": trace.replace('"line": 4', '"line": 9') }) }, /names line 9, which the example does not have/);
+  await rejects({ sources: [withVisual()], files: await visualFiles({ "examples/python/b.expected.txt": "finished\n" }) }, /final output differs from the verified output/);
+});
+
+test("visual: placement and example rules", async () => {
+  await rejects({ sources: [withVisual()], files: await visualFiles({ "lessons/python/one.md": "{{example show}}\n" }) }, /visuals never placed with \{\{visual <id>\}\}: b/);
+  await rejects({ sources: [lesson()], files: await visualFiles() }, /\{\{visual b\}\} has no matching entry in visuals/);
+  await rejects({ sources: [withVisual({ example: "python/oops" })], files: await visualFiles() }, /python\/oops is a run-error example; a visual needs an output example/);
+});
+
+test("visual: the publish gate covers the trace", async () => {
+  const published = withVisual({}, { status: "published" });
+  await rejects({ sources: [published], files: await visualFiles(), verified: ["python/show"] }, /python\/b has never been verified/);
+  const { root, run } = await build({ sources: [published], files: await visualFiles(), verified: ["python/show", "python/b"] });
+  await run();
+  const path2 = path.join(root, "examples/python/b.trace.json");
+  await writeFile(path2, (await visualFiles())["examples/python/b.trace.json"].replace('"value": "1"', '"value": "2"'));
+  await assert.rejects(run(), /The trace of python\/b has changed since it was last verified/);
 });
