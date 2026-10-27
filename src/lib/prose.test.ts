@@ -125,8 +125,8 @@ test("unsupported Markdown is refused, with a message saying what to do", () => 
     ["- a\nnot an item\n", /every line of a list/],
     ["Some <b>bold</b> HTML\n", /raw HTML/],
     ["A comment <!-- x -->\n", /raw HTML/],
-    ["Wait — an em dash\n", /em and en dashes/],
-    ["pages 1–2\n", /em and en dashes/],
+    ["Wait \u2014 an em dash\n", /em and en dashes/],
+    ["pages 1\u20132\n", /em and en dashes/],
   ];
   for (const [source, message] of cases) fails(() => parseProse(source, "t.md", LESSON), message);
 });

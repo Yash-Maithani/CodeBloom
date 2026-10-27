@@ -221,7 +221,7 @@ test("notes must point at real lines, in order", async () => {
 });
 
 test("text fields are checked: no dashes, no empty recap, no unsupported syntax", async () => {
-  await rejects({ sources: [lesson({ objective: "Learn this — fast." })], files: {} }, /objective: em and en dashes/);
+  await rejects({ sources: [lesson({ objective: "Learn this \u2014 fast." })], files: {} }, /objective: em and en dashes/);
   await rejects({ sources: [lesson({ recap: ["Only one."] })], files: {} }, /recap needs at least two points/);
   await rejects({ sources: [lesson({ recap: ["A `broken point.", "Fine."] })], files: {} }, /recap point 1: a backtick is not closed/);
   await rejects({ sources: [lesson({ title: "A **bold** title" })], files: {} }, /title: must be plain text/);

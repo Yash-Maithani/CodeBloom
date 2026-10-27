@@ -27,7 +27,7 @@ export class ProseError extends Error {}
 
 type InlineOptions = { links?: boolean };
 
-const DASHES = /[–—]/; // en dash and em dash, banned in site copy (CLAUDE.md)
+const DASHES = /[\u2013\u2014]/; // en dash and em dash, banned in site copy (CLAUDE.md)
 const RAW_HTML = /<[A-Za-z/!]/;
 
 /** Parses one piece of inline text. `where` names the source in error messages. */
