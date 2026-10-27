@@ -4,11 +4,14 @@ import { normalizeLineEndings } from "../../src/lib/line-endings.ts";
 
 // Interactive practice (SPEC.md FR-P1 to FR-P5, DESIGN.md "Quiz and feedback").
 
-const LESSONS = ["/courses/c/first-program", "/courses/c/variables", "/courses/python/variables", "/courses/python/decisions"];
+const LESSONS = ["/courses/c/first-program", "/courses/c/variables", "/courses/python/first-program", "/courses/python/variables", "/courses/python/input-output", "/courses/python/decisions", "/courses/python/elif"];
 const verified = (id: string) => normalizeLineEndings(readFileSync(`content/examples/${id}.expected.txt`, "utf8")).replace(/\n$/, "");
 
 const question = (page: import("@playwright/test").Page, n: number) => page.locator(`li[data-question="${n}"]`);
-const optionLines = (option: Locator) => option.locator("span.block > span.block").evaluateAll((spans) => spans.map((s) => s.lastChild?.textContent ?? ""));
+// The visible text of each line: the last child is a text node, except on an empty
+// line, where only the screen-reader-only "Line N:" label is there.
+const optionLines = (option: Locator) =>
+  option.locator("span.block > span.block").evaluateAll((spans) => spans.map((s) => (s.lastChild?.nodeType === Node.TEXT_NODE ? (s.lastChild.textContent ?? "") : "")));
 
 test("a wrong answer says Not quite with that option's own explanation, then the correct answer says Correct", async ({ page }) => {
   await page.goto("/courses/python/decisions");

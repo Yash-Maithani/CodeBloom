@@ -91,10 +91,96 @@
       "source": "f5f7de82c910f74e9803e4b1e2b5c02a54539f3cc9230cf5e08795e0a7bd3266",
       "expected": "91d476fecfbb9621ef9cefe884f5df3bc92394c5dd1a001573db58d7f964c285"
     },
+    "python/elif_grade": {
+      "kind": "output",
+      "source": "92fc986925e21d96cbf62057049872eb888dfe93c715f1731b3e225f68bc6c76",
+      "expected": "3d903f038677a43e473000044be3354b10c580df1be9f242fd8e0185f4ba397c"
+    },
+    "python/elif_missing_colon": {
+      "kind": "run-error",
+      "source": "4d073d0aafeaee13009bfbedc738514334bbeed95ecfc2b58ace7e78108725a3",
+      "expected": "1b75b9b0cb52354ffa8b037c07d17276582094618f51f7c3f43864a9cc607513"
+    },
+    "python/elif_right_order": {
+      "kind": "output",
+      "source": "73133243368c778cb961906f1bd4d22a20bb2c3df9d63fc9f088a9f265ea3193",
+      "expected": "b816bbe1430739d310b6001635343127adacb15fb3daaf98c5b208b94461231e"
+    },
+    "python/elif_separate": {
+      "kind": "output",
+      "source": "c4b7a7edf2e58bdbd22b22163ff09919b36c31005faa7a12b1db8af8858169a6",
+      "expected": "3edbb971caf49d096ab544511ef5bf4c38c70429a8a3617d24a85602b2c73c58"
+    },
+    "python/elif_ticket": {
+      "kind": "output",
+      "source": "4cb571e7eaff3126edac9c9b339a93277659171af482aa2982aa2cf6997e704e",
+      "expected": "e75f0a3c4ecfab9b35e7efff124f1f571eae7bae1590e3095131f0ca1b78757c",
+      "trace": "0dda01fdcf5d5946ee129f46e7a9a06672f6efefd7ec908a798fd8c727a519c3"
+    },
+    "python/elif_wrong_order": {
+      "kind": "output",
+      "source": "0e82b25be14510e2218319a65d0108e54f0986512f462c5b92c5d7d1eb47226c",
+      "expected": "be74f37819ffb11ffad06d49783004b660971ca7970cc3617eefcc96c1b083af"
+    },
+    "python/first_hello": {
+      "kind": "output",
+      "source": "8cee8640913615b46789a3b10cae544d74c3c2324da0e16c6aedd2a3a5253e51",
+      "expected": "694560293fb0a1b935ca41467da2588244879527033edee0305a53339ce283e2"
+    },
+    "python/first_missing_quote": {
+      "kind": "run-error",
+      "source": "fb0c957bb09f5a6201945f0e5ed5eb05f85bda50226fd0375cf977fbbf5c6690",
+      "expected": "00afb11f8671bb071d48592d78165b4bdee8f71b486cfb95833d31fbe799ef6d"
+    },
+    "python/first_order": {
+      "kind": "output",
+      "source": "94eb97bc4ab4ef2a7a2a8012b3d75b5911f1652a6be28ad16c2f79e1c0be2e5c",
+      "expected": "4d6e9e0d4a4455eb950014be368976fa4ef7c432ab13afcb7b7f216aa2ff16b3"
+    },
+    "python/first_wrong_case": {
+      "kind": "run-error",
+      "source": "4e0e861c0f802f08aa75c9c81f7a9a05c6ed2f339cbdb306c07ca22af85029fb",
+      "expected": "d8c012754a78e8bc15c54131cf83b1bb0868159949dfd330ce7283990d814c07"
+    },
     "python/hello": {
       "kind": "output",
       "source": "cb46ce7f29b8cc271d6f51b161d1968c8838be235b8618b2927520e267e4a9e0",
       "expected": "cf06366b358707b65a0241f462d4920a51a19073e9d26304d94b9da86a903b11"
+    },
+    "python/io_age": {
+      "kind": "output",
+      "source": "70411c97c2c7fb9045b7f9239385ed4104af1fbcce73f359dfa76b2352580faa",
+      "expected": "c693e8947d392afaf68663d07d3481d966b3b84032325697e51a64dfd40f0b45",
+      "input": "54183f4323f377b737433a1e98229ead0fdc686f93bab057ecb612daa94002b5"
+    },
+    "python/io_bad_number": {
+      "kind": "run-error",
+      "source": "b50a23a8f56dd57a25b0b4dc3fd3db328257655d353ba9ab1f68e109f58185d9",
+      "expected": "095c3cbdc87344194b81b76dc5a05008b64d657a4fb19de64c2262ee3eb905b4"
+    },
+    "python/io_greet": {
+      "kind": "output",
+      "source": "5e62f1bd5d23fd21f79880bbb913702e38560eaf5f7d56cf12b06b65937ac645",
+      "expected": "dd030608dcb52cc58b75f83af04b55ab3893bd61b92320c15f536f655138339c",
+      "input": "c4b7d45359e10813d1787293eb7ffa9a074e837fcf99c0281610eab5fe907e79"
+    },
+    "python/io_sum": {
+      "kind": "output",
+      "source": "b7c2cfa346f70845ca6abc1a5ead07c631217f8487afb1e49accdd68f37db726",
+      "expected": "65d725bd563fbf612a0ebafa309785b585356a3967bd58bbd2cdd061efddf825",
+      "input": "0d0830f739a0a589f6478ff3d62d471dfb0974db59484dbebbfb39a770e5412f"
+    },
+    "python/io_text_plus": {
+      "kind": "output",
+      "source": "c7c6fe7199e6e11dffb892163945136d7fc93846d0b2bfe5454006047ec6504f",
+      "expected": "c5fe3befda224f76c3f51f2484c3c757b1bcf0f136caeaa29de4963fa0c0612c",
+      "input": "0d0830f739a0a589f6478ff3d62d471dfb0974db59484dbebbfb39a770e5412f"
+    },
+    "python/io_type": {
+      "kind": "output",
+      "source": "0f4d6b910013f4761203005d09995da7306e358590dc1b830fcce4a21801c55f",
+      "expected": "0afa6ef91fa98833848c68340984410b5abab4e50aee9a7e547bb4eccfad74ef",
+      "input": "084c799cd551dd1d8d5c5f9a5d593b2e931f5e36122ee5c793c1d08a19839cc0"
     },
     "python/missing_indent": {
       "kind": "run-error",
@@ -111,10 +197,42 @@
       "source": "6136af513a32e0997e06a28afe5fbb1445b9e22e1e1b9fb4864f8f20fd1c5c2b",
       "expected": "7ae15ce3109ab5e210cd4686faef828330a0a1511e789b4ac7b806570071c791"
     },
+    "python/practice_elif_boundary": {
+      "kind": "output",
+      "source": "d39702a8c8f75cd0c70b5c28022a5d22318b7bdd5d1c65d235e185e44da3ac76",
+      "expected": "2f93c9c07b18ef817203b0c05efb994a8f9f46e20c86b6a5862082ba7835f5da"
+    },
+    "python/practice_elif_order": {
+      "kind": "output",
+      "source": "c855705eb9f90cb66de53a5f45c885536517b4378acdc50ba20268b6abf05403",
+      "expected": "c6681182e9e2b22dd10562e8bf3a0893bd38a2e506a4da73d43b4c92a9b89bcf"
+    },
     "python/practice_fee": {
       "kind": "output",
       "source": "0fd7eadd6bfc7d0ffb36471a535063a5e5e7bdf3c09ffed67f137e0d74457c6e",
       "expected": "f6c2c78ae684a9ac5339908557df34b8ae39d0574c7de7b9f160a80bf327d848"
+    },
+    "python/practice_first_comments": {
+      "kind": "output",
+      "source": "937efd3fb6221118642bc81443ff18ddb849a37942c1c90bb83b70352d9980a8",
+      "expected": "0b7329c3e40b2733c3c4137a8f816e0284a219284383c2c42f3be73a7cf7ab95"
+    },
+    "python/practice_first_lines": {
+      "kind": "output",
+      "source": "a73526acbc4df42d5cb28eeda714c5286442639a24a3cb50258e505afd5e1e74",
+      "expected": "54811906d6e8f243a4a1322380f842b8f505bae67298fab28f66f74429699b79"
+    },
+    "python/practice_io_double": {
+      "kind": "output",
+      "source": "7a5100c1dfd074a8461d37e7b10d9db33143eb929af6cbf4c3394e173a7e74a2",
+      "expected": "cb8e4a72a92d073d163a91674b3717789eaf0d7222d416efbdfc9f9c12561a0a",
+      "input": "06e9d52c1720fca412803e3b07c4b228ff113e303f4c7ab94665319d832bbfb7"
+    },
+    "python/practice_io_name": {
+      "kind": "output",
+      "source": "36766838e70d7811566818639791c74f7072b5737925aa5c6d3afc8b798b293b",
+      "expected": "aedb7aa517d9d34603b641ec69bcb6096eba7f9ba89de1914414d9a02dd06a2b",
+      "input": "f162219f8f6ad6aa121039de4368b5c8803b0486407b8e4ca06abe79e2aed709"
     },
     "python/practice_quotes": {
       "kind": "output",

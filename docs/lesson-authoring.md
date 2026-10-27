@@ -25,6 +25,7 @@ content/
   examples/<course>/<name>.<ext>        a program shown in a lesson
   examples/<course>/<name>.<kind>.txt   what it really printed (section 5)
   examples/python/<name>.trace.json     the line-by-line trace behind a step-through visual (section 3b)
+  examples/python/<name>.input.txt      the lines a person types, for an example that calls input() (section 5)
   verified-examples.json        written by npm run check:examples; never edit it
 ```
 
@@ -104,7 +105,7 @@ On the page, the learner starts at "Start. Nothing has run yet.", and moves with
 
 ### 3c. Playground links
 
-Every runnable Python example and fix in a published lesson gets "Try it in the playground" automatically, and its own page at `/playground/python/<name>` that starts from the verified file. Nothing to write. Practice questions never get a link, because their output is the answer. An example that uses `input()` would need the learner to fill the Input box; say so in the prose. C, C++ and Java examples get no link until the playground supports them.
+Every runnable Python example and fix in a published lesson gets "Try it in the playground" automatically, and its own page at `/playground/python/<name>` that starts from the verified file. Nothing to write. Practice questions never get a link, because their output is the answer. For an example with an input file, the Input box starts filled with that file's lines, and "Reset code" restores both the code and the input. In the prose, say what is in the Input box, and that the typed line appears after the prompt in the output. C, C++ and Java examples get no link until the playground supports them.
 
 ## 4. The prose (`<slug>.md` and concept files)
 
@@ -130,6 +131,8 @@ Each example program has exactly one expectation file:
 | `name.compile-error.txt` | The compiler fails (C, C++ and Java only); this is its exact error message |
 | `name.run-error.txt` | The program starts and exits with an error, printing nothing to standard output first; this is the exact error message. A Python `SyntaxError` is a run error, because Python has no separate compile step here |
 
+A Python example that calls `input()` also has `name.input.txt`: the lines a person types, one line per `input()` call. Only an example that succeeds (`.expected.txt`) may have one, and it cannot have a trace. An error example must print nothing before it fails, and a prompt would be printed first, so error examples do not call `input()`.
+
 File names start with a letter and use letters, digits and underscores. Java file names match the class name.
 
 **Capturing a result.** Never type output or an error message. Run the program the way `check:examples` runs it, from inside the example's folder, and save what it prints (Linux or WSL; see `PROGRESS.md` Known limitations for Windows):
@@ -143,6 +146,15 @@ cd content/examples/c
 LANG=C.UTF-8 gcc -std=c17 -Wall -Wextra -Werror name.c -o /tmp/name 2> name.compile-error.txt
 LANG=C.UTF-8 gcc -std=c17 -Wall -Wextra -Werror name.c -o /tmp/name && /tmp/name > name.expected.txt
 ```
+
+**Capturing an example that reads input.** Run it through the input script, which feeds the input file and writes the output a learner sees:
+
+```
+cd content/examples/python
+LANG=C.UTF-8 python3 -I -B ../../../scripts/lib/python-input.py name.py name.input.txt > name.expected.txt
+```
+
+The echo is simulated. Python does not echo piped input: when a program reads from a pipe, the typed text is never shown, because nobody typed it. A person at a terminal sees the typed line right after the prompt only because the terminal draws it, and the playground shows it the same way. `python-input.py` therefore writes each prompt, then the next line of the input file and a line break, so the saved output reads like a terminal session (`What is your name? Ada`). `check:examples` runs every example that has an input file this way, and a file with too few lines fails with Python's own `EOFError`. The hash of the input file is part of the verification record, so editing an input file stops the build until the example is verified again.
 
 **Capturing a trace** (Python examples with an `.expected.txt` only), from the same folder:
 
@@ -207,6 +219,9 @@ Set `status: "published"`, then run every check in `CLAUDE.md` (Quality gates), 
 | `exactly one option must be correct` / `needs one to three hints` / `two or three wrong outputs` | A practice question is outside its limits (section 3a) |
 | `error message differs` (from `check:examples`) | The compiler or interpreter printed something else; see section 5, Toolchain |
 | `trace differs from` (from `check:examples`) | The program or the tracer changed. Recapture the trace (section 5), read the new steps, and check the notes still fit |
+| `input files are only supported for Python examples` / `can have an input file` / `cannot have a trace` (from `check:examples`) | An `.input.txt` sits next to a C, C++ or Java example, an error example, or an example with a trace |
+| `The input of example ... has changed` | An input file was edited, added or removed after verification. Run `npm run check:examples` and commit the updated record |
+| `EOFError: EOF when reading a line` (from `check:examples`) | The program calls `input()` more times than its input file has lines, or the example has no input file |
 | `traces are only supported for Python examples` / `only an example with ... can have a trace` / `no example file named` (from `check:examples`) | A `.trace.json` sits next to the wrong kind of example, or its program is missing |
 | `The trace of ... has never been verified` / `has changed since it was last verified` | Run `npm run check:examples` and commit the updated record |
 | `has no trace file` / `a visual needs an output example` / `must be "python/<name>"` | The visual's `example` is not a traced Python output example |

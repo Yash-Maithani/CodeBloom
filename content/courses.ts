@@ -91,11 +91,11 @@ export const courses: Course[] = [
     description:
       "Python has short, readable syntax, so you can focus on what a program does without declaring types or ending lines with semicolons.",
     topics: [
-      { title: "Your first Python program" },
+      { title: "Your first Python program", lesson: "first-program" },
       { title: "Variables and data types", lesson: "variables" },
-      { title: "Input and output" },
+      { title: "Input and output", lesson: "input-output" },
       { title: "Making decisions with if and else", lesson: "decisions" },
-      { title: "More decisions with elif" },
+      { title: "More decisions with elif", lesson: "elif" },
       { title: "Loops: while and for" },
       { title: "Functions" },
       { title: "Lists" },

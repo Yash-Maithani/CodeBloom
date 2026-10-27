@@ -353,3 +353,94 @@ test("tracer: records only variables the example defines, never Python internals
   assert.deepEqual([...names].sort(), ["x", "y"]);
   assert.equal(steps.at(-1).output, "1 2\n");
 });
+
+// ---------- input files (name.input.txt) ----------
+
+const GREET = 'name = input("Name: ")\nprint("Hi,", name)\n';
+
+test("input: each input() line is echoed after its prompt, and the output matches", async () => {
+  const { root, languages } = await fixture({
+    "python/greet.py": GREET,
+    "python/greet.input.txt": "Ada\n",
+    "python/greet.expected.txt": "Name: Ada\nHi, Ada\n",
+  });
+  const result = await checkExamples({ root, languages });
+  assert.deepEqual(result.problems, []);
+  assert.equal(result.ok, true, JSON.stringify(result.results));
+});
+
+test("input: several lines, a CRLF input file, and no empty line from a final line break", async () => {
+  const code = 'a = input("A: ")\nb = input("B: ")\nprint(a + b)\n';
+  const { root, languages } = await fixture({
+    "python/two.py": code,
+    "python/two.input.txt": "12\r\n30\r\n",
+    "python/two.expected.txt": "A: 12\nB: 30\n1230\n",
+  });
+  assert.equal((await checkExamples({ root, languages })).ok, true);
+});
+
+test("input: too few lines gives EOFError, and the check fails with that message", async () => {
+  const { root, languages } = await fixture({
+    "python/greet.py": GREET + 'print(input("More: "))\n',
+    "python/greet.input.txt": "Ada\n",
+    "python/greet.expected.txt": "Name: Ada\nHi, Ada\nMore: \n",
+  });
+  const result = await checkExamples({ root, languages });
+  assert.equal(result.ok, false);
+  assert.match(result.results[0].message, /EOFError: EOF when reading a line/);
+  assert.ok(!result.results[0].message.includes("python-input.py"), "the wrapper's own frames are hidden");
+});
+
+test("input: an edited input file fails the check, and the recorded input hash changes", async () => {
+  const files = { "python/greet.py": GREET, "python/greet.input.txt": "Ada\n", "python/greet.expected.txt": "Name: Ada\nHi, Ada\n" };
+  const first = await fixture(files);
+  const passed = await checkExamples(first);
+  assert.equal(passed.ok, true);
+  assert.match(passed.record.examples["python/greet"].input, /^[0-9a-f]{64}$/);
+
+  // Edited input, expected output left alone: the output no longer matches.
+  await writeFile(join(first.root, "python/greet.input.txt"), "Bob\n");
+  const edited = await checkExamples(first);
+  assert.equal(edited.ok, false);
+  assert.match(edited.results[0].message, /output differs/);
+
+  // Edited input and a matching expected file: the check passes, but the record's input hash is different.
+  await writeFile(join(first.root, "python/greet.expected.txt"), "Name: Bob\nHi, Bob\n");
+  const second = await checkExamples(first);
+  assert.equal(second.ok, true);
+  assert.notEqual(second.record.examples["python/greet"].input, passed.record.examples["python/greet"].input);
+  // Line endings do not change the hash.
+  await writeFile(join(first.root, "python/greet.input.txt"), "Bob\r\n");
+  assert.equal((await checkExamples(first)).record.examples["python/greet"].input, second.record.examples["python/greet"].input);
+});
+
+test("input: an example that reads input but has no input file does not hang and fails", async () => {
+  const { root, languages } = await fixture({
+    "python/greet.py": GREET,
+    "python/greet.expected.txt": "Name: Ada\nHi, Ada\n",
+  });
+  const result = await checkExamples({ root, languages });
+  assert.equal(result.ok, false);
+  assert.match(result.results[0].message, /EOFError/);
+});
+
+test("input: refused next to an error example, with a trace, with no example, or for C", async () => {
+  const errorExample = await fixture({ "python/e.py": 'print(1 / 0)\n', "python/e.run-error.txt": "x\n", "python/e.input.txt": "1\n" });
+  assert.ok((await checkExamples(errorExample)).problems.some((p) => p.includes("python/e.input.txt") && p.includes("error example must print nothing")));
+  const traced = await fixture({ "python/t.py": 'print(input())\n', "python/t.expected.txt": "1\n1\n", "python/t.input.txt": "1\n", "python/t.trace.json": "{}\n" });
+  assert.ok((await checkExamples(traced)).problems.some((p) => p.includes("cannot have a trace")));
+  const orphan = await fixture({ "python/ok.py": 'print("x")\n', "python/ok.expected.txt": "x\n", "python/lonely.input.txt": "1\n" });
+  assert.ok((await checkExamples(orphan)).problems.some((p) => p.includes("lonely.input.txt") && p.includes("no example file named")));
+  const c = await fixture({ "c/a.c": "int main(void) { return 0; }\n", "c/a.expected.txt": "", "c/a.input.txt": "1\n" }, { c: LANGUAGES.c });
+  assert.ok((await checkExamples(c)).problems.some((p) => p.includes("only supported for Python")));
+});
+
+test("input: an error example that never reads input still must print nothing before failing", async () => {
+  const { root, languages } = await fixture({
+    "python/e.py": 'print("before")\nprint(1 / 0)\n',
+    "python/e.run-error.txt": "x\n",
+  });
+  const result = await checkExamples({ root, languages });
+  assert.equal(result.ok, false);
+  assert.match(result.results[0].message, /must print nothing to standard output before failing/);
+});

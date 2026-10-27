@@ -9,13 +9,17 @@ import { readExample } from "./examples.ts";
 import { PYODIDE_VERSION } from "./playground.ts";
 import { assertVerified, readRecord } from "./verified.ts";
 
-/** Starter code: a verified Python example that runs and prints. `file` is its name in content/examples/python. */
-export async function loadStarter(file: string): Promise<{ id: string; code: string }> {
+/**
+ * Starter code: a verified Python example that runs and prints. `file` is its name
+ * in content/examples/python. `input` is the example's .input.txt (the Input box
+ * starts with these lines), or "" when the example reads no input.
+ */
+export async function loadStarter(file: string): Promise<{ id: string; code: string; input: string }> {
   const example = await readExample("python", file);
   const id = `python/${file}`;
   if (example.kind !== "output") throw new Error(`${id}: the playground starts only from examples that run and print`);
-  await assertVerified(await readRecord(), id, example.kind, example.sourceFile, example.expectationFile);
-  return { id, code: example.code };
+  await assertVerified(await readRecord(), id, example.kind, example.sourceFile, example.expectationFile, example.inputFile);
+  return { id, code: example.code, input: example.input ?? "" };
 }
 
 /** Bytes of the five Pyodide files the worker downloads, as copied by scripts/prepare-playground.mjs before the build. */

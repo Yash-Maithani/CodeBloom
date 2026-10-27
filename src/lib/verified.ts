@@ -12,7 +12,7 @@ import { normalizeLineEndings } from "./line-endings.ts";
 
 export type ExpectationKind = "output" | "compile-error" | "run-error";
 
-type RecordEntry = { kind: ExpectationKind; source: string; expected: string; trace?: string };
+type RecordEntry = { kind: ExpectationKind; source: string; expected: string; trace?: string; input?: string };
 export type VerificationRecord = { examples: Record<string, RecordEntry> };
 
 export const RECORD_PATH = path.join(process.cwd(), "content", "verified-examples.json");
@@ -31,7 +31,10 @@ export async function readRecord(file: string = RECORD_PATH): Promise<Verificati
 
 /**
  * Stops the build unless the example's current files match the record.
- * `id` is "<language>/<name>"; `sourceFile` and `expectationFile` are its two files.
+ * `id` is "<language>/<name>"; `sourceFile` and `expectationFile` are its two files,
+ * and `inputFile` is its .input.txt if it has one. The input file is part of what
+ * was verified: the output of an example that reads input depends on it, so an
+ * edited, added or removed input file counts as a change.
  */
 /** Stops the build unless the example's trace (for a step-through visual) matches the record. */
 export async function assertTraceVerified(record: VerificationRecord, id: string, traceFile: string): Promise<void> {
@@ -49,6 +52,7 @@ export async function assertVerified(
   kind: ExpectationKind,
   sourceFile: string,
   expectationFile: string,
+  inputFile?: string,
 ): Promise<void> {
   const entry = record.examples[id];
   const fix = "Run npm run check:examples, review any changed output or error message, and commit the updated content/verified-examples.json.";
@@ -57,5 +61,10 @@ export async function assertVerified(
   const [source, expected] = await Promise.all([readFile(sourceFile, "utf8"), readFile(expectationFile, "utf8")]);
   if (sha256(source) !== entry.source || sha256(expected) !== entry.expected) {
     throw new Error(`Example ${id} has changed since it was last verified. ${fix}`);
+  }
+  const recordedInput = entry.input;
+  const currentInput = inputFile === undefined ? undefined : sha256(await readFile(/*turbopackIgnore: true*/ inputFile, "utf8"));
+  if (recordedInput !== currentInput) {
+    throw new Error(`The input of example ${id} has changed since it was last verified (an input file was edited, added or removed). ${fix}`);
   }
 }

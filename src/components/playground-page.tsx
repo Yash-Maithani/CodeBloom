@@ -6,7 +6,8 @@ import { loadStarter, pythonDownloadBytes } from "@/lib/playground-starters";
 
 /**
  * The playground pages: /playground starts from python/hello, and each
- * /playground/python/<example> starts from that lesson example. `from` names
+ * /playground/python/<example> starts from that lesson example, with the
+ * Input box filled from the example's input file if it has one. `from` names
  * the lesson the example comes from.
  */
 export async function PlaygroundPage({ file, from }: { file: string; from?: { title: string; href: string } }) {
@@ -33,7 +34,7 @@ export async function PlaygroundPage({ file, from }: { file: string; from?: { ti
         </p>
       </noscript>
       <div className="mt-8">
-        <Playground starter={starter.code} downloadBytes={downloadBytes} />
+        <Playground starter={starter.code} starterInput={starter.input} downloadBytes={downloadBytes} />
       </div>
     </Container>
   );

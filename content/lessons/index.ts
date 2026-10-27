@@ -7,6 +7,17 @@ import type { LessonSource } from "@/lib/lesson-types";
 import { cFirstProgram } from "./c/first-program.ts";
 import { cVariables } from "./c/variables.ts";
 import { pythonDecisions } from "./python/decisions.ts";
+import { pythonElif } from "./python/elif.ts";
+import { pythonFirstProgram } from "./python/first-program.ts";
+import { pythonInputOutput } from "./python/input-output.ts";
 import { pythonVariables } from "./python/variables.ts";
 
-export const lessonSources: LessonSource[] = [cFirstProgram, cVariables, pythonVariables, pythonDecisions];
+export const lessonSources: LessonSource[] = [
+  cFirstProgram,
+  cVariables,
+  pythonFirstProgram,
+  pythonVariables,
+  pythonInputOutput,
+  pythonDecisions,
+  pythonElif,
+];

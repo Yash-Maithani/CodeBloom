@@ -147,7 +147,7 @@ export async function buildLessons({ courses, sources, contentRoot, recordPath }
       usedFiles.add(example.file);
       const loaded = await readExample(language as CodeLanguage, file, examplesFolder);
       if (!allowed.includes(loaded.kind)) throw new Error(`${where}: ${example.file} is a ${loaded.kind} example; allowed here: ${allowed.join(", ")}`);
-      if (published) await assertVerified(record!, example.file, loaded.kind, loaded.sourceFile, loaded.expectationFile);
+      if (published) await assertVerified(record!, example.file, loaded.kind, loaded.sourceFile, loaded.expectationFile, loaded.inputFile);
       if (example.caption !== undefined) plainOnly(example.caption, `${where}, caption`);
       const lines = await highlight(loaded.code, loaded.language);
       checkNotes(example.notes, lines.length, `${where} (${example.file})`);
@@ -177,7 +177,7 @@ export async function buildLessons({ courses, sources, contentRoot, recordPath }
         throw new Error(`${where}: ${visual.example} has no trace file ${file}.trace.json`);
       });
       if (published) {
-        await assertVerified(record!, visual.example, loaded.kind, loaded.sourceFile, loaded.expectationFile);
+        await assertVerified(record!, visual.example, loaded.kind, loaded.sourceFile, loaded.expectationFile, loaded.inputFile);
         await assertTraceVerified(record!, visual.example, traceFile);
       }
       const trace = JSON.parse(traceText) as TraceFile;
