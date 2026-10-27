@@ -139,7 +139,8 @@
     "python/variables_change": {
       "kind": "output",
       "source": "5b6b558564f47b27c8a1059512ff4c2b81a2444c737b0958a48534ca75d9eb84",
-      "expected": "56c47cb32092661c2f3438298862e0759fa78694dbe78060f6369502f4386a09"
+      "expected": "56c47cb32092661c2f3438298862e0759fa78694dbe78060f6369502f4386a09",
+      "trace": "0cd7ec2ebb493a6d48fa3e925931e3d91cec80a45005418f539e412c7b8567eb"
     },
     "python/variables_types": {
       "kind": "output",
@@ -149,7 +150,8 @@
     "python/vote": {
       "kind": "output",
       "source": "54ad40e5635c6cd75a2a6fa579c0101a8e3a22ca83b117b5697a8e8df9b1fcae",
-      "expected": "942345b0d500c5524e638a6cbb45dbd8663332385016eafedcbb2af1ad6f1c06"
+      "expected": "942345b0d500c5524e638a6cbb45dbd8663332385016eafedcbb2af1ad6f1c06",
+      "trace": "501dd64f3ca8553ce28356666b2b1f17733404984dc66e0970516aae2d172efc"
     }
   }
 }
