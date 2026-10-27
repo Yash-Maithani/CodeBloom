@@ -41,6 +41,7 @@ for (const { name, saved, code } of cases) {
     const root = await fixture({ "python/sample.py": saved, "python/sample.expected.txt": saved });
     const example = await readExample("python", "sample", root);
     assert.equal(example.code, code);
+    assert.equal(example.kind, "output");
     assert.equal(example.expectedOutput, code, "expected output goes through the same rule");
     assert.ok(!example.code.includes("\r") && !example.expectedOutput.includes("\r"));
   });
@@ -59,7 +60,8 @@ test("loader and highlighter: CRLF copies of the real examples give exactly the 
 
       const fromCrlf = await readExample(language, file, root);
       const fromLf = await readExample(language, file);
-      assert.deepEqual(fromCrlf, fromLf, `${language}/${file}`);
+      const content = ({ code, expectedOutput, kind }: Awaited<ReturnType<typeof readExample>>) => ({ code, expectedOutput, kind });
+      assert.deepEqual(content(fromCrlf), content(fromLf), `${language}/${file}`);
 
       // What the page renders: every line rebuilds the normalized source exactly.
       const lines = await highlight(fromCrlf.code, language);

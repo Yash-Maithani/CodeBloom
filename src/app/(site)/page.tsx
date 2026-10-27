@@ -3,10 +3,12 @@ import { homeExample } from "@content/home-example";
 import { CodeBlock } from "@/components/code-block";
 import { Container } from "@/components/container";
 import { CourseCard } from "@/components/course-card";
-import { buttonStyles } from "@/components/styles";
+import { buttonStyles, textLinkStyles } from "@/components/styles";
 import { checkNotes } from "@/lib/code-notes";
 import { CODE_LANGUAGES, readExample } from "@/lib/examples";
 import { highlight } from "@/lib/highlight";
+import { allLessons, courseStatusSentence, joinNames, publishedByCourse } from "@/lib/site-lessons";
+import { assertVerified, readRecord } from "@/lib/verified";
 import Link from "next/link";
 
 // A real sequence, so the steps are numbered (DESIGN.md: numbering only for sequences).
@@ -28,8 +30,8 @@ const lessonSteps = [
     text: "Errors beginners often make, what happens when you make them, and how to fix them.",
   },
   {
-    title: "Practice with hints (planned)",
-    text: "Questions with hints you reveal one at a time, and solutions that explain why. Practice arrives after the first lessons.",
+    title: "Practice questions",
+    text: "A few questions at the end of the lesson, each with a written solution you open when you are ready. Hints and instant feedback are planned.",
   },
 ];
 
@@ -45,9 +47,21 @@ const story = [
 
 export default async function HomePage() {
   // Read at build time from the checked example files (see content/home-example.ts).
+  const exampleId = `${homeExample.language}/${homeExample.file}`;
   const example = await readExample(homeExample.language, homeExample.file);
+  // The same publish gate as lessons: the build stops if this example was not verified.
+  await assertVerified(await readRecord(), exampleId, example.kind, example.sourceFile, example.expectationFile);
   const lines = await highlight(example.code, example.language);
-  checkNotes(homeExample.notes, lines.length, `${homeExample.language}/${homeExample.file}`);
+  checkNotes(homeExample.notes, lines.length, exampleId);
+
+  // Everything said about lessons comes from the lesson data, so it cannot go stale.
+  const byCourse = await publishedByCourse();
+  const coursesWithLessons = courses.filter((course) => (byCourse.get(course.slug) ?? []).length > 0).map((course) => course.name);
+  const statusSentence = await courseStatusSentence();
+  // The published lesson that teaches with this same example, if there is one.
+  const exampleLesson = (await allLessons()).find(
+    (lesson) => lesson.source.status === "published" && lesson.body.some((block) => block.type === "example" && block.example.id === exampleId),
+  );
 
   return (
     <>
@@ -59,12 +73,13 @@ export default async function HomePage() {
             </h1>
             <p className="mt-6 text-lg">
               CodeBloom is a learning site for beginners studying C, C++, Java or Python. Lessons
-              will explain code in plain English, with a note beside each line that matters and the
+              explain code in plain English, with a note beside each line that matters and the
               output the code really prints.
             </p>
             <p className="mt-4 text-ink-muted">
-              CodeBloom is new. The first lessons are being written, and each course page shows
-              what it will cover.
+              {coursesWithLessons.length === 0
+                ? "CodeBloom is new. The first lessons are being written, and each course page shows what it will cover."
+                : `CodeBloom is new. The first lessons are published for ${joinNames(coursesWithLessons)}, and more are being written.`}
             </p>
             <Link href="/courses" className={`mt-8 ${buttonStyles.primary}`}>
               Browse the courses
@@ -74,12 +89,23 @@ export default async function HomePage() {
           <div className="mt-12">
             <CodeBlock
               caption={homeExample.caption}
+              regionLabel={`${CODE_LANGUAGES[example.language].label} code: ${homeExample.caption}`}
               languageLabel={CODE_LANGUAGES[example.language].label}
               code={example.code}
               lines={lines}
               notes={homeExample.notes}
               expectedOutput={example.expectedOutput}
+              exampleId={exampleId}
             />
+            {exampleLesson && (
+              <p className="mt-4 max-w-measure text-sm">
+                This example comes from the lesson{" "}
+                <Link href={exampleLesson.href} className={textLinkStyles}>
+                  {exampleLesson.source.title}
+                </Link>{" "}
+                in the {exampleLesson.course.name} course.
+              </p>
+            )}
           </div>
         </Container>
       </section>
@@ -87,7 +113,7 @@ export default async function HomePage() {
       <section aria-labelledby="lesson-steps-title" className="border-t border-rule">
         <Container className="py-12 md:py-16">
           <h2 id="lesson-steps-title" className="font-heading text-2xl font-semibold">
-            How each lesson will work
+            How each lesson works
           </h2>
           <ol className="mt-8 flex max-w-measure flex-col gap-8">
             {lessonSteps.map((step, index) => (
@@ -111,13 +137,12 @@ export default async function HomePage() {
             Choose a language
           </h2>
           <p className="mt-4 max-w-measure text-base">
-            Each course starts from zero. No lessons are published yet. Open a course to see the
-            topics it will cover.
+            Each course starts from zero. {statusSentence}
           </p>
           <ul className="mt-8 grid gap-6 sm:grid-cols-2">
             {courses.map((course) => (
               <li key={course.slug} className="flex">
-                <CourseCard course={course} headingLevel="h3" />
+                <CourseCard course={course} headingLevel="h3" lessonCount={byCourse.get(course.slug)?.length ?? 0} />
               </li>
             ))}
           </ul>

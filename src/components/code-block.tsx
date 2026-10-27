@@ -17,19 +17,34 @@
 
 import { Fragment, useEffect, useId, useState } from "react";
 import { CircleAlert } from "lucide-react";
+import { OutputPanel } from "@/components/output-panel";
+import { InlineText } from "@/components/prose";
 import { buttonStyles } from "@/components/styles";
 import type { CodeNote } from "@/lib/code-notes";
 import type { CodeToken, TokenKind } from "@/lib/highlight";
+import type { ExpectationKind } from "@/lib/verified";
 
 type CodeBlockProps = {
-  caption: string;
+  /** Shown above the code. Optional: mistakes and practice questions have their own headings. */
+  caption?: string;
+  /** Names the code for screen readers. Must be unique on the page, for example "Python code: The fix". */
+  regionLabel: string;
   languageLabel: string;
   /** The source exactly as it was run; this is what Copy code puts on the clipboard */
   code: string;
   /** The same source split into lines of tokens */
   lines: CodeToken[][];
   notes: CodeNote[];
+  /** The recorded output or error message */
   expectedOutput: string;
+  /** What kind of result expectedOutput is. Default: output */
+  kind?: ExpectationKind;
+  /** Labels the block "Example with a mistake" instead of "Runnable example" */
+  mistake?: boolean;
+  /** False for practice questions: the output is shown in the solution instead */
+  showOutput?: boolean;
+  /** "<language>/<file>", so tests can compare the page with the example's files */
+  exampleId?: string;
 };
 
 const tokenStyles: Record<TokenKind, string> = {
@@ -38,19 +53,6 @@ const tokenStyles: Record<TokenKind, string> = {
   literal: "text-syntax-literal",
   comment: "italic text-ink-muted",
 };
-
-// Text between backticks becomes inline code.
-function NoteText({ text }: { text: string }) {
-  return text.split("`").map((part, index) =>
-    index % 2 === 1 ? (
-      <code key={index} className="font-mono">
-        {part}
-      </code>
-    ) : (
-      <Fragment key={index}>{part}</Fragment>
-    ),
-  );
-}
 
 function NoteMarker({ number }: { number: number }) {
   return (
@@ -69,7 +71,19 @@ function lineLabel(note: CodeNote) {
     : `Lines ${note.startLine} to ${note.endLine}: `;
 }
 
-export function CodeBlock({ caption, languageLabel, code, lines, notes, expectedOutput }: CodeBlockProps) {
+export function CodeBlock({
+  caption,
+  regionLabel,
+  languageLabel,
+  code,
+  lines,
+  notes,
+  expectedOutput,
+  kind = "output",
+  mistake = false,
+  showOutput = true,
+  exampleId,
+}: CodeBlockProps) {
   const [notesHidden, setNotesHidden] = useState(false);
   const [activeNote, setActiveNote] = useState<number | null>(null);
   const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">("idle");
@@ -98,13 +112,13 @@ export function CodeBlock({ caption, languageLabel, code, lines, notes, expected
     lineNumber <= notes[activeNote].endLine;
 
   return (
-    <figure className="max-w-lesson">
-      <figcaption className="mb-3 text-sm text-ink-muted">{caption}</figcaption>
+    <figure className="max-w-lesson" data-example={exampleId}>
+      {caption && <figcaption className="mb-3 text-sm text-ink-muted">{caption}</figcaption>}
 
       <div className="rounded-panel border border-rule bg-code">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-rule px-4 py-2">
           <span className="text-sm font-bold">{languageLabel}</span>
-          <span className="text-sm text-ink-muted">Runnable example</span>
+          <span className="text-sm text-ink-muted">{mistake ? "Example with a mistake" : "Runnable example"}</span>
           <div className="ml-auto flex flex-wrap gap-2">
             {notes.length > 0 && (
               <button
@@ -135,7 +149,7 @@ export function CodeBlock({ caption, languageLabel, code, lines, notes, expected
           <pre
             tabIndex={0}
             role="region"
-            aria-label={`${languageLabel} code`}
+            aria-label={regionLabel}
             className="overflow-x-auto py-4 font-mono text-mono"
           >
             <code className="block">
@@ -178,9 +192,7 @@ export function CodeBlock({ caption, languageLabel, code, lines, notes, expected
                         className="mx-4 my-2 flex select-none gap-3 border-l-3 border-accent bg-sheet px-4 py-2 font-sans text-sm whitespace-normal lg:hidden"
                       >
                         <NoteMarker number={noteIndex + 1} />
-                        <span>
-                          <NoteText text={note.text} />
-                        </span>
+                        <InlineText text={note.text} />
                       </span>
                     )}
                   </Fragment>
@@ -220,7 +232,7 @@ export function CodeBlock({ caption, languageLabel, code, lines, notes, expected
                       <NoteMarker number={index + 1} />
                       <span>
                         <span className="sr-only">{lineLabel(note)}</span>
-                        <NoteText text={note.text} />
+                        <InlineText text={note.text} />
                       </span>
                     </li>
                   );
@@ -231,12 +243,11 @@ export function CodeBlock({ caption, languageLabel, code, lines, notes, expected
         </div>
       </div>
 
-      <div className="mt-4 rounded-panel border border-l-3 border-rule border-l-ink-muted bg-code">
-        <p className="px-4 pt-3 text-sm font-bold">Expected output</p>
-        <pre className="overflow-x-auto px-4 pt-1 pb-4 font-mono text-mono">
-          <code>{expectedOutput}</code>
-        </pre>
-      </div>
+      {showOutput && (
+        <div className="mt-4">
+          <OutputPanel kind={kind} text={expectedOutput} />
+        </div>
+      )}
     </figure>
   );
 }

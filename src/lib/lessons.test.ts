@@ -1,0 +1,234 @@
+// Tests for the lesson loader and publish gate (src/lib/lessons.ts).
+// Run with `npm run test:unit`. Fixtures live in a temporary folder.
+
+import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
+import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import path from "node:path";
+import { after, test } from "node:test";
+import { courses } from "../../content/courses.ts";
+import { lessonSources } from "../../content/lessons/index.ts";
+import type { Course } from "../../content/courses.ts";
+import type { LessonSource } from "./lesson-types.ts";
+import { buildLessons, neighbours, publishedIn, sameConceptElsewhere, type LoadedLesson } from "./lessons.ts";
+
+// ---------- the real lessons ----------
+
+let real: LoadedLesson[];
+const site = async () => {
+  real ??= await buildLessons({
+    courses,
+    sources: lessonSources,
+    contentRoot: path.join(process.cwd(), "content"),
+    recordPath: path.join(process.cwd(), "content", "verified-examples.json"),
+  });
+  return real;
+};
+const find = (lessons: LoadedLesson[], href: string) => lessons.find((l) => l.href === href)!;
+
+test("every real lesson loads, passes its checks and the publish gate", async () => {
+  const lessons = await site();
+  assert.deepEqual(lessons.map((l) => `${l.href} ${l.source.status}`).sort(), [
+    "/courses/c/first-program published",
+    "/courses/c/variables published",
+    "/courses/python/decisions published",
+    "/courses/python/variables published",
+  ]);
+});
+
+test("real courses: previous and next follow published lessons in topic order", async () => {
+  const lessons = await site();
+  const c = courses.find((course) => course.slug === "c")!;
+  assert.deepEqual(publishedIn(lessons, c).map((l) => l.source.slug), ["first-program", "variables"]);
+  const first = neighbours(lessons, find(lessons, "/courses/c/first-program"));
+  assert.equal(first.number, 1);
+  assert.equal(first.previous, undefined, "the first lesson has no previous lesson");
+  assert.equal(first.next?.href, "/courses/c/variables");
+  const last = neighbours(lessons, find(lessons, "/courses/python/decisions"));
+  assert.equal(last.number, 2);
+  assert.equal(last.previous?.href, "/courses/python/variables");
+  assert.equal(last.next, undefined, "the last lesson has no next lesson");
+  for (const slug of ["cpp", "java"]) assert.deepEqual(publishedIn(lessons, courses.find((x) => x.slug === slug)!), []);
+});
+
+test("real lessons: the Variables lessons point to each other as the same concept", async () => {
+  const lessons = await site();
+  assert.deepEqual(sameConceptElsewhere(lessons, find(lessons, "/courses/python/variables")).map((l) => l.href), ["/courses/c/variables"]);
+  assert.deepEqual(sameConceptElsewhere(lessons, find(lessons, "/courses/c/variables")).map((l) => l.href), ["/courses/python/variables"]);
+  assert.deepEqual(sameConceptElsewhere(lessons, find(lessons, "/courses/python/decisions")), []);
+});
+
+test("real lessons: displayed results are the recorded files, including trailing spaces", async () => {
+  const lessons = await site();
+  const semicolon = find(lessons, "/courses/c/first-program").mistakes[0].rendered;
+  assert.equal(semicolon.kind, "compile-error");
+  assert.ok(semicolon.result.endsWith("|     ~~~~~~                    "), "gcc's 20 trailing spaces are kept");
+  const nameError = find(lessons, "/courses/python/variables").mistakes[0].rendered;
+  assert.equal(nameError.kind, "run-error");
+  assert.ok(nameError.result.startsWith("Traceback (most recent call last):\n  File \"name_error.py\", line 3"));
+});
+
+// ---------- fixtures ----------
+
+const folders: string[] = [];
+after(async () => {
+  for (const folder of folders) await rm(folder, { recursive: true, force: true });
+});
+
+const sha = (text: string) => createHash("sha256").update(text.replace(/\r\n?/g, "\n"), "utf8").digest("hex");
+
+type Fixture = {
+  sources: LessonSource[];
+  files: Record<string, string>;
+  /** Example ids to put in the record (from the files as given, before `after` changes) */
+  verified?: string[];
+  topics?: Course["topics"];
+};
+
+const EXAMPLE_FILES = {
+  "examples/python/show.py": "x = 1\nprint(x)\n",
+  "examples/python/show.expected.txt": "1\n",
+  "examples/python/oops.py": "print(y)\n",
+  "examples/python/oops.run-error.txt": "NameError\n",
+};
+
+const lesson = (overrides: Partial<LessonSource> = {}): LessonSource => ({
+  course: "python",
+  slug: "one",
+  title: "One",
+  status: "draft",
+  objective: "Do one thing.",
+  examples: { show: { file: "python/show", notes: [{ startLine: 1, endLine: 1, text: "Sets `x`." }] } },
+  mistakes: [],
+  practice: [],
+  recap: ["First point.", "Second point."],
+  ...overrides,
+});
+
+async function build({ sources, files, verified = [], topics }: Fixture) {
+  const root = await mkdtemp(path.join(tmpdir(), "codebloom-lessons-test-"));
+  folders.push(root);
+  const all: Record<string, string> = { ...EXAMPLE_FILES, "lessons/python/one.md": "Intro.\n\n{{example show}}\n", ...files };
+  for (const [name, content] of Object.entries(all)) {
+    await mkdir(path.dirname(path.join(root, name)), { recursive: true });
+    await writeFile(path.join(root, name), content);
+  }
+  const record: Record<string, unknown> = {};
+  for (const id of verified) {
+    const kind = all[`examples/${id}.expected.txt`] !== undefined ? "output" : "run-error";
+    const expectation = kind === "output" ? `examples/${id}.expected.txt` : `examples/${id}.run-error.txt`;
+    record[id] = { kind, source: sha(all[`examples/${id}.py`]), expected: sha(all[expectation]) };
+  }
+  await writeFile(path.join(root, "record.json"), JSON.stringify({ examples: record }));
+  const course: Course = {
+    slug: "python",
+    name: "Python",
+    summary: "s",
+    description: "d",
+    topics: topics ?? sources.map((s) => ({ title: s.title, lesson: s.slug })),
+  };
+  return { root, run: () => buildLessons({ courses: [course], sources, contentRoot: root, recordPath: path.join(root, "record.json") }) };
+}
+
+const rejects = async (fixture: Fixture, message: RegExp) => {
+  const { run } = await build(fixture);
+  await assert.rejects(run(), message);
+};
+
+// ---------- the publish gate ----------
+
+test("gate: a draft with unverified examples loads, but is never listed as published", async () => {
+  const { run } = await build({ sources: [lesson()], files: {} });
+  const lessons = await run();
+  assert.equal(lessons.length, 1);
+  assert.deepEqual(publishedIn(lessons, lessons[0].course), []);
+});
+
+test("gate: a published lesson with an example that was never verified stops the build", async () => {
+  await rejects({ sources: [lesson({ status: "published" })], files: {} }, /python\/show has never been verified/);
+});
+
+test("gate: a published lesson whose example changed after verification stops the build", async () => {
+  const { root, run } = await build({ sources: [lesson({ status: "published" })], files: {}, verified: ["python/show"] });
+  await run(); // verified as recorded: loads
+  await writeFile(path.join(root, "examples/python/show.expected.txt"), "2\n");
+  await assert.rejects(run(), /python\/show has changed since it was last verified/);
+});
+
+test("gate: a Windows (CRLF) checkout of a verified example still passes", async () => {
+  const { root, run } = await build({ sources: [lesson({ status: "published" })], files: {}, verified: ["python/show"] });
+  await writeFile(path.join(root, "examples/python/show.py"), "x = 1\r\nprint(x)\r\n");
+  await writeFile(path.join(root, "examples/python/show.expected.txt"), "1\r\n");
+  const [loaded] = await run();
+  assert.equal(loaded.body[1].type === "example" && loaded.body[1].example.result, "1");
+});
+
+test("gate: every example of a published lesson is checked, including mistakes and practice", async () => {
+  const published = lesson({
+    status: "published",
+    mistakes: [{ title: "Oops", example: { file: "python/oops", notes: [] }, whatHappens: "it fails.", fix: "fix it." }],
+  });
+  await rejects({ sources: [published], files: {}, verified: ["python/show"] }, /python\/oops has never been verified/);
+  const { run } = await build({ sources: [published], files: {}, verified: ["python/show", "python/oops"] });
+  const [loaded] = await run();
+  assert.equal(loaded.mistakes[0].rendered.kind, "run-error");
+});
+
+// ---------- schema checks ----------
+
+test("placeholders must match the examples exactly", async () => {
+  await rejects({ sources: [lesson()], files: { "lessons/python/one.md": "{{example missing}}\n" } }, /\{\{example missing\}\} has no matching entry/);
+  await rejects({ sources: [lesson()], files: { "lessons/python/one.md": "{{example show}}\n\n{{example show}}\n" } }, /placed more than once/);
+  await rejects({ sources: [lesson()], files: { "lessons/python/one.md": "No examples.\n" } }, /never placed with \{\{example <id>\}\}: show/);
+  await rejects({ sources: [lesson({ examples: {} })], files: { "lessons/python/one.md": "Text.\n" } }, /needs at least one runnable example/);
+});
+
+test("an analogy needs its limit and must be placed exactly once", async () => {
+  const analogy = { title: "A box", text: "Like a box.", limit: "it is not a box." };
+  await rejects({ sources: [lesson({ analogy })], files: {} }, /must place it once with \{\{analogy\}\}/);
+  await rejects({ sources: [lesson()], files: { "lessons/python/one.md": "{{analogy}}\n\n{{example show}}\n" } }, /lesson has no analogy/);
+  await rejects({ sources: [lesson({ analogy: { ...analogy, limit: " " } })], files: {} }, /analogy limit: must not be empty/);
+});
+
+test("links must lead to real pages; a published lesson may not link to a draft", async () => {
+  const two = lesson({ slug: "two", title: "Two" });
+  await rejects({ sources: [lesson()], files: { "lessons/python/one.md": "See [x](/nowhere).\n\n{{example show}}\n" } }, /link to \/nowhere does not lead to a page/);
+  const linking = { "lessons/python/one.md": "See [two](/courses/python/two).\n\n{{example show}}\n", "lessons/python/two.md": "{{example show}}\n" };
+  await rejects({ sources: [lesson({ status: "published" }), two], files: linking, verified: ["python/show"] }, /points to a draft lesson/);
+  const { run } = await build({ sources: [lesson(), two], files: linking });
+  assert.equal((await run()).length, 2, "a draft may link to another draft");
+});
+
+test("every lesson appears once in its course topics, and every topic lesson exists", async () => {
+  await rejects({ sources: [lesson()], files: {}, topics: [{ title: "Something" }] }, /must appear exactly once in the topics/);
+  await rejects({ sources: [lesson()], files: {}, topics: [{ title: "One", lesson: "one" }, { title: "Ghost", lesson: "ghost" }] }, /names lesson "ghost", which does not exist/);
+});
+
+test("examples must belong to the lesson's language and be the right kind", async () => {
+  await rejects({ sources: [lesson({ examples: { show: { file: "c/show", notes: [] } } })], files: {} }, /file must be "python\/<name>"/);
+  await rejects(
+    { sources: [lesson({ examples: { show: { file: "python/oops", notes: [] } } })], files: {} },
+    /python\/oops is a run-error example; allowed here: output/,
+  );
+});
+
+test("notes must point at real lines, in order", async () => {
+  await rejects(
+    { sources: [lesson({ examples: { show: { file: "python/show", notes: [{ startLine: 3, endLine: 3, text: "No line 3." }] } } })], files: {} },
+    /lines 3 to 3 are outside the 2-line example/,
+  );
+});
+
+test("text fields are checked: no dashes, no empty recap, no unsupported syntax", async () => {
+  await rejects({ sources: [lesson({ objective: "Learn this — fast." })], files: {} }, /objective: em and en dashes/);
+  await rejects({ sources: [lesson({ recap: ["Only one."] })], files: {} }, /recap needs at least two points/);
+  await rejects({ sources: [lesson({ recap: ["A `broken point.", "Fine."] })], files: {} }, /recap point 1: a backtick is not closed/);
+  await rejects({ sources: [lesson({ title: "A **bold** title" })], files: {} }, /title: must be plain text/);
+});
+
+test("a published course with a single lesson has neither previous nor next", async () => {
+  const { run } = await build({ sources: [lesson({ status: "published" })], files: {}, verified: ["python/show"] });
+  const lessons = await run();
+  assert.deepEqual(neighbours(lessons, lessons[0]), { number: 1, previous: undefined, next: undefined });
+});

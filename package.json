@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit",
     "test:e2e": "npm run build && playwright test",
     "test:runner": "node --test scripts/check-examples.test.mjs",
-    "test:unit": "node --conditions=react-server --test \"src/**/*.test.ts\"",
+    "test:unit": "node --import ./scripts/tsx-loader.mjs --test \"src/**/*.test.ts\"",
     "check:examples": "node scripts/check-examples.mjs",
     "verify:browser": "node scripts/verify-browser.mjs"
   },
