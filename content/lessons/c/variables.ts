@@ -107,7 +107,7 @@ export const cVariables: LessonSource = {
         { text: "10", why: "C does not round when it stores a decimal number in an `int`. It drops the decimal part, so 9.99 becomes 9." },
         { text: "9.99", why: "`count` is an `int`, which holds only whole numbers, so the decimal part is dropped when the value is stored. `%d` then prints a whole number." },
       ],
-      hints: ["What kind of number can an `int` hold?", "Look at the common mistake about storing 2.75 in an `int`: does C round?"],
+      hints: ["What kind of number can an `int` hold?", "Look at the 2.75 example under Common mistakes. Compare the number in the code with what it printed. Which part of the number went missing?"],
       explanation: "`count` is an `int`, so it keeps only the whole-number part. C does not round.",
     },
     {

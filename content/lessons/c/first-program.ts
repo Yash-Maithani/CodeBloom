@@ -111,9 +111,9 @@ export const cFirstProgram: LessonSource = {
       kind: "choice",
       question: "You compile `first_program.c`, then change the message in the source code and run `./first_program` again without compiling. What do you see?",
       options: [
-        { text: "The new message, because the computer reads the `.c` file each time.", why: "The processor runs the machine code in the program file, not the source code. Until you compile again, that file still holds the old instructions." },
-        { text: "The old message.", why: "The program file only changes when you compile, so it still contains the old instructions.", correct: true },
-        { text: "An error, because the source code changed.", why: "Running a program does not look at the source file, so changing it cannot cause an error at this point." },
+        { text: "The new message, because `./first_program` reads the `.c` file.", why: "The processor runs the machine code in the program file, not the source code. Until you compile again, that file still holds the old instructions." },
+        { text: "The old message, because the program file was not rebuilt.", why: "The program file only changes when you compile, so it still contains the old instructions.", correct: true },
+        { text: "An error, because the source file changed after compiling.", why: "Running a program does not look at the source file, so changing it cannot cause an error at this point." },
       ],
       hints: ["Which file does `./first_program` run: the source code or the machine code?", "When does the program file change?"],
       explanation: "Compiling turns source code into a separate program file. Running uses that file, so after a change you compile again before you run.",

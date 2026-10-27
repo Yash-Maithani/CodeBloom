@@ -133,10 +133,10 @@ export const pythonVariables: LessonSource = {
       kind: "choice",
       question: "In Python, what happens when `age = 17` is followed later by `age = \"seventeen\"`?",
       options: [
-        { text: "`age` now refers to a `str` value, and Python allows it.", why: "In Python, values have types and names do not, so a name can be reassigned to a value of a different type. The types example in this lesson shows it on lines 5 and 6.", correct: true },
+        { text: "`type(age)` reports `str`, because `age` refers to the new value.", why: "In Python, values have types and names do not, so a name can be reassigned to a value of a different type. The types example in this lesson shows it: line 6 reports `str` after line 5 reassigns `age`.", correct: true },
         { text: "Python stops with a `TypeError`, because `age` was an `int`.", why: "The type belongs to the value, not to the name. Reassigning `age` to text is allowed; a `TypeError` happens when an operation gets the wrong type, as in joining text and a number with `+`." },
-        { text: "The value 17 is turned into the text \"seventeen\".", why: "The second line does not change the value 17. It makes the name `age` refer to a different value." },
-        { text: "`age` now holds both values.", why: "A variable refers to one value at a time. After the second line, `age` refers only to \"seventeen\"." },
+        { text: "The value 17 becomes \"seventeen\", because Python converts it.", why: "The second line does not change the value 17. It makes the name `age` refer to a different value." },
+        { text: "`age` holds both values, because Python keeps the old one.", why: "A variable refers to one value at a time. After the second line, `age` refers only to \"seventeen\"." },
       ],
       hints: ["In Python, does a type belong to the name or to the value?", "Look back at the types example: what does line 6 show after line 5 runs?"],
       explanation: "Giving an existing name a new value is reassigning it. Python checks types when an operation uses a value, not when a name gets a new one.",
