@@ -1,0 +1,4 @@
+Password: wrong
+Try again: guess
+Try again: open
+Welcome

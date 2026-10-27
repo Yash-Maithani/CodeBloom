@@ -9,6 +9,7 @@ const VISUALS = [
   { path: "/courses/python/variables", id: "change", file: "python/variables_change" },
   { path: "/courses/python/decisions", id: "vote", file: "python/vote" },
   { path: "/courses/python/elif", id: "ticket", file: "python/elif_ticket" },
+  { path: "/courses/python/loops", id: "count", file: "python/loop_while_count" },
 ];
 const traceOf = (file: string): Trace => JSON.parse(readFileSync(`content/examples/${file}.trace.json`, "utf8"));
 const outputLines = (output: string) => (output === "" ? [] : output.replace(/\n$/, "").split("\n"));

@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "func_wrong_count.py", line 4, in <module>
+    greet("Ada", "Grace")
+    ~~~~~^^^^^^^^^^^^^^^^
+TypeError: greet() takes 1 positional argument but 2 were given

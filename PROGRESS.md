@@ -8,7 +8,9 @@ Last updated: 2026-10-27
 
 **Milestone 5: Python playground.** Implemented and Tested (Chromium only; light and dark; 320 to 1440px; keyboard only). Python runs in the browser with Pyodide 314.0.7, self-hosted, in a Web Worker: `/playground` and one page per runnable Python lesson example. Not yet Verified in browser with a real screen reader or on a real phone. Awaiting owner review and a pull request opened by the owner. Nothing is Deployed.
 
-**Python batch 1** (branch `claude/python-batch-1`, started from `main` at `4539e0c`): three published Python lessons in course order, "Your first Python program", "Input and output" and "More decisions with elif", so the Python course now has five lessons. Text approved by the owner before any file was written. Implemented, Tested and Verified in browser (Chromium only). Awaiting owner review and a pull request opened by the owner. Nothing is Deployed.
+**Python batch 2** (branch `claude/python-batch-2`, started from `main` at `e272980`, which includes batch 1 merged as pull request 8): three more published Python lessons in course order, "Loops: while and for", "Functions" and "Lists", so the Python course now has eight lessons. Text approved by the owner, with five wording fixes, before any file was written. Implemented, Tested and Verified in browser (Chromium only). Awaiting owner review and a pull request opened by the owner. Nothing is Deployed.
+
+**Python batch 1** (merged by the owner in pull request 8, `e272980`; branch `claude/python-batch-1`, started from `main` at `4539e0c`): three published Python lessons in course order, "Your first Python program", "Input and output" and "More decisions with elif", so the Python course now has five lessons. Text approved by the owner before any file was written. Implemented, Tested and Verified in browser (Chromium only). Awaiting owner review and a pull request opened by the owner. Nothing is Deployed.
 
 Milestone 4 was merged by the owner in pull request 6 (`2a6a7a5`). The Milestone 3 screen reader walkthrough is deferred by the owner's decision and stays open (checklist below). Milestone 3 was merged in pull request 5 (`b70ba48`).
 
@@ -86,6 +88,9 @@ Windows, Narrator (Windows key + Ctrl + Enter) or NVDA, in Edge or Chrome, on `/
 | Python lesson: Your first Python program (D64) | Verified in browser | `content/lessons/python/first-program.*`, concept `first-program`. 6 examples, 2 practice predictions and 1 choice. No visual |
 | Python lesson: Input and output (D64) | Verified in browser | `input-output.*`, concept `input-output`. 8 examples, 4 that read input. No visual: the tracer cannot trace `input()` |
 | Python lesson: More decisions with elif (D64) | Verified in browser | `elif.*`, concept `several-choices`, one step-through visual (`elif_ticket`) |
+| Python lesson: Loops: while and for (D68) | Verified in browser | `content/lessons/python/loops.*`, concept `repetition`. 8 examples, one input example, one step-through visual (`loop_while_count`), 2 mistakes (a stop value that `range` never includes, an indent that repeats a line). The infinite loop is taught in prose and a choice question, not an example (D69) |
+| Python lesson: Functions (D68) | Verified in browser | `functions.*`, concept `functions`. 5 examples, 3 mistakes (no `return`, a local name used outside, the wrong number of arguments). No visual: the tracer cannot show function calls |
+| Python lesson: Lists (D68) | Verified in browser | `lists.*`, concept `many-values`. 3 examples, 2 mistakes (an index that does not exist, a second name that is not a copy). No visual |
 | Input files for examples (D65) | Tested | `name.input.txt`, `scripts/lib/python-input.py`, hash in the verification record; 7 runner tests and 5 gate tests |
 | Playground pre-fills the Input box (D66) | Verified in browser | From the example's input file; Reset restores code and input; the four input examples run in the real playground and match their verified output |
 
@@ -96,7 +101,7 @@ Nothing beyond owner review of Milestone 5 and the owner's Milestone 3 screen re
 ## Outstanding tasks
 
 1. Owner reviews Milestone 5 and opens the pull request from `claude/milestone-5`.
-1a. Owner reviews Python batch 1 and opens the pull request from `claude/python-batch-1`. Optional follow-up, not done: the published Variables lesson also says that Python runs lines one at a time, which now repeats the first lesson a little.
+1a. Owner reviews Python batch 2 and opens the pull request from `claude/python-batch-2`. Python batch 1 was merged in pull request 8. Optional follow-up, not done: the published Variables lesson also says that Python runs lines one at a time, which now repeats the first lesson a little.
 2. Measure the first Python start on a real mid-range phone (Chromium's CPU throttling does not reach workers, so the emulated numbers understate CPU time).
 3. Owner runs the screen reader checklist above and reports the results; then Milestone 3 can be marked Verified in browser. Deferred by the owner; kept open.
 4. A screen reader pass over one visual and one playground run (Next step, the ends, the table) when the owner does the Milestone 3 walkthrough; not done.
@@ -292,6 +297,11 @@ The OFL allows free use, self-hosting and embedding in a website; the font files
 | 2026-10-27 | Problems found while adding the lessons | The prose checker rejected a bare `*` used as multiplication in an explanation (now "6 times 2"). A practice test helper read the screen-reader label "Line 3: " as the text of an empty output line; the page is correct, so the helper now reads only the visible text node. Tests that pinned the old lesson list, the Python course order, the card count (now "5 lessons published"), the planned topics and the 404 example were updated to the real data; the previous and next test now walks every lesson of a course. The practice, layout and visual tests now also cover the new lessons. |
 | 2026-10-27 | Final gates for Python batch 1 | `lint` 0, `typecheck` 0, `test:e2e` 168 of 168 (builds first), `check:examples` 52 of 52, `test:runner` 37 of 37, `test:unit` 102 of 102, `verify:browser` 114 of 114, `npm audit` 0 vulnerabilities. New browser tests: 3 playground (Input box filled, Reset restores both, no input stays empty) with a run of each input example in the real Pyodide playground, 1 visual (the `elif` ticket). |
 | 2026-10-27 | Accessibility scan after Python batch 1 (axe-core 4.14.0, outside the repo, reduced motion) | 28 scans (`/courses/python`, the three new lessons, decisions, two playground pages; light and dark; 360 and 1440px): 0 violations, 8 items needing review (see Known limitations). |
+| 2026-10-27 | Python batch 2: claims and examples run in the scratchpad before any file was written | 28 draft examples run under Python 3.13.17 (the checker) and Pyodide 314.0.7, Python 3.14.2 (the playground): identical output and error text. Claims measured: `range(3)`, `range(1, 4)`, `range(1, 5)` (length 4), `range(0)`, `range(5, 1)` and `range(3, 3)` are as the lesson says, the last three empty; a `while` false at the start runs 0 passes; the condition is checked only at the top of a pass (the body ran with `count` at 4); a loop that never changes its variable was killed by `timeout` with no Python error; `for` over an empty list runs 0 passes; a call before its `def` gives `NameError`; `greet` without parentheses does nothing; `return` stops a function; a function without `return` gives `None`; too few arguments gives `TypeError`; `fruits[3]` on three items gives `IndexError`; `append` returns `None`; `b = a` makes `a is b` true and `a.copy()` makes it false. The tracer prints a function with a changing address and shows no parameters, which is why Functions has no visual (D68). An attempt to test Ctrl+C hung and was stopped, so the lessons say nothing about it. |
+| 2026-10-27 | Owner's wording fixes applied in Python batch 2 | `len` removed from the list of functions already used in Functions (it first appears in Lists). Mistake order in the Lists prose and the "second name" reference in the Lists and Functions practice questions now match the page order. The Functions text says a name created inside a function is local to it and cannot be used directly from outside, and that a result is returned and then stored or used; it never says the value disappears. The Loops text says Python itself never stops an infinite loop and that the playground stops a run after its 5-second limit (`TIME_LIMIT_MS` in `src/lib/playground.ts`). |
+| 2026-10-27 | `npm run check:examples` after Python batch 2 | 81 of 81 (52 before, 29 new). The record gained the `loop_while_count` trace hash and the `loop_ask_again` input hash. |
+| 2026-10-27 | Final gates for Python batch 2 | `lint` 0, `typecheck` 0, `test:e2e` 190 of 190 (builds first; 168 before, 22 new), `check:examples` 81 of 81, `test:runner` 37 of 37, `test:unit` 102 of 102, `verify:browser` 114 of 114, `npm audit` 0 vulnerabilities. Tests updated to the real data: the lesson list and Python order, the card count (8 lessons published), the planned topics (now starting with Strings), the 404 example, the playground link list, the Input box examples (now 5), and the new visual. |
+| 2026-10-27 | Not done for Python batch 2 | The `design:design-critique`, `design:ux-copy` and `design:accessibility-review` skills and an axe scan were not run: the owner approved the full text first and credits are limited. Only `loop_ask_again` of the input examples was checked in the real playground (by the playground test). Chromium only; no real screen reader. |
 
 ### What `verify:browser` covers
 
@@ -377,6 +387,9 @@ Screenshots are saved to `screenshots/` (`light-360.png`, `light-1440.png`, `dar
 | D65 | 2026-10-27 | An example may have `name.input.txt`, fed one line per `input()` call with each line echoed after its prompt. Only an example that succeeds may have one, and none has a trace. The input hash is in the verification record, so editing an input file stops the build. Error examples still print nothing before failing | Owner approved. The runner gave programs no stdin, so `input()` examples could not be verified. The echo is simulated because Python does not echo piped input; the reason is written in `scripts/lib/python-input.py` and `docs/lesson-authoring.md`. |
 | D66 | 2026-10-27 | A playground page for an example with an input file starts with the Input box filled from that file; "Reset code" restores code and input, with its own announcement | Owner addition. |
 | D67 | 2026-10-27 | Three shared concept files, `first-program`, `input-output` and `several-choices`, language-neutral; the published C lessons are not changed or linked | Owner approved. |
+| D68 | 2026-10-27 | Python batch 2 on a new branch `claude/python-batch-2` from `main` at `e272980` (batch 1 had been merged as pull request 8, so the baseline moved from `4539e0c`): the next three Python topics in course order. A step-through visual only for `loop_while_count`; none for Functions or Lists | Owner approved the text and the choices. The tracer shows only module-level names and prints a function as an object with a changing memory address (`<function greet at 0x...>`), so a function visual would need a tracer change. A list example already prints its result. |
+| D69 | 2026-10-27 | The infinite loop has no runnable example: it is taught in prose and in a choice question that claims no output. The lesson says Python itself never stops an infinite loop and that the CodeBloom playground stops a run after its 5-second limit | Owner approved. An example that never ends cannot be verified by the runner. Measured: a `while` loop whose variable never changes was killed by `timeout` with no Python error, and `TIME_LIMIT_MS` is 5000 in `src/lib/playground.ts`. |
+| D70 | 2026-10-27 | Three concept files, `repetition`, `functions` and `many-values`, language-neutral; topics cut on purpose: `range` with a step, `break`, `continue`, default parameter values, negative indexes, removing list items | Owner approved. Each lesson stays small; none of the text mentions the cut topics. A name created inside a function is described as local to it (not usable directly from outside); the text never says the value itself disappears. |
 
 ## Environment (verified 2026-10-26, cloud session)
 
@@ -384,13 +397,13 @@ Node 22.22.0, npm 10.9.4, Python 3.13, gcc and g++ 13.3, OpenJDK and javac 21. P
 
 ## Git
 
-- Working branch: `claude/milestone-5` (Milestone 5), created from `main` at `2a6a7a5` (D63).
-- `main` at `2a6a7a5` (Milestone 4 merged by the owner); unchanged by Claude.
-- For the latest commit on this branch, run `git log -1 origin/claude/milestone-5`.
+- Working branch: `claude/python-batch-2` (Python batch 2), created from `main` at `e272980` (D68).
+- `main` at `e272980` (Python batch 1 merged by the owner in pull request 8); unchanged by Claude.
+- For the latest commit on this branch, run `git log -1 origin/claude/python-batch-2`.
 
 ## Next recommended task
 
-Owner reviews Milestone 5 and opens the pull request. Before launch, measure the first Python start on a real phone and confirm the host serves the Pyodide files and headers correctly. Milestone 6 gets acceptance criteria when it is planned.
+Owner reviews Python batch 2 and opens the pull request. Before launch, measure the first Python start on a real phone and confirm the host serves the Pyodide files and headers correctly. Milestone 6 gets acceptance criteria when it is planned.
 
 ## Resuming work
 
