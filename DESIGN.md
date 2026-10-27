@@ -133,6 +133,7 @@ Rules:
 - Headings and body are left-aligned. Center only short, single-line elements inside a component.
 - Sentence case everywhere. No all-caps labels. Emphasize with weight 700 sparingly, never by coloring one word of a headline.
 - Code never wraps by default, because wrapping can disguise Python indentation. Long lines scroll horizontally inside the code block.
+- Inline code inside a sentence may wrap where it would otherwise overflow a narrow screen (`overflow-wrap: anywhere`), so pages reflow at 320px (WCAG 1.4.10). Code blocks, output and error messages never wrap.
 
 ## 5. Spacing and layout
 
@@ -219,11 +220,11 @@ One primary button per view region. Labels say exactly what happens ("Check answ
 
 ### Code block (signature component)
 
-- **Header row:** language name in plain text ("Python"), a label saying "Runnable example" or "Pseudocode, not runnable", a notes toggle where notes exist, and a Copy button. The Copy button confirms with "Copied" for two seconds.
+- **Header row:** language name in plain text ("Python"), a label saying "Runnable example", "Example with a mistake" (a real program that fails or misbehaves on purpose, shown in a Common mistake callout) or "Pseudocode, not runnable", a notes toggle where notes exist, and a Copy button. The Copy button confirms with "Copied" for two seconds.
 - **Body:** `code` background, 8px radius, 1px `rule` border, line numbers in `ink-muted` that are not selectable or copied.
 - **Syntax colors (deliberately minimal):** keywords in `ink` at weight 700, strings and numbers in `syntax-literal`, comments in `ink-muted` italic, everything else `ink`. Code must remain readable with no color at all.
 - **Pseudocode:** same panel with a dashed `rule-strong` border and the "not runnable" label. Never styled like runnable code.
-- **Output panel:** directly below the code, headed "Expected output", `code` background with a 3px `ink-muted` left bar. Compiler or runtime error output uses an `error` left bar and an error icon.
+- **Output panel:** directly below the code, headed "Expected output", `code` background with a 3px `ink-muted` left bar. An error message uses an `error` left bar and an x-circle icon, headed "Compiler error message" when the compiler failed or "Error message" when the program failed. The text is always the recorded result of a real run. Like the code, the panel is a focusable region with its own name ("Error message for Python code with a mistake: ..."), so a long message can be scrolled from the keyboard.
 
 ### Margin notes
 
@@ -246,8 +247,23 @@ Three kinds only, each with an icon and a visible title:
 | Kind | Style | Use |
 |---|---|---|
 | Analogy | `accent-tint` background, `accent` left bar | Real-life comparison, followed by where it stops being accurate |
-| Common mistake | `warning-tint` background, `warning` left bar | Wrong code, what happens, the fix |
+| Common mistake | `warning-tint` background, `warning` left bar, triangle-alert icon | An h3 title, then the code block labeled "Example with a mistake" with its real error message or output, then bold-labeled paragraphs "What happens:", optionally "How to read it:" or "Why it is easy to miss:", and "Fix:", optionally followed by a runnable fixed version. Spans the lesson width because it holds code |
 | Note | `sheet` background, `rule-strong` left bar | Side information |
+
+### Lesson page
+
+Left-aligned, in this order: a back link to the course ("Python course"), the h1, the objective as a lead paragraph starting with a bold "Goal:", then "The idea" (the shared explanation of the concept), the lesson's own sections, "Common mistakes", "Practice", "Recap", and the lesson navigation. Prose stays in the 68ch column; code blocks and mistake callouts use the lesson width. Section headings sit 48px apart, 64px from 768px. No label above the h1.
+
+- **Shared idea:** under the "The idea" heading, a small `ink-muted` line "This part is the same in the C lesson." links the same concept in the other languages that have a published lesson. It is left out when there is none.
+- **Analogy callout:** titled "Analogy: <title>", with a bold "Where the comparison stops:" paragraph.
+
+### Practice questions (Milestone 2)
+
+Numbered, because the text can refer to "the first practice question". Each has the question with a bold "Question 1.", the code block without its output, and a native disclosure (`details` and `summary`) styled as a secondary button. Its label reads "Show solution" when closed and "Hide solution" when open. It opens instantly and needs no JavaScript. Inside: the real output panel and a written explanation. No grading, hints or progress until Milestone 3.
+
+### Lesson navigation
+
+After the recap, above a `rule` divider: up to two bordered links (`sheet` background, `rule-strong` border, `accent-tint` on hover), "Previous lesson" on the left and "Next lesson" on the right, each a small `ink-muted` label above the lesson title. They follow published lessons in course order. The first lesson has no previous link and the last has no next link (absent, not disabled). The last lesson says "This is the last published lesson in the <course> course." with a link back to the course. No arrows are added to the text.
 
 ### Quiz and feedback
 

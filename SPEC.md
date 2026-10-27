@@ -96,11 +96,13 @@ Optional blocks, chosen per concept rather than forced into every lesson: [C]
 - Analogy, with a note on where it stops being accurate.
 - A more challenging example.
 - Common mistakes, each with the wrong code, what happens, and the fix.
-- Practice exercises with progressive hints and explained solutions.
+- Practice exercises with progressive hints and explained solutions. In Milestone 2, practice is plain questions with written solutions and no hints; hints and feedback arrive in Milestone 3. [C]
 - A visualization.
 - A small project or revision exercise.
 
 When one concept is taught in several languages, the shared idea is explained once and language-specific syntax or behavior is called out separately. [C]
+
+The schema is implemented in `src/lib/lesson-types.ts` and checked at build time; how to write a lesson is in `docs/lesson-authoring.md`. [C]
 
 ### Language targets
 
@@ -161,11 +163,13 @@ The criteria for Milestones 1 to 4 below refine brief Section 18 and are [A] unt
 - Correct at 360, 768, 1024 and 1440 pixels; no horizontal page scroll.
 - `website-design:web-review` and `design:accessibility-review` run; high-priority findings fixed and logged.
 
-### Milestone 2: lesson architecture
+### Milestone 2: lesson architecture [C]
+
+Confirmed by the owner on 2026-10-27.
 
 - Lesson schema implemented and validated at build time.
 - Course and lesson navigation work (FR-C1, FR-C2, FR-L5).
-- At least three lessons meet the verified definition in Section 6.
+- At least three lessons on three different concepts meet the verified definition in Section 6. The same concept taught in another language is a separate lesson page and must also be verified, but it counts once.
 
 ### Milestone 3: practice
 
@@ -191,8 +195,8 @@ Browser code editor, secure external execution service, accounts (Supabase is a 
 
 ### Open decisions
 
-1. Lesson file format: MDX or typed data files. Decide in Milestone 2 after one sample lesson.
-2. Which language or languages the first lessons use.
+1. Lesson file format. Decided in Milestone 2: typed lesson files with prose in a Markdown subset (`PROGRESS.md` D32).
+2. Which language or languages the first lessons use. Decided in Milestone 2: C and Python (`PROGRESS.md` D33).
 3. Whether the first release remembers completed lessons in browser storage.
 4. When the light and dark theme toggle ships (tokens for both are already defined).
 5. Hosting provider for previews and launch.

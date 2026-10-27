@@ -23,7 +23,8 @@ for (const [path, width] of [["/", 360], ["/", 1440], ["/courses/python/variable
         // Chromium makes a panel that scrolls sideways focusable by itself, so
         // keyboard users can scroll it (a long error message on a phone).
         .filter((el) => el.tagName !== "PRE" || el.hasAttribute("tabindex") || el.scrollWidth > el.clientWidth)
-        .filter((el) => el.offsetParent !== null || el.getAttribute("href") === "#main")
+        // checkVisibility also leaves out what is inside a closed "Show solution".
+        .filter((el) => el.checkVisibility() || el.getAttribute("href") === "#main")
         .map((el) => el.textContent?.trim() || el.getAttribute("aria-label") || el.tagName),
     );
 

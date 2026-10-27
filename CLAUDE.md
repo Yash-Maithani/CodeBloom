@@ -62,7 +62,7 @@ Add it only with a clear yes on need, and log the decision in `PROGRESS.md`.
 
 ## Lesson content rules
 
-Lesson requirements and the lesson schema live in `SPEC.md`. When writing or editing lessons:
+Lesson requirements live in `SPEC.md`; how to write, verify, review and publish a lesson is in `docs/lesson-authoring.md`. When writing or editing lessons:
 
 - Compile and run every runnable example and paste the real output. Never write output from memory.
 - Label pseudocode as not runnable.
@@ -76,7 +76,7 @@ Target WCAG 2.1 AA. Product requirements are in `SPEC.md`; visual rules (contras
 
 ## Quality gates
 
-Run the checks that exist and read the actual output before reporting. Scripts: `npm run lint`, `npm run typecheck`, `npm run build`, `npm run test:e2e` (all Playwright tests in `tests/e2e/`), `npm run check:examples` (runs the example files in `content/examples/` and compares output), `npm run test:runner` (tests that runner), `npm run test:unit` (tests the syntax highlighter), `npm run verify:browser` (checks tokens, contrast and fonts in a real browser; run `npm run build` first). Cloud sessions install dependencies through the SessionStart hook in `.claude/`.
+Run the checks that exist and read the actual output before reporting. Scripts: `npm run lint`, `npm run typecheck`, `npm run build`, `npm run test:e2e` (all Playwright tests in `tests/e2e/`), `npm run check:examples` (runs the example files in `content/examples/` and compares output), `npm run test:runner` (tests that runner), `npm run test:unit` (tests the highlighter, lesson loader, publish gate and prose renderer), `npm run verify:browser` (checks tokens, contrast and fonts in a real browser; run `npm run build` first). Cloud sessions install dependencies through the SessionStart hook in `.claude/`.
 
 - Never skip, delete or weaken a test, warning or acceptance criterion to get a pass.
 - If something cannot be tested, say so and record it in `PROGRESS.md`.
