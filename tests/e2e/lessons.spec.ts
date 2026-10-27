@@ -14,6 +14,9 @@ const COURSES = {
       ["/courses/python/input-output", "Input and output"],
       ["/courses/python/decisions", "Making decisions with if and else"],
       ["/courses/python/elif", "More decisions with elif"],
+      ["/courses/python/loops", "Loops: while and for"],
+      ["/courses/python/functions", "Functions"],
+      ["/courses/python/lists", "Lists"],
     ],
   },
 } as const;
@@ -61,10 +64,11 @@ for (const [slug, course] of Object.entries(COURSES)) {
   });
 }
 
-test("Python's planned topics start with loops now that elif is published, and the replaced topic is gone", async ({ page }) => {
+test("Python's planned topics start with Strings now that loops, functions and lists are published, and the replaced topic is gone", async ({ page }) => {
   await page.goto("/courses/python");
   const planned = page.locator("[data-planned-topics] li");
-  await expect(planned.first()).toContainText("Loops: while and for");
+  await expect(planned.first()).toContainText("Strings");
+  await expect(planned.filter({ hasText: "Loops: while and for" })).toHaveCount(0);
   await expect(planned.filter({ hasText: "More decisions with elif" })).toHaveCount(0);
   await expect(planned.filter({ hasText: "Decisions with if, elif and else" })).toHaveCount(0);
 });
@@ -83,7 +87,7 @@ test("course cards show the real number of published lessons", async ({ page }) 
   await page.goto("/courses");
   const status = (name: string) => page.locator("article").filter({ has: page.getByRole("link", { name, exact: true }) }).locator("p").last();
   await expect(status("C")).toHaveText("2 lessons published");
-  await expect(status("Python")).toHaveText("5 lessons published");
+  await expect(status("Python")).toHaveText("8 lessons published");
   await expect(status("C++")).toHaveText("No lessons published yet");
   await expect(status("Java")).toHaveText("No lessons published yet");
 });
@@ -126,7 +130,7 @@ for (const [slug, course] of Object.entries(COURSES)) {
 }
 
 test("unknown lesson addresses return the 404 page", async ({ page }) => {
-  for (const path of ["/courses/c/no-such-lesson", "/courses/cpp/variables", "/courses/python/loops"]) {
+  for (const path of ["/courses/c/no-such-lesson", "/courses/cpp/variables", "/courses/python/strings"]) {
     const response = await page.goto(path);
     expect(response?.status(), path).toBe(404);
   }

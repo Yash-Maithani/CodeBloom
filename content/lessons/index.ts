@@ -9,7 +9,10 @@ import { cVariables } from "./c/variables.ts";
 import { pythonDecisions } from "./python/decisions.ts";
 import { pythonElif } from "./python/elif.ts";
 import { pythonFirstProgram } from "./python/first-program.ts";
+import { pythonFunctions } from "./python/functions.ts";
 import { pythonInputOutput } from "./python/input-output.ts";
+import { pythonLists } from "./python/lists.ts";
+import { pythonLoops } from "./python/loops.ts";
 import { pythonVariables } from "./python/variables.ts";
 
 export const lessonSources: LessonSource[] = [
@@ -20,4 +23,7 @@ export const lessonSources: LessonSource[] = [
   pythonInputOutput,
   pythonDecisions,
   pythonElif,
+  pythonLoops,
+  pythonFunctions,
+  pythonLists,
 ];

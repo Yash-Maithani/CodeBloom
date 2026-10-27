@@ -208,6 +208,9 @@ test("each Python lesson example links to its playground page, which starts from
     "/courses/python/input-output": /^Input and output/,
     "/courses/python/decisions": /^Making decisions/,
     "/courses/python/elif": /^More decisions with elif/,
+    "/courses/python/loops": /^Loops: while and for/,
+    "/courses/python/functions": /^Functions/,
+    "/courses/python/lists": /^Lists/,
   };
   for (const [lesson, title] of Object.entries(titles)) {
     await page.goto(lesson);
@@ -232,10 +235,26 @@ test("each Python lesson example links to its playground page, which starts from
     "python/elif_ticket",
     "python/first_hello",
     "python/first_order",
+    "python/func_greet",
+    "python/func_no_return_fix",
+    "python/func_param",
+    "python/func_return",
+    "python/func_scope_fix",
     "python/io_age",
     "python/io_greet",
     "python/io_sum",
     "python/io_type",
+    "python/list_alias_fix",
+    "python/list_basics",
+    "python/list_change",
+    "python/list_index_error_fix",
+    "python/list_loop",
+    "python/loop_ask_again",
+    "python/loop_done_after",
+    "python/loop_off_by_one_fix",
+    "python/loop_range",
+    "python/loop_sum",
+    "python/loop_while_count",
     "python/type_error_fixed",
     "python/variables_change",
     "python/variables_types",
@@ -268,7 +287,7 @@ test.describe("without JavaScript", () => {
 // tests run the real playground and compare, so the simulation is checked
 // against what a learner really sees.
 
-const INPUT_EXAMPLES = ["io_greet", "io_type", "io_age", "io_sum"];
+const INPUT_EXAMPLES = ["io_greet", "io_type", "io_age", "io_sum", "loop_ask_again"];
 const readText = (file: string) => readFileSync(file, "utf8").replace(/\r\n?/g, "\n");
 
 test("an example with an input file opens with the Input box filled, and its real output is the verified output", async ({ page }) => {

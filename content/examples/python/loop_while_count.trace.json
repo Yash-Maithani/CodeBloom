@@ -1,0 +1,136 @@
+{
+  "steps": [
+    {
+      "line": 1,
+      "variables": [
+        {
+          "name": "count",
+          "value": "1",
+          "type": "int"
+        }
+      ],
+      "output": ""
+    },
+    {
+      "line": 2,
+      "variables": [
+        {
+          "name": "count",
+          "value": "1",
+          "type": "int"
+        }
+      ],
+      "output": ""
+    },
+    {
+      "line": 3,
+      "variables": [
+        {
+          "name": "count",
+          "value": "1",
+          "type": "int"
+        }
+      ],
+      "output": "Count is 1\n"
+    },
+    {
+      "line": 4,
+      "variables": [
+        {
+          "name": "count",
+          "value": "2",
+          "type": "int"
+        }
+      ],
+      "output": "Count is 1\n"
+    },
+    {
+      "line": 2,
+      "variables": [
+        {
+          "name": "count",
+          "value": "2",
+          "type": "int"
+        }
+      ],
+      "output": "Count is 1\n"
+    },
+    {
+      "line": 3,
+      "variables": [
+        {
+          "name": "count",
+          "value": "2",
+          "type": "int"
+        }
+      ],
+      "output": "Count is 1\nCount is 2\n"
+    },
+    {
+      "line": 4,
+      "variables": [
+        {
+          "name": "count",
+          "value": "3",
+          "type": "int"
+        }
+      ],
+      "output": "Count is 1\nCount is 2\n"
+    },
+    {
+      "line": 2,
+      "variables": [
+        {
+          "name": "count",
+          "value": "3",
+          "type": "int"
+        }
+      ],
+      "output": "Count is 1\nCount is 2\n"
+    },
+    {
+      "line": 3,
+      "variables": [
+        {
+          "name": "count",
+          "value": "3",
+          "type": "int"
+        }
+      ],
+      "output": "Count is 1\nCount is 2\nCount is 3\n"
+    },
+    {
+      "line": 4,
+      "variables": [
+        {
+          "name": "count",
+          "value": "4",
+          "type": "int"
+        }
+      ],
+      "output": "Count is 1\nCount is 2\nCount is 3\n"
+    },
+    {
+      "line": 2,
+      "variables": [
+        {
+          "name": "count",
+          "value": "4",
+          "type": "int"
+        }
+      ],
+      "output": "Count is 1\nCount is 2\nCount is 3\n"
+    },
+    {
+      "line": 5,
+      "variables": [
+        {
+          "name": "count",
+          "value": "4",
+          "type": "int"
+        }
+      ],
+      "output": "Count is 1\nCount is 2\nCount is 3\nDone\n"
+    }
+  ]
+}

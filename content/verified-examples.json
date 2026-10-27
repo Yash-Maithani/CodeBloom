@@ -142,6 +142,46 @@
       "source": "4e0e861c0f802f08aa75c9c81f7a9a05c6ed2f339cbdb306c07ca22af85029fb",
       "expected": "d8c012754a78e8bc15c54131cf83b1bb0868159949dfd330ce7283990d814c07"
     },
+    "python/func_greet": {
+      "kind": "output",
+      "source": "cc13e3fd3f39d40109bc30dd381b75140155729442710c160cb065ca7d1b6147",
+      "expected": "f4ce74e5ea29bd0f68ee93a9926166f70efff94e8f896a787fab1772e219e977"
+    },
+    "python/func_no_return": {
+      "kind": "output",
+      "source": "db68a8225e0214c1114b588e0fb9d451d3913fd5f9ba4eb29f01641815b9e963",
+      "expected": "af5d8a21858f42808c9bcc17012b77bcc2fd6ab3b071dbd4a05f13f410470541"
+    },
+    "python/func_no_return_fix": {
+      "kind": "output",
+      "source": "3cd9213186e9c9fb1fc6aa6816b94ba0a01c79498fd9724e4a42a5660e33cf20",
+      "expected": "f0b5c2c2211c8d67ed15e75e656c7862d086e9245420892a7de62cd9ec582a06"
+    },
+    "python/func_param": {
+      "kind": "output",
+      "source": "e0c444c84ffbdff8380c8f2a82d0b8b542b3304861a5e5da64263ed0dc00c425",
+      "expected": "7a753514839e8ced55cb4edb5fc0701a5912fdcafc254931c643dbe0e1e0ed08"
+    },
+    "python/func_return": {
+      "kind": "output",
+      "source": "3a4280d862909320d1bc069d7f02a357ed1cee15e5c651848d1e9a21dfa249a5",
+      "expected": "3acc2107160c0253eaefd4cd0325569814226f2c3621d357b214be854cda31ca"
+    },
+    "python/func_scope": {
+      "kind": "run-error",
+      "source": "eebb74c4b3049b8745cb3c67912bc50795b8f013ccc18c6d8fc3675280c1a847",
+      "expected": "84e8a201bbd84822f921f0b42ececcb495128e1e68dd577ce796f65b01fd0e1a"
+    },
+    "python/func_scope_fix": {
+      "kind": "output",
+      "source": "a8332603a07bae0c444d3174d33bc353d32ea622e55273be8a2422ac8c589468",
+      "expected": "aa67a169b0bba217aa0aa88a65346920c84c42447c36ba5f7ea65f422c1fe5d8"
+    },
+    "python/func_wrong_count": {
+      "kind": "run-error",
+      "source": "5f70cf3562be3b0dd670d7b5bc7c1fbe28044d313a57b9c38b71604e56142248",
+      "expected": "cfa8010a0e8c09bdf3e277303ba8aa1ee1d020f8a13b36154188f532a388f158"
+    },
     "python/hello": {
       "kind": "output",
       "source": "cb46ce7f29b8cc271d6f51b161d1968c8838be235b8618b2927520e267e4a9e0",
@@ -181,6 +221,83 @@
       "source": "0f4d6b910013f4761203005d09995da7306e358590dc1b830fcce4a21801c55f",
       "expected": "0afa6ef91fa98833848c68340984410b5abab4e50aee9a7e547bb4eccfad74ef",
       "input": "084c799cd551dd1d8d5c5f9a5d593b2e931f5e36122ee5c793c1d08a19839cc0"
+    },
+    "python/list_alias": {
+      "kind": "output",
+      "source": "30ac0f9d3b003bdc6543a3adc0f405219c0ef81b5fa4bcd0f69043f0f0203f69",
+      "expected": "faac8a0414a69ab286a6294635640fde5a1361b071f6b1cc06a6086c45c12e3e"
+    },
+    "python/list_alias_fix": {
+      "kind": "output",
+      "source": "7c42eafacee5c9d41949568187eab53a710b5a79d16faf13ce340a89ccf1166d",
+      "expected": "96c206971ddc593f676eeba36ee565c018aae9b2e05bb5c2c891b2c7ac92ee24"
+    },
+    "python/list_basics": {
+      "kind": "output",
+      "source": "0ed9cc6e863fa072ed5859eee15f86c99616981f7fcb695a74e1bd99cb157f50",
+      "expected": "6a20a033d1483eb7eaf0bb0f9654bddcb51c3d66fb7d6073b2d96cf621cef25c"
+    },
+    "python/list_change": {
+      "kind": "output",
+      "source": "7f22d411fece170e7a75fe7e9b57edc3e9fc263af76ec1748e871eb3268e4c8f",
+      "expected": "e63a2b799acb8a2bd2eefdc35076ee70710450dab0391025159f8d6409faa9ad"
+    },
+    "python/list_index_error": {
+      "kind": "run-error",
+      "source": "949f100bb38f568e8e1b507101a4480f3534c14e4f26921b370c139d0e1d80f0",
+      "expected": "6c33c1fbe762f3c2ff9b51f4af28dd4a3fbf2cbd85f616b547c4362a6ea30901"
+    },
+    "python/list_index_error_fix": {
+      "kind": "output",
+      "source": "debac1f8cb891bddeb832c4e59f43bf8e3f3ff1c3e0c2119c629bdca6f713cfa",
+      "expected": "86baf3529da550a44b0681ffa031b6b676e620e9e06dc5ac1119d0cd21cbcf55"
+    },
+    "python/list_loop": {
+      "kind": "output",
+      "source": "83a10ef5a2689a1263335f1693497c5ad7e9217e04293290d36150c8e97352ec",
+      "expected": "57248b650d7f87524f9342402aa8b94dba31f1857e4c38bbc2d9d15ef420a02b"
+    },
+    "python/loop_ask_again": {
+      "kind": "output",
+      "source": "a0663c17c998bc7053c39f5fadbd5f490409cd7e1046cc9b98c206f1f7d3b70d",
+      "expected": "3364e91ebe4642b96e4ac16e7691375fce9395c98fdd5ce25a2cb530dd684b7c",
+      "input": "523992e874a7e30e1321c5e63dacf67de85a98d31d8758c23c6f7952b67d7473"
+    },
+    "python/loop_done_after": {
+      "kind": "output",
+      "source": "fed1976881258e6e4e9d7f02862eb354f9b781a295f692c9e7a2d7a6d5000d5f",
+      "expected": "b5394c9c32b47716f5cd575f4ba77779a01504491647d5b9f9dd22082a586b34"
+    },
+    "python/loop_done_inside": {
+      "kind": "output",
+      "source": "4e483244bf070419566ab0b5f3f1f35ea611d11e3446ceea2aad6b0fff396345",
+      "expected": "fce936261e5a1678fcd13e78d575aa2d6ccd154ff9b56b1d436282c5b41063b9"
+    },
+    "python/loop_off_by_one": {
+      "kind": "output",
+      "source": "7d0b15fdb215f09d8bb7f347f02fbaa96ef3892e5d851e5fac2f57eb934e313b",
+      "expected": "16fbd7d1f18d2fedb247d73edc3bc6aa040f5ab99bd3b48c35b79e543d22179b"
+    },
+    "python/loop_off_by_one_fix": {
+      "kind": "output",
+      "source": "65043e39ba33a2b2425d53fa44c8a5963ee9e97eafdc6731977a074edfbd6b22",
+      "expected": "f6b49467f595b1a44e442c198b3df4d221e88efcaabc26254f8e0ad4f79b6242"
+    },
+    "python/loop_range": {
+      "kind": "output",
+      "source": "ea4ff92f7232bed444fd0ed4b0642f94636b8cee8e68b67d1a93a52857f9ae8c",
+      "expected": "f3572c0e47a7c5fbf4b1c93b0ed9b698a457a8828a0a3252535158ca249a412d"
+    },
+    "python/loop_sum": {
+      "kind": "output",
+      "source": "ebcb9e9e7bb7e72959105be5064012f75513762c887f9adf3069f50b1d8ead2e",
+      "expected": "07180ff9c3647a5331393e81b948625dc209093e713c89a5a4271fe4ddaa7c3e"
+    },
+    "python/loop_while_count": {
+      "kind": "output",
+      "source": "46e5bbc220a761a33ef9be50282dcd0599124ee35bee80e940437e731cba611f",
+      "expected": "22559d33bed98d7ca82251a6f1e02a8fb6a2c41cb4d1d4709f6c9e59a83777d7",
+      "trace": "3458ccbbbdba1de74b998d4d844fdcb5bc1c381c9e0b1baed40e428654008189"
     },
     "python/missing_indent": {
       "kind": "run-error",
@@ -222,6 +339,16 @@
       "source": "a73526acbc4df42d5cb28eeda714c5286442639a24a3cb50258e505afd5e1e74",
       "expected": "54811906d6e8f243a4a1322380f842b8f505bae67298fab28f66f74429699b79"
     },
+    "python/practice_func_double": {
+      "kind": "output",
+      "source": "2faf568b49f835713fb194a751d0bffc8db29f3f041ed0bd1168e75b3567c778",
+      "expected": "2e6d31a5983a91251bfae5aefa1c0a19d8ba3cf601d0e8a706b4cfa9661a6b8a"
+    },
+    "python/practice_func_order": {
+      "kind": "output",
+      "source": "93716568e362de8eadcc2222b8be1d05abdf5e315353280c42ef2a428882cfdc",
+      "expected": "1c27355ebace0f4575d613c6725bd1add9221ed551261d9ff7a2f141b47b284b"
+    },
     "python/practice_io_double": {
       "kind": "output",
       "source": "7a5100c1dfd074a8461d37e7b10d9db33143eb929af6cbf4c3394e173a7e74a2",
@@ -233,6 +360,26 @@
       "source": "36766838e70d7811566818639791c74f7072b5737925aa5c6d3afc8b798b293b",
       "expected": "aedb7aa517d9d34603b641ec69bcb6096eba7f9ba89de1914414d9a02dd06a2b",
       "input": "f162219f8f6ad6aa121039de4368b5c8803b0486407b8e4ca06abe79e2aed709"
+    },
+    "python/practice_list_positions": {
+      "kind": "output",
+      "source": "bfdbf21ba9322c82079fc410a0f9db78a776da27e17c33053423b612048d2b8b",
+      "expected": "d1db56da053e27589fac4cf4721203a68f51352e450af73385950b2629c7719b"
+    },
+    "python/practice_list_total": {
+      "kind": "output",
+      "source": "be58bd41acbe7552c2e7ddb02b5656a95c93c19a3d8efcdb7ad8cb1ee2642c60",
+      "expected": "917df3320d778ddbaa5c5c7742bc4046bf803c36ed2b050f30844ed206783469"
+    },
+    "python/practice_loop_sum": {
+      "kind": "output",
+      "source": "a7fbba11895e1ca94b3212cee350eee74986dcc47db879858826aa83436b34a4",
+      "expected": "06e9d52c1720fca412803e3b07c4b228ff113e303f4c7ab94665319d832bbfb7"
+    },
+    "python/practice_loop_trace": {
+      "kind": "output",
+      "source": "60186c49b0d6ea0768346bcd8171b0cd271987207b2a47fc54f2cc45c9f4f484",
+      "expected": "35348fff5097ce610aefa8452eee25e4181b8c71adf56714004b75e9cbf3d3bd"
     },
     "python/practice_quotes": {
       "kind": "output",
