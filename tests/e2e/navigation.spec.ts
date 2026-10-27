@@ -1,7 +1,18 @@
 import { expect, test, type Page } from "@playwright/test";
 
-// Every public page that should exist in Milestone 1.
-const EXPECTED_PAGES = ["/", "/courses", "/courses/c", "/courses/cpp", "/courses/java", "/courses/python"];
+// Every public page that should exist: Milestone 1 pages plus the published lessons.
+const EXPECTED_PAGES = [
+  "/",
+  "/courses",
+  "/courses/c",
+  "/courses/cpp",
+  "/courses/java",
+  "/courses/python",
+  "/courses/c/first-program",
+  "/courses/c/variables",
+  "/courses/python/variables",
+  "/courses/python/decisions",
+];
 
 async function internalLinks(page: Page): Promise<string[]> {
   const hrefs = await page.locator("a[href]").evaluateAll((links) =>

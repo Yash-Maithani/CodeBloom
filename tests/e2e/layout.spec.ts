@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 // Responsive and theme checks at 360px and 1440px, light and dark.
 // Screenshots are attached to the test report (not committed).
 
-const PAGES = ["/", "/courses", "/courses/c"];
+const PAGES = ["/", "/courses", "/courses/c", "/courses/c/first-program", "/courses/python/variables"];
 const PAPER = { light: "rgb(248, 247, 242)", dark: "rgb(22, 26, 24)" };
 
 for (const path of PAGES) {
@@ -28,6 +28,19 @@ for (const path of PAGES) {
         });
       });
     }
+  }
+}
+
+// Lesson pages at the other widths in SPEC.md AR-6 and AR-8.
+for (const path of ["/courses/c/first-program", "/courses/c/variables", "/courses/python/variables", "/courses/python/decisions"]) {
+  for (const width of [320, 768, 1024]) {
+    test(`${path} at ${width}px: no horizontal scroll, solutions open`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto(path);
+      for (const summary of await page.locator("details summary").all()) await summary.click();
+      const { scrollWidth, innerWidth } = await page.evaluate(() => ({ scrollWidth: document.documentElement.scrollWidth, innerWidth: window.innerWidth }));
+      expect(scrollWidth, "page must not scroll sideways").toBeLessThanOrEqual(innerWidth);
+    });
   }
 }
 

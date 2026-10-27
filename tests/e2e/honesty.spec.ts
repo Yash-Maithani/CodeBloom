@@ -19,7 +19,7 @@ test("the homepage example shows the checked code and its real output", async ({
   await expect(page.locator("figure pre").last()).toHaveText(exampleOutput);
 });
 
-test("buttons exist only where they do something: two on the homepage, none elsewhere", async ({ page }) => {
+test("buttons exist only where they do something: two on the homepage, none on course pages", async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 800 });
   await page.goto("/");
   await expect(page.getByRole("button")).toHaveText(["Hide notes", "Copy code"]);
@@ -59,20 +59,21 @@ test("screen readers get every note with its line number", async ({ page }) => {
   await expect(list.getByRole("listitem")).toHaveText([/^1Line 1: /, /^2Line 2: /, /^3Lines 4 to 5: /]);
 });
 
-test("course cards and course pages say plainly that no lessons exist yet", async ({ page }) => {
+test("courses without lessons say so plainly; planned topics are plain text on every course page", async ({ page }) => {
   for (const path of ["/", "/courses"]) {
     await page.goto(path);
     const cards = page.locator("article");
     await expect(cards).toHaveCount(4);
-    for (const card of await cards.all()) {
-      await expect(card).toContainText("No lessons published yet");
+    for (const name of ["C++", "Java"]) {
+      await expect(cards.filter({ has: page.getByRole("link", { name, exact: true }) })).toContainText("No lessons published yet");
     }
   }
 
   for (const path of COURSE_PAGES) {
     await page.goto(path);
-    await expect(page.getByText("No lessons yet", { exact: true })).toBeVisible();
-    await expect(page.getByText("Planned and subject to change.")).toBeVisible();
+    const hasLessons = path === "/courses/c" || path === "/courses/python";
+    await expect(page.getByText("No lessons yet", { exact: true }), path).toHaveCount(hasLessons ? 0 : 1);
+    await expect(page.getByText(/^Planned and subject to change/)).toBeVisible();
     const topics = page.locator("[data-planned-topics]");
     expect(await topics.locator("li").count(), path).toBeGreaterThan(0);
     // Planned topics are plain text: no links or buttons pretending lessons exist.
@@ -80,10 +81,39 @@ test("course cards and course pages say plainly that no lessons exist yet", asyn
   }
 });
 
-test("practice is described as planned, not as a working feature", async ({ page }) => {
+test("practice is described honestly: written solutions now, hints and feedback planned", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Practice with hints (planned)" })).toBeVisible();
-  for (const word of ["Start lesson", "Start practice", "Sign up", "Log in"]) {
+  await expect(page.getByRole("heading", { name: "Practice questions" })).toBeVisible();
+  await expect(page.getByText("Hints and instant feedback are planned.")).toBeVisible();
+  for (const word of ["Start practice", "Sign up", "Log in", "Check answer"]) {
     await expect(page.getByText(word)).toHaveCount(0);
+  }
+});
+
+test("on a lesson page, every code block has working Copy code and Hide notes buttons", async ({ page, context }) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.goto("/courses/c/variables");
+  const figures = page.locator("figure[data-example]");
+  for (let index = 0; index < (await figures.count()); index++) {
+    const figure = figures.nth(index);
+    const id = await figure.getAttribute("data-example");
+    const code = normalizeLineEndings(readFileSync(`content/examples/${id}.c`, "utf8")).replace(/\n$/, "");
+    await figure.getByRole("button", { name: "Copy code" }).click();
+    expect(await page.evaluate(() => navigator.clipboard.readText()), `${id} copy`).toBe(code);
+    const hide = figure.getByRole("button", { name: "Hide notes" });
+    if ((await hide.count()) > 0) {
+      await hide.click();
+      await expect(figure.locator("[data-note-row]")).toHaveCount(0);
+      await figure.getByRole("button", { name: "Show notes" }).click();
+    }
+  }
+});
+
+test("no page says lessons are missing or still to come, now that lessons exist", async ({ page }) => {
+  for (const path of ["/", "/courses", "/courses/c", "/courses/python"]) {
+    await page.goto(path);
+    const text = await page.locator("main").innerText();
+    expect(text, path).not.toMatch(/No lessons are published yet|Lessons will explain|How each lesson will work|first lessons are being written/);
   }
 });
