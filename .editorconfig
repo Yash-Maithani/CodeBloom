@@ -1,0 +1,11 @@
+# Editor settings that protect lesson example files. Most editors read this file
+# (some need the EditorConfig extension).
+root = true
+
+# Expected output and error messages are compared character by character with
+# what the program really printed. Compiler messages can end lines with spaces
+# (gcc does), so an editor that trims trailing spaces or adds a final newline
+# would break the check. See docs/lesson-authoring.md.
+[*.{expected,compile-error,run-error}.txt]
+trim_trailing_whitespace = false
+insert_final_newline = unset

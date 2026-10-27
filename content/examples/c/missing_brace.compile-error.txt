@@ -1,0 +1,4 @@
+missing_brace.c: In function ‘main’:
+missing_brace.c:5:5: error: expected declaration or statement at end of input
+    5 |     return 0;
+      |     ^~~~~~

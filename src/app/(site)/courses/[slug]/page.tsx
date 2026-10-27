@@ -4,11 +4,13 @@ import { notFound } from "next/navigation";
 import { courses, findCourse } from "@content/courses";
 import { NoteCallout } from "@/components/callout";
 import { Container } from "@/components/container";
-import { textLinkStyles } from "@/components/styles";
+import { InlineText } from "@/components/prose";
+import { backLinkStyles, buttonStyles, textLinkStyles } from "@/components/styles";
+import { publishedByCourse } from "@/lib/site-lessons";
 
-// One page per course, built at build time from content/courses.ts.
-// dynamicParams = false: an address for a course that is not in the list
-// (for example /courses/rust) gets the 404 page instead of an empty page.
+// One page per course, built at build time from content/courses.ts and the
+// published lessons. dynamicParams = false: an address for a course that is not
+// in the list (for example /courses/rust) gets the 404 page instead of an empty page.
 export const dynamicParams = false;
 
 export function generateStaticParams() {
@@ -19,45 +21,78 @@ type CoursePageProps = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: CoursePageProps): Promise<Metadata> {
   const course = findCourse((await params).slug);
-  return course
-    ? { title: `${course.name} course`, description: `${course.description} No lessons are published yet.` }
-    : {};
+  if (!course) return {};
+  const count = (await publishedByCourse()).get(course.slug)?.length ?? 0;
+  const status = count === 0 ? "No lessons are published yet." : `${count} ${count === 1 ? "lesson is" : "lessons are"} published.`;
+  return { title: `${course.name} course`, description: `${course.description} ${status}` };
 }
 
 export default async function CoursePage({ params }: CoursePageProps) {
   const course = findCourse((await params).slug);
   if (!course) notFound();
+  const lessons = (await publishedByCourse()).get(course.slug) ?? [];
+  const published = new Set(lessons.map((lesson) => lesson.source.slug));
+  // Topics without a published lesson. Drafts stay here too, as plain text.
+  const planned = course.topics.filter((topic) => !topic.lesson || !published.has(topic.lesson));
 
   return (
     <Container className="py-12 md:py-16">
       <div className="max-w-measure">
-        <Link href="/courses" className={`inline-flex py-3 text-sm ${textLinkStyles}`}>
+        <Link href="/courses" className={backLinkStyles}>
           All courses
         </Link>
         <h1 className="mt-4 font-heading text-3xl font-semibold">{course.name}</h1>
         <p className="mt-4 text-lg">{course.description}</p>
 
-        <div className="mt-8">
-          <NoteCallout title="No lessons yet">
-            This course has no published lessons. The topics below are the plan and may change as
-            lessons are written.
-          </NoteCallout>
-        </div>
+        {lessons.length === 0 ? (
+          <div className="mt-8">
+            <NoteCallout title="No lessons yet">
+              This course has no published lessons. The topics below are the plan and may change as
+              lessons are written.
+            </NoteCallout>
+          </div>
+        ) : (
+          <Link href={lessons[0].href} className={`mt-8 ${buttonStyles.primary}`}>
+            Start the first lesson
+          </Link>
+        )}
 
-        <h2 className="mt-12 font-heading text-2xl font-semibold">Who this course is for</h2>
+        {lessons.length > 0 && (
+          <>
+            <h2 className="mt-12 font-heading text-2xl font-semibold md:mt-16">Lessons</h2>
+            <ol data-lessons className="mt-6 flex list-decimal flex-col gap-6 pl-8 text-base">
+              {lessons.map((lesson) => (
+                <li key={lesson.href}>
+                  <Link href={lesson.href} className={`font-bold ${textLinkStyles}`}>
+                    {lesson.source.title}
+                  </Link>
+                  <p className="mt-1 text-ink-muted">
+                    <InlineText text={lesson.source.objective} />
+                  </p>
+                </li>
+              ))}
+            </ol>
+          </>
+        )}
+
+        <h2 className="mt-12 font-heading text-2xl font-semibold md:mt-16">Who this course is for</h2>
         <p className="mt-4 text-base">
           Complete beginners and students taking a {course.name} course. You do not need any
           programming experience.
         </p>
 
-        <h2 className="mt-12 font-heading text-2xl font-semibold">Planned topics</h2>
-        <p className="mt-2 text-ink-muted">Planned and subject to change.</p>
-        {/* Plain text on purpose: there are no lesson pages to link to yet (SPEC.md FR-C2). */}
-        <ol data-planned-topics className="mt-6 flex list-decimal flex-col gap-2 pl-8 text-base">
-          {course.plannedTopics.map((topic) => (
-            <li key={topic}>{topic}</li>
-          ))}
-        </ol>
+        {planned.length > 0 && (
+          <>
+            <h2 className="mt-12 font-heading text-2xl font-semibold md:mt-16">Planned topics</h2>
+            <p className="mt-2 text-ink-muted">Planned and subject to change. Listed in course order.</p>
+            {/* Plain text on purpose: these topics have no lesson page yet (SPEC.md FR-C2). */}
+            <ul data-planned-topics className="mt-6 flex list-disc flex-col gap-2 pl-8 text-base">
+              {planned.map((topic) => (
+                <li key={topic.title}>{topic.title}</li>
+              ))}
+            </ul>
+          </>
+        )}
       </div>
     </Container>
   );

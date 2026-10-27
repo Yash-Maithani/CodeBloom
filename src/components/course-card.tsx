@@ -1,9 +1,11 @@
 import Link from "next/link";
 import type { Course } from "@content/courses";
 
-const statusText: Record<Course["status"], string> = {
-  planned: "No lessons published yet",
-};
+// A real count, never a promise (DESIGN.md section 7, cards).
+function statusText(lessonCount: number) {
+  if (lessonCount === 0) return "No lessons published yet";
+  return lessonCount === 1 ? "1 lesson published" : `${lessonCount} lessons published`;
+}
 
 // One language on the homepage and the courses page (DESIGN.md section 7, cards).
 // The title link is stretched over the whole card with an ::after layer, so the
@@ -11,9 +13,12 @@ const statusText: Record<Course["status"], string> = {
 export function CourseCard({
   course,
   headingLevel,
+  lessonCount,
 }: {
   course: Course;
   headingLevel: "h2" | "h3";
+  /** Number of published lessons */
+  lessonCount: number;
 }) {
   const Heading = headingLevel;
   return (
@@ -27,7 +32,7 @@ export function CourseCard({
         </Link>
       </Heading>
       <p className="text-sm">{course.summary}</p>
-      <p className="text-sm text-ink-muted">{statusText[course.status]}</p>
+      <p className="text-sm text-ink-muted">{statusText(lessonCount)}</p>
     </article>
   );
 }

@@ -47,7 +47,7 @@ export const metadata: Metadata = {
     template: "%s | CodeBloom",
   },
   description:
-    "Beginner programming lessons in C, C++, Java and Python, with plain-English notes beside the code. The first lessons are being written.",
+    "Beginner programming lessons in C, C++, Java and Python, with plain-English notes beside the code and the output it really prints.",
 };
 
 export default function RootLayout({

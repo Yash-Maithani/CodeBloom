@@ -7,8 +7,28 @@ import { expect, test } from "@playwright/test";
 // appear inside Shiki's grammar files and in our own scope table, and nowhere
 // in code that is meant for the browser.
 
-const MARKERS = ["vscode-textmate", "keyword.control.flow", "storage.type.built-in.primitive", "storage.type.primitive", "includeExplanation"];
-const ROUTES = ["/", "/courses", "/courses/c", "/courses/cpp", "/courses/java", "/courses/python", "/dev/tokens", "/no-such-page"];
+// The last two come from the lesson loader and the publish gate, which are server only too.
+const MARKERS = [
+  "vscode-textmate",
+  "keyword.control.flow",
+  "storage.type.built-in.primitive",
+  "storage.type.primitive",
+  "includeExplanation",
+  "has never been verified",
+  "must appear exactly once in the topics",
+];
+const ROUTES = [
+  "/",
+  "/courses",
+  "/courses/c",
+  "/courses/cpp",
+  "/courses/java",
+  "/courses/python",
+  "/courses/c/first-program",
+  "/courses/python/variables",
+  "/dev/tokens",
+  "/no-such-page",
+];
 
 function filesUnder(folder: string): string[] {
   return readdirSync(folder).flatMap((name) => {
@@ -24,6 +44,8 @@ test("positive control: the markers really appear in Shiki's grammars and in our
   expect(found(python), "Python grammar").toContain("keyword.control.flow");
   const serverCode = filesUnder(".next/server").filter((f) => /\.(js|mjs)$/.test(f)).map((f) => readFileSync(f, "utf8"));
   expect(serverCode.some((code) => code.includes("storage.type.primitive")), "our scope table in the server build").toBe(true);
+  expect(serverCode.some((code) => code.includes("has never been verified")), "the publish gate in the server build").toBe(true);
+  expect(serverCode.some((code) => code.includes("must appear exactly once in the topics")), "the lesson loader in the server build").toBe(true);
 });
 
 test("no Shiki code or scope table in any file the browser can download", () => {

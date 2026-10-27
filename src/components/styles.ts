@@ -14,3 +14,6 @@ export const buttonStyles = {
 /** Links inside text: always underlined; the underline thickens on hover. */
 export const textLinkStyles =
   "text-accent underline decoration-1 underline-offset-3 transition-colors hover:decoration-2 active:text-accent-hover";
+
+/** The link back to the page above ("All courses", "Python course"): 48px tall. */
+export const backLinkStyles = `inline-flex py-3 text-sm ${textLinkStyles}`;

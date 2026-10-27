@@ -1,0 +1,6 @@
+undeclared.c: In function ‘main’:
+undeclared.c:6:20: error: ‘Age’ undeclared (first use in this function); did you mean ‘age’?
+    6 |     printf("%d\n", Age);
+      |                    ^~~
+      |                    age
+undeclared.c:6:20: note: each undeclared identifier is reported only once for each function it appears in

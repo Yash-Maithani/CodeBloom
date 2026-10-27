@@ -1,0 +1,4 @@
+  File "assign_in_if.py", line 2
+    if age = 18:
+       ^^^^^^^^
+SyntaxError: invalid syntax. Maybe you meant '==' or ':=' instead of '='?

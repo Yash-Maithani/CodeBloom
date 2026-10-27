@@ -17,19 +17,34 @@
 
 import { Fragment, useEffect, useId, useState } from "react";
 import { CircleAlert } from "lucide-react";
+import { OutputPanel } from "@/components/output-panel";
+import { InlineText } from "@/components/prose";
 import { buttonStyles } from "@/components/styles";
 import type { CodeNote } from "@/lib/code-notes";
 import type { CodeToken, TokenKind } from "@/lib/highlight";
+import type { ExpectationKind } from "@/lib/verified";
 
 type CodeBlockProps = {
-  caption: string;
+  /** Shown above the code. Optional: mistakes and practice questions have their own headings. */
+  caption?: string;
+  /** Names the code for screen readers. Must be unique on the page, for example "Python code: The fix". */
+  regionLabel: string;
   languageLabel: string;
   /** The source exactly as it was run; this is what Copy code puts on the clipboard */
   code: string;
   /** The same source split into lines of tokens */
   lines: CodeToken[][];
   notes: CodeNote[];
+  /** The recorded output or error message */
   expectedOutput: string;
+  /** What kind of result expectedOutput is. Default: output */
+  kind?: ExpectationKind;
+  /** Labels the block "Example with a mistake" instead of "Runnable example" */
+  mistake?: boolean;
+  /** False for practice questions: the output is shown in the solution instead */
+  showOutput?: boolean;
+  /** "<language>/<file>", so tests can compare the page with the example's files */
+  exampleId?: string;
 };
 
 const tokenStyles: Record<TokenKind, string> = {
@@ -38,19 +53,6 @@ const tokenStyles: Record<TokenKind, string> = {
   literal: "text-syntax-literal",
   comment: "italic text-ink-muted",
 };
-
-// Text between backticks becomes inline code.
-function NoteText({ text }: { text: string }) {
-  return text.split("`").map((part, index) =>
-    index % 2 === 1 ? (
-      <code key={index} className="font-mono">
-        {part}
-      </code>
-    ) : (
-      <Fragment key={index}>{part}</Fragment>
-    ),
-  );
-}
 
 function NoteMarker({ number }: { number: number }) {
   return (
@@ -69,26 +71,49 @@ function lineLabel(note: CodeNote) {
     : `Lines ${note.startLine} to ${note.endLine}: `;
 }
 
-export function CodeBlock({ caption, languageLabel, code, lines, notes, expectedOutput }: CodeBlockProps) {
+export function CodeBlock({
+  caption,
+  regionLabel,
+  languageLabel,
+  code,
+  lines,
+  notes,
+  expectedOutput,
+  kind = "output",
+  mistake = false,
+  showOutput = true,
+  exampleId,
+}: CodeBlockProps) {
   const [notesHidden, setNotesHidden] = useState(false);
   const [activeNote, setActiveNote] = useState<number | null>(null);
-  const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">("idle");
+  // Every click stores a NEW object, even when the result is the same as last
+  // time (copied again, failed again). React only reacts to a changed value, so
+  // a bare "copied" string set twice does nothing: the timer below would not
+  // restart and screen readers would not be told again. `attempt` also keys the
+  // status message, so each click adds a fresh message for them to announce.
+  const [copy, setCopy] = useState<{ result: "idle" | "copied" | "failed"; attempt: number }>({
+    result: "idle",
+    attempt: 0,
+  });
   const notesTitleId = useId();
 
-  // "Copied" goes back to "Copy code" after two seconds (DESIGN.md section 7).
+  // "Copied" goes back to "Copy code" two seconds after the LAST click
+  // (DESIGN.md section 7). A new click changes `copy`, which clears the old
+  // timer before it can fire and starts a new one.
   useEffect(() => {
-    if (copyState !== "copied") return;
-    const timer = setTimeout(() => setCopyState("idle"), 2000);
+    if (copy.result !== "copied") return;
+    const timer = setTimeout(() => setCopy((current) => ({ ...current, result: "idle" })), 2000);
     return () => clearTimeout(timer);
-  }, [copyState]);
+  }, [copy]);
 
   async function copyCode() {
+    let result: "copied" | "failed" = "copied";
     try {
       await navigator.clipboard.writeText(code);
-      setCopyState("copied");
     } catch {
-      setCopyState("failed");
+      result = "failed";
     }
+    setCopy((current) => ({ result, attempt: current.attempt + 1 }));
   }
 
   const noteStartingAt = new Map(notes.map((note, index) => [note.startLine, index]));
@@ -98,13 +123,17 @@ export function CodeBlock({ caption, languageLabel, code, lines, notes, expected
     lineNumber <= notes[activeNote].endLine;
 
   return (
-    <figure className="max-w-lesson">
-      <figcaption className="mb-3 text-sm text-ink-muted">{caption}</figcaption>
+    <figure className="max-w-lesson" data-example={exampleId}>
+      {caption && (
+        <figcaption className="mb-3 text-sm text-ink-muted">
+          <InlineText text={caption} />
+        </figcaption>
+      )}
 
       <div className="rounded-panel border border-rule bg-code">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-rule px-4 py-2">
           <span className="text-sm font-bold">{languageLabel}</span>
-          <span className="text-sm text-ink-muted">Runnable example</span>
+          <span className="text-sm text-ink-muted">{mistake ? "Example with a mistake" : "Runnable example"}</span>
           <div className="ml-auto flex flex-wrap gap-2">
             {notes.length > 0 && (
               <button
@@ -116,26 +145,28 @@ export function CodeBlock({ caption, languageLabel, code, lines, notes, expected
               </button>
             )}
             <button type="button" onClick={copyCode} className={buttonStyles.secondary}>
-              {copyState === "copied" ? "Copied" : "Copy code"}
+              {copy.result === "copied" ? "Copied" : "Copy code"}
             </button>
           </div>
         </div>
 
-        {/* Announces the copy result. Visible only when copying failed. */}
+        {/* Announces the copy result. Visible only when copying failed. The
+            region itself stays in the page; each click replaces the keyed
+            message inside it, and screen readers announce what is added. */}
         <p
           role="status"
-          className={copyState === "failed" ? "flex items-center gap-2 border-b border-rule px-4 py-2 text-sm" : "sr-only"}
+          className={copy.result === "failed" ? "flex items-center gap-2 border-b border-rule px-4 py-2 text-sm" : "sr-only"}
         >
-          {copyState === "failed" && <CircleAlert aria-hidden="true" size={20} strokeWidth={1.75} className="shrink-0 text-error" />}
-          {copyState === "copied" && "Code copied"}
-          {copyState === "failed" && "Copy failed. Select the code and copy it manually."}
+          {copy.result === "failed" && <CircleAlert aria-hidden="true" size={20} strokeWidth={1.75} className="shrink-0 text-error" />}
+          {copy.result === "copied" && <span key={copy.attempt}>Code copied</span>}
+          {copy.result === "failed" && <span key={copy.attempt}>Copy failed. Select the code and copy it manually.</span>}
         </p>
 
         <div className="lg:grid lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
           <pre
             tabIndex={0}
             role="region"
-            aria-label={`${languageLabel} code`}
+            aria-label={regionLabel}
             className="overflow-x-auto py-4 font-mono text-mono"
           >
             <code className="block">
@@ -178,9 +209,7 @@ export function CodeBlock({ caption, languageLabel, code, lines, notes, expected
                         className="mx-4 my-2 flex select-none gap-3 border-l-3 border-accent bg-sheet px-4 py-2 font-sans text-sm whitespace-normal lg:hidden"
                       >
                         <NoteMarker number={noteIndex + 1} />
-                        <span>
-                          <NoteText text={note.text} />
-                        </span>
+                        <InlineText text={note.text} />
                       </span>
                     )}
                   </Fragment>
@@ -220,7 +249,7 @@ export function CodeBlock({ caption, languageLabel, code, lines, notes, expected
                       <NoteMarker number={index + 1} />
                       <span>
                         <span className="sr-only">{lineLabel(note)}</span>
-                        <NoteText text={note.text} />
+                        <InlineText text={note.text} />
                       </span>
                     </li>
                   );
@@ -231,12 +260,11 @@ export function CodeBlock({ caption, languageLabel, code, lines, notes, expected
         </div>
       </div>
 
-      <div className="mt-4 rounded-panel border border-l-3 border-rule border-l-ink-muted bg-code">
-        <p className="px-4 pt-3 text-sm font-bold">Expected output</p>
-        <pre className="overflow-x-auto px-4 pt-1 pb-4 font-mono text-mono">
-          <code>{expectedOutput}</code>
-        </pre>
-      </div>
+      {showOutput && (
+        <div className="mt-4">
+          <OutputPanel kind={kind} text={expectedOutput} of={regionLabel} />
+        </div>
+      )}
     </figure>
   );
 }

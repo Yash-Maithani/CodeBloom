@@ -13,14 +13,18 @@ test("the skip link is the first stop and moves focus to the main content", asyn
   await expect(page.locator("main#main")).toBeFocused();
 });
 
-for (const width of [360, 1440]) {
-  test(`at ${width}px, Tab reaches every control once, each with a visible focus ring`, async ({ page }) => {
+for (const [path, width] of [["/", 360], ["/", 1440], ["/courses/python/variables", 360], ["/courses/c/first-program", 1440]] as const) {
+  test(`${path} at ${width}px, Tab reaches every control once, each with a visible focus ring`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
-    await page.goto("/");
+    await page.goto(path);
 
     const expected = await page.evaluate(() =>
-      [...document.querySelectorAll<HTMLElement>("a[href], button, [tabindex='0']")]
-        .filter((el) => el.offsetParent !== null || el.getAttribute("href") === "#main")
+      [...document.querySelectorAll<HTMLElement>("a[href], button, summary, [tabindex='0'], pre")]
+        // Chromium makes a panel that scrolls sideways focusable by itself, so
+        // keyboard users can scroll it (a long error message on a phone).
+        .filter((el) => el.tagName !== "PRE" || el.hasAttribute("tabindex") || el.scrollWidth > el.clientWidth)
+        // checkVisibility also leaves out what is inside a closed "Show solution".
+        .filter((el) => el.checkVisibility() || el.getAttribute("href") === "#main")
         .map((el) => el.textContent?.trim() || el.getAttribute("aria-label") || el.tagName),
     );
 

@@ -1,0 +1,106 @@
+import type { LessonSource } from "@/lib/lesson-types";
+
+// Prose in reading order: first-program.md. No shared concept file yet: Python's
+// first lesson will share one when it is written.
+export const cFirstProgram: LessonSource = {
+  course: "c",
+  slug: "first-program",
+  title: "Your first C program",
+  status: "published",
+  objective: "Explain what compiling means, and write a C program that prints text with `printf`.",
+  analogy: {
+    title: "Translating a recipe",
+    text: "Compiling is like having a recipe translated into the cook's language before the cook starts. The cook never reads your original; they follow the translation, step by step.",
+    limit:
+      "a human translator can guess what a sloppy sentence meant. A compiler does not guess: a missing semicolon or a misspelled word stops the translation, and you fix the source code and compile again. The translation also suits only one kind of computer: machine code made for one kind of processor and operating system (such as Windows, macOS or Linux) does not run on another.",
+  },
+  examples: {
+    hello: {
+      file: "c/first_program",
+      notes: [
+        {
+          startLine: 1,
+          endLine: 1,
+          text: "`#include <stdio.h>` adds C's standard input and output tools to your program, including `printf`. `stdio` stands for standard input and output. A file ending in `.h` is a header file: it describes tools your program can use.",
+        },
+        {
+          startLine: 3,
+          endLine: 3,
+          text: "Every C program starts running at `main`. `main` is a **function**: a named group of instructions. The `{` opens the group.",
+        },
+        {
+          startLine: 4,
+          endLine: 4,
+          text: "`printf` prints the text between the double quotes. `\\n` is not printed: it means start a new line. The semicolon ends the instruction.",
+        },
+        {
+          startLine: 5,
+          endLine: 5,
+          text: "`return 0;` ends `main` and hands back the value 0 as its result. The operating system reads 0 as: the program finished without problems.",
+        },
+        { startLine: 6, endLine: 6, text: "The `}` closes the group that `{` opened on line 3." },
+      ],
+    },
+    order: {
+      file: "c/print_order",
+      notes: [
+        {
+          startLine: 4,
+          endLine: 4,
+          text: "No `\\n` here, so the next output continues on the same line. The space before the closing quote is printed too.",
+        },
+        { startLine: 5, endLine: 5, text: "This `\\n` ends the first line of output." },
+        { startLine: 6, endLine: 6, text: "Runs after line 5, so its text appears on the next line." },
+      ],
+    },
+  },
+  mistakes: [
+    {
+      title: "Forgetting a semicolon",
+      example: {
+        file: "c/missing_semicolon",
+        notes: [{ startLine: 4, endLine: 4, text: "The semicolon at the end of this line is missing." }],
+      },
+      whatHappens:
+        "compilation fails, so there is no program to run. Without the semicolon, the compiler cannot tell where the `printf` instruction ends, and it notices the problem when it reaches `return` on the next line.",
+      howToRead:
+        "`missing_semicolon.c:4:30` means line 4, column 30: the end of line 4, where the semicolon belongs. The message says the compiler expected a semicolon before the word `return`. Under the line, gcc marks the spot with `^` and shows the `;` it expected.",
+      fix: "add the semicolon, as in `printf(\"Hello, world!\\n\");`, then compile again.",
+    },
+    {
+      title: "Forgetting the closing brace",
+      example: {
+        file: "c/missing_brace",
+        notes: [
+          { startLine: 5, endLine: 5, text: "The file ends here, but the `}` that should close `main` is missing." },
+        ],
+      },
+      whatHappens:
+        "the compiler reads to the end of the file while still inside `main`, waiting for more instructions or a `}`. \"End of input\" means the end of the file. Compilation fails, so there is no program to run.",
+      howToRead:
+        "line 5 is the last line the compiler read before the file ended. The real problem is what is missing after it.",
+      fix: "add `}` on a new line at the end, to close the `{` from line 3. Every `{` needs a matching `}`.",
+    },
+  ],
+  practice: [
+    {
+      question: "What does this program print? Think about where each line of output ends.",
+      example: { file: "c/practice_print", notes: [] },
+      explanation:
+        "Line 4 has no `\\n`, so line 5's text continues on the same line. Line 5 ends with `\\n`, so line 6's text starts a new line.",
+    },
+    {
+      question: "What does this program print?",
+      example: { file: "c/practice_newline", notes: [] },
+      explanation:
+        "One `printf` can print several lines. Each `\\n` inside the text starts a new line, so `A` and `B` appear on separate lines.",
+    },
+  ],
+  recap: [
+    "A program is a list of instructions. You write them as source code, and C source files end in `.c`.",
+    "A compiler translates source code into machine code before the program runs. This is compiling. If the compiler finds an error, compilation fails, so there is no program to run.",
+    "Every C program starts at `main`. Its instructions run from top to bottom, and each ends with a semicolon.",
+    "`printf` prints text, and `\\n` starts a new line. `printf` never starts a new line by itself.",
+    "`return 0;` ends `main` and reports that the program finished without problems.",
+  ],
+};
