@@ -113,6 +113,7 @@ export default async function LessonPage(props: LessonPageProps) {
           return (
             <div key={index} className="mt-8">
               <LessonCodeBlock
+                playground
                 example={example}
                 regionLabel={`${example.languageLabel} code: ${example.caption ? plainText(example.caption) : `example ${exampleNumber}`}`}
               />

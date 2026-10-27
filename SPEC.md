@@ -130,14 +130,15 @@ A lesson may be marked verified only when all of these are true: [C]
 
 ## 8. Initial release scope
 
-Proposed first public release: Milestones 1 to 4 plus the launch checklist in brief Section 16 (Milestone 7). [A]
+Proposed first public release: Milestones 1 to 5 plus the launch checklist in brief Section 16 (Milestone 7). Milestone 5 was added to the proposal when it was built; the owner confirms the release scope. [A]
 
 | In scope | Out of scope for the first release |
 |---|---|
 | Homepage, four course pages | Accounts and login |
 | A small set of beginner lessons, starting with one or two languages | Database and server-side progress |
-| Practice questions with hints and solutions | Code editor and playground |
-| One or two step-through visualizations | Running learner code anywhere |
+| Practice questions with hints and solutions | Running learner code on a server |
+| One or two step-through visualizations | A playground for C, C++ or Java |
+| A Python playground that runs in the browser (Milestone 5) | |
 | Privacy policy and terms that describe real practice | Dashboards, bookmarks, history |
 
 ## 9. Acceptance criteria by milestone
@@ -186,7 +187,19 @@ Confirmed by the owner on 2026-10-27, including FR-V2. The chosen concepts are v
 - Every line, value and output in a visual comes from a trace of a real run, which `check:examples` compares with a fresh run.
 - Reduced-motion mode checked in the browser.
 
-Milestones 5 to 7 get acceptance criteria when they are planned.
+### Milestone 5: playground [C]
+
+Confirmed by the owner on 2026-10-27. Python only, running in the learner's browser with Pyodide 314.0.7 (self-hosted) in a Web Worker. No server-side or hosted execution and no paid service.
+
+- A `/playground` page and one page per runnable Python lesson example, linked as "Try it in the playground". C, C++ and Java say they are not yet supported in the playground.
+- Python is downloaded only when the learner first presses Run. The download shows real progress (MB received of the exact total) and can be stopped; a failed download says so and Run tries again.
+- Every run starts a fresh Python. A run is stopped after 5 seconds and output is cut off after 10,000 characters; learner code has no network access and no packages beyond the standard library.
+- `input()` reads one line per call from an Input box filled before running.
+- Output is labelled "Your run", is cleared on each run, and each ending has its own wording: finished, printed nothing, syntax error, runtime error, ran out of input, package not available, time limit, output cut off, stopped, download failed, stopped unexpectedly.
+- Learner code never changes a verified example; starter code comes from verified files through the publish gate. Nothing is saved or sent.
+- Works with a keyboard alone, announces results, reflows at 320px, and says what to do without JavaScript.
+
+Milestones 6 and 7 get acceptance criteria when they are planned.
 
 ## 10. Exclusions and open decisions
 
@@ -196,7 +209,7 @@ Forums or community features, certificates, streaks or gamified counters, AI cha
 
 ### Deferred [F]
 
-Browser code editor, secure external execution service, accounts (Supabase is a candidate), persistent progress, dashboards, bookmarks and history.
+Playground support for C, C++ and Java, typing input while a program runs, a secure external execution service, accounts (Supabase is a candidate), persistent progress, dashboards, bookmarks and history.
 
 ### Open decisions
 

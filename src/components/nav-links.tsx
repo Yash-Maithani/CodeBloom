@@ -8,7 +8,10 @@ import { usePathname } from "next/navigation";
 
 // Decision D18: while there are three links or fewer they stay visible at every
 // width, with no menu button.
-const links = [{ href: "/courses", label: "Courses" }];
+const links = [
+  { href: "/courses", label: "Courses" },
+  { href: "/playground", label: "Playground" },
+];
 
 export function NavLinks() {
   const pathname = usePathname();
