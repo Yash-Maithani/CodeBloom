@@ -178,9 +178,12 @@ Confirmed by the owner on 2026-10-27. The screen reader walkthrough is done by t
 - FR-P1 to FR-P5 met for every published lesson that has exercises.
 - Keyboard-only and screen reader walkthrough of a full question recorded in `PROGRESS.md`.
 
-### Milestone 4: visualizations
+### Milestone 4: visualizations [C]
+
+Confirmed by the owner on 2026-10-27, including FR-V2. The chosen concepts are variable state (Python Variables, a value changing) and which lines run (Python Decisions, if and else). C is left for a later milestone.
 
 - FR-V1 to FR-V3 met for the chosen concepts.
+- Every line, value and output in a visual comes from a trace of a real run, which `check:examples` compares with a fresh run.
 - Reduced-motion mode checked in the browser.
 
 Milestones 5 to 7 get acceptance criteria when they are planned.
