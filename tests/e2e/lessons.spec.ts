@@ -128,8 +128,10 @@ for (const path of LESSON_PAGES) {
       expect((await codeLines(page, figure)).join("\n"), `${id} code`).toBe(fileText(`content/examples/${id}${EXTENSIONS[language]}`));
 
       const { path: resultPath, kind } = expectationFile(id);
-      const solution = page.locator(`details[data-solution="${id}"]`);
-      if ((await solution.count()) > 0) {
+      // A practice question's solution sits in the same question item as its code.
+      const question = await figure.evaluate((f) => f.closest("li[data-question]")?.getAttribute("data-question") ?? null);
+      const solution = page.locator(`li[data-question="${question}"] details[data-solution]`);
+      if (question !== null) {
         // Practice: the output is hidden until the learner opens the solution.
         await expect(figure.locator("[data-output]")).toHaveCount(0);
         await expect(solution.locator("[data-output]")).toBeHidden();
