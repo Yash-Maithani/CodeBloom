@@ -1,0 +1,37 @@
+{
+  "steps": [
+    {
+      "line": 1,
+      "variables": [
+        {
+          "name": "age",
+          "value": "17",
+          "type": "int"
+        }
+      ],
+      "output": ""
+    },
+    {
+      "line": 2,
+      "variables": [
+        {
+          "name": "age",
+          "value": "17",
+          "type": "int"
+        }
+      ],
+      "output": ""
+    },
+    {
+      "line": 5,
+      "variables": [
+        {
+          "name": "age",
+          "value": "17",
+          "type": "int"
+        }
+      ],
+      "output": "Not yet\n"
+    }
+  ]
+}

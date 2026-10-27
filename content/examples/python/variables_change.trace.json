@@ -1,0 +1,48 @@
+{
+  "steps": [
+    {
+      "line": 1,
+      "variables": [
+        {
+          "name": "apples",
+          "value": "3",
+          "type": "int"
+        }
+      ],
+      "output": ""
+    },
+    {
+      "line": 2,
+      "variables": [
+        {
+          "name": "apples",
+          "value": "3",
+          "type": "int"
+        }
+      ],
+      "output": "3\n"
+    },
+    {
+      "line": 3,
+      "variables": [
+        {
+          "name": "apples",
+          "value": "5",
+          "type": "int"
+        }
+      ],
+      "output": "3\n"
+    },
+    {
+      "line": 4,
+      "variables": [
+        {
+          "name": "apples",
+          "value": "5",
+          "type": "int"
+        }
+      ],
+      "output": "3\n5\n"
+    }
+  ]
+}

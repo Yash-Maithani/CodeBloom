@@ -10,8 +10,9 @@
 // on the server and passed in, so this component sends no lesson logic to the
 // browser beyond the options, hints and feedback text.
 
-import { useEffect, useId, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import { useId, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { CircleCheck, CircleX } from "lucide-react";
+import { OutputLines } from "@/components/output-lines";
 import { InlineText } from "@/components/prose";
 import { buttonStyles } from "@/components/styles";
 import type { RenderedOption } from "@/lib/lessons";
@@ -27,39 +28,6 @@ export type PracticeItem = {
   /** Server-rendered "Show solution" disclosure */
   solution: ReactNode;
 };
-
-/**
- * Program output as real separate lines in monospace. Screen readers hear
- * "Line 1:" before each line. Output never wraps (DESIGN.md), so on a narrow
- * screen a long line scrolls inside the option; only then does the output
- * become focusable, so keyboard users can scroll it (WCAG 2.1.1).
- */
-function OutputLines({ text }: { text: string }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const [scrolls, setScrolls] = useState(false);
-  useEffect(() => {
-    const element = ref.current;
-    if (!element) return;
-    const measure = () => setScrolls(element.scrollWidth > element.clientWidth);
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, []);
-
-  if (text === "") return <span className="italic">Nothing is printed</span>;
-  const lines = text.split("\n");
-  return (
-    <span ref={ref} tabIndex={scrolls ? 0 : undefined} className="block min-w-0 overflow-x-auto font-mono text-mono whitespace-pre">
-      {lines.map((line, index) => (
-        <span key={index} className="block">
-          {lines.length > 1 && <span className="sr-only">{`Line ${index + 1}: `}</span>}
-          {line}
-        </span>
-      ))}
-    </span>
-  );
-}
 
 // `attempt` changes on every check, so checking again (even the same option)
 // replaces the message and screen readers announce it again.
@@ -135,7 +103,7 @@ function Question({ item, number, onCorrect }: { item: PracticeItem; number: num
                 onChange={() => choose(index)}
                 className="mt-1 size-4 shrink-0 accent-accent"
               />
-              {option.output ? <OutputLines text={option.text} /> : <InlineText text={option.text} />}
+              {option.output ? <OutputLines text={option.text} empty="Nothing is printed" /> : <InlineText text={option.text} />}
             </label>
           ))}
         </div>

@@ -86,7 +86,7 @@ Computed with the WCAG 2.1 relative luminance formula on 2026-10-26. All text pa
 | `ink` on `accent-tint` / `success-tint` / `error-tint` / `warning-tint` | 13.50 / 13.63 / 13.69 / 14.08 | 10.15 / 11.84 / 12.27 / 10.94 |
 | `ink-muted` on `paper` / `sheet` / `code` / `accent-tint` | 6.95 / 7.45 / 6.62 / 6.31 | 8.00 / 7.26 / 8.31 / 5.61 |
 | `accent` on `paper` / `sheet` / `code` / `accent-tint` | 7.16 / 7.68 / 6.82 / 6.50 | 8.60 / 7.80 / 8.93 / 6.03 |
-| `on-accent` on `accent` / `accent-hover` | 7.68 / 10.75 | 8.36 / 10.15 |
+| `on-accent` on `accent` / `accent-hover` / `ink-muted` | 7.68 / 10.75 / 7.45 | 8.36 / 10.15 / 7.78 |
 | `success` on `paper` / `sheet` / `success-tint` | 6.53 / 7.00 / 5.98 | 8.54 / 7.74 / 6.98 |
 | `error` on `paper` / `sheet` / `error-tint` | 6.62 / 7.10 / 6.09 | 8.19 / 7.43 / 6.94 |
 | `warning` on `paper` / `sheet` / `warning-tint` | 6.24 / 6.69 / 5.91 | 9.31 / 8.45 / 7.04 |
@@ -279,6 +279,21 @@ After the recap, above a `rule` divider: up to two bordered links (`sheet` backg
 - Feedback appears in place below the question and is announced through a polite live region.
 - Hints are revealed one at a time with "Show hint 1 of 3"; revealed hints stay visible.
 
+### Step-through visuals
+
+A panel below an example's explanation that lets the learner run the program one line at a time. Every line, value and output in it comes from a recorded trace of a real run; only the title and step notes are written by hand.
+
+- **Heading:** an h3 title ("Step through it: watch the value of `apples`"), then a small `ink-muted` line "Move one line at a time. Every value shown comes from really running this program."
+- **Panel:** `sheet` background, 1px `rule` border, 8px radius, 16px padding (24px from 768px).
+- **Code:** a compact copy of the example on `code`, line numbers in `ink-muted`. The line that just ran gets a 3px `accent` left bar, `accent-tint` background and a 16px Lucide `arrow-right` in `accent` beside its number, so it is not shown by colour alone. Lines that never run are never marked. Code never wraps; it scrolls inside the panel.
+- **Step text:** bold "Step 3 of 4. Line 3 ran: `apples = apples + 2`", then what changed in words, generated from the trace ("apples changed from 3 to 5.", "No variable changed.", "Python went from line 2 to line 5."), then the step's note if it has one. The start state reads "Start. Nothing has run yet."
+- **Variables:** the labeled boxes from Educational diagrams, as HTML: the name above in sans, the value inside in `text-mono` on `sheet` with a 1px `rule-strong` border, the type below in `text-xs` `ink-muted`. A variable that changed on this step gets a 2px `accent` border, `accent-tint` fill and the words "changed (was 3)", or "new" when it first appears. Before anything runs: "No variables yet" in italic.
+- **Output so far:** the output panel style (`code`, 3px `ink-muted` left bar), with output as real separate lines in `text-mono`, read as "Line 1:", "Line 2:". Before anything is printed: "nothing yet" in italic.
+- **Controls:** "Back" (secondary), "Next step" (primary), "Start again" (secondary), in one row that wraps on a phone. At the ends, Back or Next step stays focusable with `aria-disabled`: text turns `ink-muted` (the primary button's fill turns `ink-muted` with `on-accent` text), and pressing it announces "This is the start. Nothing has run yet." or "This is the last step." without moving. The controls appear only once the page is interactive; their space is reserved.
+- **Announcement:** every step's full sentence (step, line, changes, note, output so far line by line) goes to a polite live region.
+- **Text equivalent:** an "All steps as a table" disclosure (secondary button style) below the panel, holding a table with a Start row and one row per step: line that ran, variables after it, output so far. It is a focusable region, because it scrolls sideways on a phone. Without JavaScript the panel is hidden and the table is shown open.
+- **Motion:** only the current line's existing 120ms colour change; values do not move. Instant with reduced motion. Nothing plays by itself.
+
 ### Progress
 
 - Lesson section steps may be numbered because they are a real sequence.
@@ -322,7 +337,7 @@ Motion explains a change or answers an action. Nothing moves on its own.
 
 Built as inline SVG with token colors so they work in both themes.
 
-- **Variables:** a labeled box; the name above in sans-serif, the value inside in mono.
+- **Variables:** a labeled box; the name above in sans-serif, the value inside in mono. Built in HTML in the step-through visuals (Components).
 - **Arrays:** a row of equal cells with the index below each cell, starting at 0.
 - **Pointers and references:** an arrow from the pointer's box to the target's box, with the address shown in mono when it matters.
 - **Call stack:** stacked frames with the newest on top, each showing its function name and local variables.

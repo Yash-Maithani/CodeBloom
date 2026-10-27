@@ -5,6 +5,8 @@ import { mkdtemp, mkdir, readFile, rm, symlink, writeFile } from "node:fs/promis
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { after, test } from "node:test";
+import { execFileSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 import { checkExamples, LANGUAGES, writeRecordIfPassed } from "./lib/example-runner.mjs";
 
 const created = [];
@@ -297,4 +299,57 @@ test("record: a failed run never overwrites the existing record file", async () 
   assert.equal(failed.ok, false);
   assert.equal(await writeRecordIfPassed(failed, file), false);
   assert.equal(await readFile(file, "utf8"), valid, "the last valid record is kept");
+});
+
+// ---------- traces for step-through visuals ----------
+
+const TRACER = fileURLToPath(new URL("./lib/python-trace.py", import.meta.url));
+const traceOf = (file) => execFileSync("python3", ["-I", "-B", TRACER, file], { encoding: "utf8" });
+
+async function tracedFixture(source, output, edit = (trace) => trace) {
+  const { root, languages } = await fixture({ "python/t.py": source, "python/t.expected.txt": output });
+  await writeFile(join(root, "python", "t.trace.json"), edit(traceOf(join(root, "python", "t.py"))));
+  return { root, languages };
+}
+
+test("trace: passes when the saved trace matches a fresh trace, and its hash is recorded", async () => {
+  const result = await checkExamples(await tracedFixture("x = 3\nprint(x)\nx = x + 2\nprint(x)\n", "3\n5\n"));
+  assert.equal(result.ok, true, result.results[0]?.message);
+  assert.match(result.results[0].message, /trace \(4 steps\) match/);
+  assert.match(result.record.examples["python/t"].trace, /^[0-9a-f]{64}$/);
+});
+
+test("trace: fails when an intermediate value, a line or the output so far was edited, even if the final output is right", async () => {
+  for (const [what, edit] of [
+    ["an intermediate value", (t) => t.replace('"value": "3"', '"value": "4"')],
+    ["a line number", (t) => t.replace('"line": 3', '"line": 2')],
+    ["the output so far", (t) => t.replace('"output": "3\\n"', '"output": ""')],
+  ]) {
+    const result = await checkExamples(await tracedFixture("x = 3\nprint(x)\nx = x + 2\nprint(x)\n", "3\n5\n", edit));
+    assert.equal(result.ok, false, what);
+    assert.match(result.results[0].message, /trace differs/, what);
+  }
+});
+
+test("trace: refused next to a C example, an example meant to fail, or with no example", async () => {
+  const c = await fixture({ "c/a.c": "int main(void) { return 0; }\n", "c/a.expected.txt": "", "c/a.trace.json": "{}\n" }, { c: LANGUAGES.c });
+  assert.ok((await checkExamples(c)).problems.some((p) => p.includes("only supported for Python")));
+  const failing = await fixture({ "python/f.py": 'import sys\nsys.exit("x")\n', "python/f.run-error.txt": "x\n", "python/f.trace.json": "{}\n" });
+  assert.ok((await checkExamples(failing)).problems.some((p) => p.includes("can have a trace")));
+  const orphan = await fixture({ "python/ok.py": 'print("x")\n', "python/ok.expected.txt": "x\n", "python/gone.trace.json": "{}\n" });
+  assert.ok((await checkExamples(orphan)).problems.some((p) => p.includes("gone.trace.json: no example file")));
+});
+
+test("tracer: records only variables the example defines, never Python internals", async () => {
+  const { root } = await fixture({
+    "python/i.py": "import math\nimport os as system\nfrom math import sqrt\nx = 1\nshow = print\ny = math.floor(2.5)\nprint(x, y)\n",
+  });
+  const steps = JSON.parse(traceOf(join(root, "python", "i.py"))).steps;
+  const names = new Set(steps.flatMap((step) => step.variables.map((v) => v.name)));
+  const types = new Set(steps.flatMap((step) => step.variables.map((v) => v.type)));
+  // Fails if any dunder name, module or builtin ever appears.
+  assert.deepEqual([...names].filter((n) => n.startsWith("__")), []);
+  assert.deepEqual([...types].filter((t) => ["module", "builtin_function_or_method"].includes(t)), []);
+  assert.deepEqual([...names].sort(), ["x", "y"]);
+  assert.equal(steps.at(-1).output, "1 2\n");
 });

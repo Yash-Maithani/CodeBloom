@@ -6,7 +6,7 @@
 // The subset on purpose: anything outside it stops the build with a message
 // that says what to change, instead of being shown in some surprising way.
 //   Blocks:  paragraphs (separated by a blank line), "## " headings, "- " lists,
-//            and placeholder lines such as {{example change}} or {{analogy}}.
+//            and placeholder lines such as {{example change}}, {{visual change}} or {{analogy}}.
 //   Inline:  `code`, **bold** and [text](/internal/link).
 // There are no code blocks: every program on a page comes from a checked file.
 
@@ -20,7 +20,7 @@ export type ProseBlock =
   | { type: "paragraph"; content: Inline[] }
   | { type: "heading"; text: string }
   | { type: "list"; items: Inline[][] }
-  | { type: "placeholder"; kind: "example"; id: string }
+  | { type: "placeholder"; kind: "example" | "visual"; id: string }
   | { type: "placeholder"; kind: "analogy" };
 
 export class ProseError extends Error {}
@@ -125,9 +125,9 @@ export function parseProse(source: string, name: string, options: BlockOptions):
       if (group.length > 1) fail("a placeholder must have a blank line before and after it");
       if (!options.placeholders) fail("placeholders are not allowed in this file");
       const [, kind, id] = placeholder;
-      if (kind === "example" && id) blocks.push({ type: "placeholder", kind, id });
+      if ((kind === "example" || kind === "visual") && id) blocks.push({ type: "placeholder", kind, id });
       else if (kind === "analogy" && !id) blocks.push({ type: "placeholder", kind });
-      else fail(`unknown placeholder {{${kind}${id ? ` ${id}` : ""}}}; use {{example <id>}} or {{analogy}}`);
+      else fail(`unknown placeholder {{${kind}${id ? ` ${id}` : ""}}}; use {{example <id>}}, {{visual <id>}} or {{analogy}}`);
     } else if (group.some((line) => line.includes("{{") || line.includes("}}"))) {
       fail("a placeholder must be on a line of its own");
     } else if (!group[0].startsWith("- ") && group.slice(1).some((line) => line.startsWith("- ") || line.startsWith("## "))) {

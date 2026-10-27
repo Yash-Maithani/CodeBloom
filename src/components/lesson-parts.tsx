@@ -8,8 +8,9 @@ import { CodeBlock } from "@/components/code-block";
 import { OutputPanel } from "@/components/output-panel";
 import { PracticeSet, type PracticeItem } from "@/components/practice-set";
 import { InlineText } from "@/components/prose";
+import { StepThrough, TraceTable } from "@/components/step-through";
 import { backLinkStyles, buttonStyles } from "@/components/styles";
-import type { LoadedLesson, RenderedExample } from "@/lib/lessons";
+import type { LoadedLesson, RenderedExample, RenderedVisual } from "@/lib/lessons";
 import { plainText as plain } from "@/lib/prose";
 
 export function LessonCodeBlock({
@@ -165,5 +166,39 @@ export function LessonNav({
         </li>
       </ul>
     </nav>
+  );
+}
+
+/** A step-through visual with its text equivalent (DESIGN.md "Step-through visuals"). */
+export function VisualBlock({ visual }: { visual: RenderedVisual }) {
+  const headingId = `visual-${visual.id}`;
+  return (
+    <section aria-labelledby={headingId} data-visual={visual.id} className="max-w-lesson">
+      <h3 id={headingId} className="font-heading text-xl font-semibold">
+        <InlineText text={visual.title} />
+      </h3>
+      <p className="mt-2 max-w-measure text-sm text-ink-muted">
+        Move one line at a time. Every value shown comes from really running this program.
+      </p>
+      <div className="mt-4">
+        <StepThrough visual={visual} />
+      </div>
+      <details data-trace-details className="mt-4">
+        <summary className={`${buttonStyles.secondary} cursor-pointer list-none [&::-webkit-details-marker]:hidden`}>
+          All steps as a table
+        </summary>
+        <div className="mt-4">
+          <TraceTable visual={visual} />
+        </div>
+      </details>
+      {/* Without JavaScript the buttons cannot work, so the stepper is hidden
+          and the table is shown open instead. */}
+      <noscript>
+        <style>{`[data-visual="${visual.id}"] [data-stepper], [data-visual="${visual.id}"] [data-trace-details] { display: none; }`}</style>
+        <div className="mt-4">
+          <TraceTable visual={visual} />
+        </div>
+      </noscript>
+    </section>
   );
 }

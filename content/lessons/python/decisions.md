@@ -23,6 +23,8 @@ An `if` uses a comparison as its condition. This is the program from the CodeBlo
 
 Indentation is how Python knows which lines belong to the `if` and which belong to the `else`. It is part of the program, not decoration: change the indentation and you change what the program does. Use four spaces for each level. Many code editors insert four spaces when you press the Tab key.
 
+{{visual vote}}
+
 ## When there is no else
 
 An `else` is optional. Without one, Python either runs the indented lines or skips them, then carries on.

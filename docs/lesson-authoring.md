@@ -24,6 +24,7 @@ content/
   lessons/index.ts              the list of all lessons
   examples/<course>/<name>.<ext>        a program shown in a lesson
   examples/<course>/<name>.<kind>.txt   what it really printed (section 5)
+  examples/python/<name>.trace.json     the line-by-line trace behind a step-through visual (section 3b)
   verified-examples.json        written by npm run check:examples; never edit it
 ```
 
@@ -51,6 +52,7 @@ The type is `LessonSource` in `src/lib/lesson-types.ts`. Text fields may use `` 
 | `examples` | at least one | Runnable examples by id: `file` (`"python/variables_change"`), optional `caption`, and `notes`. Each is placed in the prose with `{{example <id>}}` |
 | `mistakes` | no | Each: `title`, `example` (may fail, or run with surprising output), `whatHappens`, optional `howToRead` and `whyEasyToMiss`, `fix`, optional `fixExample` |
 | `practice` | no | Interactive questions, two kinds; see section 3a |
+| `visuals` | no | Step-through visuals by id, Python lessons only; see section 3b. Each is placed in the prose with `{{visual <id>}}` |
 | `recap` | at least 2 | Short points |
 
 Fields shown after a label ("Where the comparison stops:", "What happens:", "Fix:") start in lowercase unless the first word is a name.
@@ -77,6 +79,29 @@ On the page, a question counts as answered when the learner checks the correct o
 
 **Margin notes** (`notes`): `{ startLine, endLine, text }`, counting from line 1, in order, not overlapping. Explain the lines that matter, not every line. A note must not restate the output; the output panel shows it. The page adds "Line 4:" for screen readers, so do not start a note with the line number.
 
+### 3b. Step-through visuals
+
+A visual lets the learner move through one example a line at a time and see the line that ran, every variable after it, and the output so far. It is built from a trace: a file recorded by really running the example, never typed. Only the title and the step notes are written by hand.
+
+Each entry in `visuals` has:
+
+| Field | Required | What it is |
+|---|---|---|
+| `example` | yes | A Python example of this lesson's course with an `.expected.txt` and a `.trace.json`, for example `"python/vote"` |
+| `title` | yes | Shown as the visual's heading, for example "Step through it: watch which lines run" |
+| `notes` | no | Step number to note text. Step 1 is the first line that ran; the start state has no note |
+| `branches` | no | Step number to `true` or `false`: whether the condition checked on that step was true. Only for a step that runs an `if` or `elif` line |
+
+How to make one:
+
+1. Pick an example that shows something a static block cannot: a value changing over time, or lines that are skipped. Keep it short; every step is one click.
+2. Capture its trace (section 5) and read it. Check each step's line, values and output against what you expect. If something surprises you, the trace is right and your expectation is not; that surprise may be worth a note.
+3. Write a note only where the step needs an explanation. A note must not restate what the panel already shows (the line, the values, the output).
+4. If a note talks about a condition being true or false, declare it in `branches`. The build checks the declaration against the trace: a true condition means the next line that ran is the first indented line under the `if`. A note on a condition step without a declaration stops the build.
+5. Place it in the prose with `{{visual <id>}}` after the paragraph that explains the example, so the learner reads the explanation first.
+
+On the page, the learner starts at "Start. Nothing has run yet.", and moves with Back, Next step and Start again; nothing plays by itself. Each step is announced to screen readers, and "All steps as a table" gives the same information as text. Without JavaScript the table is shown open instead.
+
 ## 4. The prose (`<slug>.md` and concept files)
 
 A small subset of Markdown. Anything else stops the build with a message saying what to change.
@@ -85,7 +110,7 @@ A small subset of Markdown. Anything else stops the build with a message saying 
 - `## Heading` (lesson files only; concept files have no headings), with a blank line before and after.
 - Lists: every line starts with `- `, with a blank line before the list. No nested or numbered lists.
 - Inline: `` `code` ``, `**bold**`, `[text](/courses/c/first-program)`. Links must be internal and lead to a real page; a published lesson may not link to a draft.
-- Placeholders, each alone on its line: `{{example <id>}}` and `{{analogy}}`.
+- Placeholders, each alone on its line: `{{example <id>}}`, `{{visual <id>}}` and `{{analogy}}`.
 
 Not allowed: code blocks (every program on a page comes from a checked file), raw HTML, images, tables, block quotes, other heading levels, a single `*`, and em or en dashes. Write `<`, `>`, `&` and quotes as they are: the page shows them exactly, and never changes straight quotes into curly ones.
 
@@ -115,6 +140,15 @@ LANG=C.UTF-8 gcc -std=c17 -Wall -Wextra -Werror name.c -o /tmp/name 2> name.comp
 LANG=C.UTF-8 gcc -std=c17 -Wall -Wextra -Werror name.c -o /tmp/name && /tmp/name > name.expected.txt
 ```
 
+**Capturing a trace** (Python examples with an `.expected.txt` only), from the same folder:
+
+```
+cd content/examples/python
+LANG=C.UTF-8 python3 -I -B ../../../scripts/lib/python-trace.py name.py > name.trace.json
+```
+
+The tracer (`scripts/lib/python-trace.py`) runs the program line by line and records, for each line that runs, the line number, every variable the program defines (value as Python shows it with `repr`, and type) after that line, and the output so far. Python's own names (such as `__name__`, modules and built-in functions) never appear. `check:examples` reruns it with the same limits as every example and fails if the trace differs in any way, or if its final output differs from `.expected.txt`. This command reproduces the two Milestone 4 traces byte for byte.
+
 `check:examples` compares error messages with the example's folder removed from paths, so `/home/you/CodeBloom/content/examples/python/name.py` becomes `name.py`. gcc already prints the name as you typed it; Python prints the full path, which the `sed` part removes. These commands were checked against the Milestone 2 files and reproduce them byte for byte. Open the file and read it before you continue.
 
 **Toolchain.** Error messages are matched exactly against the recorded cloud toolchain: gcc 13.3.0 and Python 3.13.17 with the `C.UTF-8` locale (`PROGRESS.md`, decision D34). Under that locale gcc prints curly quotes around names, such as `‘main’`; that is what learners see in a UTF-8 terminal, so it is kept. If a newer compiler words a message differently, `check:examples` fails. A person then reads the new message, decides whether the lesson text still explains it, and only then saves the new file. Nothing re-captures messages automatically.
@@ -129,7 +163,7 @@ LANG=C.UTF-8 gcc -std=c17 -Wall -Wextra -Werror name.c -o /tmp/name && /tmp/name
 npm run check:examples
 ```
 
-It compiles and runs every example, compares the results, and lists any problem. When everything passes it rewrites `content/verified-examples.json`, which stores a hash of each example and its expectation file. A failed run never changes it. Commit the record together with the examples.
+It compiles and runs every example, compares the results (and traces, for Python examples that have one), and lists any problem. When everything passes it rewrites `content/verified-examples.json`, which stores a hash of each example, its expectation file and its trace. A failed run never changes it. Commit the record together with the examples.
 
 If a result differs, read the difference first. A changed message may mean the lesson text needs to change too.
 
@@ -146,6 +180,7 @@ Teaching quality is separate from passing checks. Before publishing, read the wh
 - Prose and notes never state output that is not shown in a verified panel.
 - Each mistake shows the wrong code, what happens, and the fix.
 - Each practice solution, wrong option and hint is checked against its question, and each wrong option's explanation addresses its own misconception.
+- Each visual: step through it once with the mouse and once with the keyboard only, and open the table. Every note matches the step it is on.
 
 Then run the skills `CLAUDE.md` names for lesson screens: `design:design-critique` (teaching quality), `design:ux-copy` for any new interface text, and `design:accessibility-review` before a milestone is verified. Record the results in `PROGRESS.md`. A lesson meets `SPEC.md`'s "verified" definition only when all of this is done.
 
@@ -167,3 +202,12 @@ Set `status: "published"`, then run every check in `CLAUDE.md` (Quality gates), 
 | `wrong output N is the real output` | A wrong option equals what the program really prints; change it to a real misconception |
 | `exactly one option must be correct` / `needs one to three hints` / `two or three wrong outputs` | A practice question is outside its limits (section 3a) |
 | `error message differs` (from `check:examples`) | The compiler or interpreter printed something else; see section 5, Toolchain |
+| `trace differs from` (from `check:examples`) | The program or the tracer changed. Recapture the trace (section 5), read the new steps, and check the notes still fit |
+| `traces are only supported for Python examples` / `only an example with ... can have a trace` / `no example file named` (from `check:examples`) | A `.trace.json` sits next to the wrong kind of example, or its program is missing |
+| `The trace of ... has never been verified` / `has changed since it was last verified` | Run `npm run check:examples` and commit the updated record |
+| `has no trace file` / `a visual needs an output example` / `must be "python/<name>"` | The visual's `example` is not a traced Python output example |
+| `step N does not exist` | A note or branch key is past the last step of the trace |
+| `must declare whether the condition was true` | A note sits on an `if` or `elif` step; add it to `branches` |
+| `declares the condition was ..., but the trace shows` | The declaration is wrong; the trace shows which way the program went |
+| `cannot declare a branch` | `branches` names a step whose line is not an `if` or `elif` |
+| `{{visual ...}} has no matching entry` / `visuals never placed` | A placeholder and the `visuals` field do not match |

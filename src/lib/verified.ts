@@ -12,7 +12,7 @@ import { normalizeLineEndings } from "./line-endings.ts";
 
 export type ExpectationKind = "output" | "compile-error" | "run-error";
 
-type RecordEntry = { kind: ExpectationKind; source: string; expected: string };
+type RecordEntry = { kind: ExpectationKind; source: string; expected: string; trace?: string };
 export type VerificationRecord = { examples: Record<string, RecordEntry> };
 
 export const RECORD_PATH = path.join(process.cwd(), "content", "verified-examples.json");
@@ -33,6 +33,16 @@ export async function readRecord(file: string = RECORD_PATH): Promise<Verificati
  * Stops the build unless the example's current files match the record.
  * `id` is "<language>/<name>"; `sourceFile` and `expectationFile` are its two files.
  */
+/** Stops the build unless the example's trace (for a step-through visual) matches the record. */
+export async function assertTraceVerified(record: VerificationRecord, id: string, traceFile: string): Promise<void> {
+  const entry = record.examples[id];
+  const fix = "Run npm run check:examples, review the trace, and commit the updated content/verified-examples.json.";
+  if (!entry?.trace) throw new Error(`The trace of ${id} has never been verified. ${fix}`);
+  if (sha256(await readFile(/*turbopackIgnore: true*/ traceFile, "utf8")) !== entry.trace) {
+    throw new Error(`The trace of ${id} has changed since it was last verified. ${fix}`);
+  }
+}
+
 export async function assertVerified(
   record: VerificationRecord,
   id: string,

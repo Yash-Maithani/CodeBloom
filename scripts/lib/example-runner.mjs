@@ -33,6 +33,7 @@ import { createHash } from "node:crypto";
 import { mkdtemp, readdir, realpath, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join, sep } from "node:path";
+import { fileURLToPath } from "node:url";
 
 export const DEFAULT_TIMEOUT_MS = 10_000;
 const MAX_OUTPUT_BYTES = 64 * 1024;
@@ -77,6 +78,8 @@ export const LANGUAGES = {
     extension: ".py",
     // -I isolates Python from user settings and the current folder; -B skips .pyc files.
     steps: ({ source }) => [{ command: "python3", args: ["-I", "-B", source] }],
+    // Step-through visuals: python-trace.py runs the example line by line.
+    trace: ({ source }) => ({ command: "python3", args: ["-I", "-B", TRACER, source] }),
   },
 };
 
@@ -87,6 +90,13 @@ export const EXPECTATIONS = {
   "run-error": ".run-error.txt",
 };
 const SUFFIXES = Object.entries(EXPECTATIONS);
+
+// An optional trace for a step-through visual: name.trace.json next to a Python
+// example that has name.expected.txt. check:examples reruns the tracer and the
+// trace must match the file exactly: every line that ran, every intermediate
+// value and the output so far, not only the final output.
+export const TRACE_SUFFIX = ".trace.json";
+const TRACER = fileURLToPath(new URL("./python-trace.py", import.meta.url));
 
 // Windows line endings (\r\n) and old Mac ones (\r) become \n before output is
 // compared, so an expected file saved on Windows still matches. Nothing else is
@@ -176,6 +186,7 @@ async function discover(root, languages) {
     const sources = [];
     // Example name -> list of [kind, file name] expectation files found for it.
     const expectations = new Map();
+    const traces = new Map();
     for (const entry of entries) {
       const id = `${key}/${entry.name}`;
       if (entry.isSymbolicLink() || !entry.isFile()) {
@@ -188,7 +199,9 @@ async function discover(root, languages) {
         continue;
       }
       const expectation = SUFFIXES.find(([, suffix]) => entry.name.endsWith(suffix));
-      if (expectation) {
+      if (entry.name.endsWith(TRACE_SUFFIX)) {
+        traces.set(entry.name.slice(0, -TRACE_SUFFIX.length), entry.name);
+      } else if (expectation) {
         const name = entry.name.slice(0, -expectation[1].length);
         expectations.set(name, [...(expectations.get(name) ?? []), [expectation[0], entry.name]]);
       } else if (entry.name.endsWith(language.extension)) {
@@ -199,13 +212,23 @@ async function discover(root, languages) {
         }
         sources.push({ key, language, name, file: entry.name, source: join(dir, entry.name) });
       } else {
-        problems.push(`${id}: unexpected file (expected ${language.extension}, ${SUFFIXES.map(([, suffix]) => suffix).join(", ")} files only)`);
+        problems.push(`${id}: unexpected file (expected ${language.extension}, ${[...SUFFIXES.map(([, suffix]) => suffix), TRACE_SUFFIX].join(", ")} files only)`);
       }
     }
     if (sources.length === 0) problems.push(`${key}: no examples found, so nothing would be checked`);
     for (const example of sources) {
       const found = expectations.get(example.name) ?? [];
       expectations.delete(example.name);
+      const traceFile = traces.get(example.name);
+      traces.delete(example.name);
+      if (traceFile && !language.trace) {
+        problems.push(`${key}/${traceFile}: traces are only supported for Python examples`);
+        continue;
+      }
+      if (traceFile && found.length === 1 && found[0][0] !== "output") {
+        problems.push(`${key}/${traceFile}: only an example with ${example.name}${EXPECTATIONS.output} can have a trace`);
+        continue;
+      }
       if (found.length === 0) {
         problems.push(`${key}/${example.file}: missing ${example.name}${EXPECTATIONS.output} (or a .compile-error.txt or .run-error.txt file)`);
       } else if (found.length > 1) {
@@ -213,9 +236,15 @@ async function discover(root, languages) {
       } else if (found[0][0] === "compile-error" && !language.compiles) {
         problems.push(`${key}/${found[0][1]}: ${language.label} has no separate compile step; use ${example.name}${EXPECTATIONS["run-error"]}`);
       } else {
-        examples.push({ ...example, kind: found[0][0], expected: join(dir, found[0][1]) });
+        examples.push({
+          ...example,
+          kind: found[0][0],
+          expected: join(dir, found[0][1]),
+          ...(traceFile ? { trace: join(dir, traceFile) } : {}),
+        });
       }
     }
+    for (const [name, file] of traces) problems.push(`${key}/${file}: no example file named ${name}${language.extension}`);
     for (const [name, found] of expectations) {
       for (const [, file] of found) problems.push(`${key}/${file}: no example file named ${name}${language.extension}`);
     }
@@ -275,7 +304,28 @@ async function checkOne(example, timeoutMs) {
     if (actual !== expected) {
       return finishedWith(false, `output differs\n  expected: ${JSON.stringify(expected)}\n  actual:   ${JSON.stringify(actual)}`);
     }
-    return finishedWith(true, "output matches");
+    if (!example.trace) return finishedWith(true, "output matches");
+
+    // The trace: rerun the example line by line and compare with the file.
+    const tracer = example.language.trace({ source: example.source });
+    const traced = await runProcess(tracer.command, tracer.args, { cwd: workDir, env, timeoutMs });
+    if (traced.startError) return finishedWith(false, `could not start the tracer (${traced.startError.code ?? traced.startError.message})`);
+    if (traced.timedOut) return finishedWith(false, `the tracer timed out after ${timeoutMs} ms`);
+    if (traced.tooMuchOutput) return finishedWith(false, `the tracer printed more than ${MAX_OUTPUT_BYTES} bytes`);
+    if (traced.code !== 0) return finishedWith(false, `the tracer exited with code ${traced.code ?? traced.signal}\n${traced.stderr.trimEnd()}`);
+    const trace = normalizeLineEndings(traced.stdout);
+    const savedTrace = normalizeLineEndings(await readFile(example.trace, "utf8"));
+    if (trace !== savedTrace) {
+      return finishedWith(false, `trace differs from ${example.name}${TRACE_SUFFIX}\n  expected: ${JSON.stringify(savedTrace)}\n  actual:   ${JSON.stringify(trace)}`);
+    }
+    // The traced run must print exactly what the normal run printed.
+    const traceSteps = JSON.parse(trace).steps;
+    if (traceSteps.length === 0) return finishedWith(false, "the trace has no steps");
+    const finalOutput = traceSteps[traceSteps.length - 1].output;
+    if (finalOutput !== actual) {
+      return finishedWith(false, `the trace's final output differs from the real output\n  trace:  ${JSON.stringify(finalOutput)}\n  output: ${JSON.stringify(actual)}`);
+    }
+    return finishedWith(true, `output and trace (${traceSteps.length} steps) match`);
   } finally {
     // Only removes the temporary folder created above.
     await rm(workDir, { recursive: true, force: true });
@@ -306,6 +356,7 @@ async function buildRecord(examples) {
         kind: example.kind,
         source: sha256(await readFile(example.source, "utf8")),
         expected: sha256(await readFile(example.expected, "utf8")),
+        ...(example.trace ? { trace: sha256(await readFile(example.trace, "utf8")) } : {}),
       },
     ]);
   }

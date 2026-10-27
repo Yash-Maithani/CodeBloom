@@ -83,6 +83,18 @@ export const pythonDecisions: LessonSource = {
       ],
     },
   },
+  visuals: {
+    vote: {
+      example: "python/vote",
+      title: "Step through it: watch which lines run",
+      notes: {
+        1: "`age` gets the value 17.",
+        2: "Python checks the condition `age >= 18`. It is `False`, because 17 is less than 18.",
+        3: "Because the condition was `False`, Python skipped line 3 and ran the line under `else:`. Line 4, `else:`, is not a step of its own: it only marks where the other path starts.",
+      },
+      branches: { 2: false },
+    },
+  },
   mistakes: [
     {
       title: "Using = instead of ==",

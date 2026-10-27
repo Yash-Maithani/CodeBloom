@@ -47,7 +47,7 @@ type CodeBlockProps = {
   exampleId?: string;
 };
 
-const tokenStyles: Record<TokenKind, string> = {
+export const tokenStyles: Record<TokenKind, string> = {
   plain: "",
   keyword: "font-bold",
   literal: "text-syntax-literal",
