@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "first_wrong_case.py", line 2, in <module>
+    Print(greeting)
+    ^^^^^
+NameError: name 'Print' is not defined. Did you mean: 'print'?

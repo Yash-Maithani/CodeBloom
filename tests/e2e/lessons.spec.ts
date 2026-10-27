@@ -8,7 +8,13 @@ const COURSES = {
   c: { name: "C", lessons: [["/courses/c/first-program", "Your first C program"], ["/courses/c/variables", "Variables and data types"]] },
   python: {
     name: "Python",
-    lessons: [["/courses/python/variables", "Variables and data types"], ["/courses/python/decisions", "Making decisions with if and else"]],
+    lessons: [
+      ["/courses/python/first-program", "Your first Python program"],
+      ["/courses/python/variables", "Variables and data types"],
+      ["/courses/python/input-output", "Input and output"],
+      ["/courses/python/decisions", "Making decisions with if and else"],
+      ["/courses/python/elif", "More decisions with elif"],
+    ],
   },
 } as const;
 const LESSON_PAGES = Object.values(COURSES).flatMap((course) => course.lessons.map(([href]) => href));
@@ -55,10 +61,11 @@ for (const [slug, course] of Object.entries(COURSES)) {
   });
 }
 
-test("Python's planned topics include the new elif topic and not the replaced one", async ({ page }) => {
+test("Python's planned topics start with loops now that elif is published, and the replaced topic is gone", async ({ page }) => {
   await page.goto("/courses/python");
   const planned = page.locator("[data-planned-topics] li");
-  await expect(planned.filter({ hasText: "More decisions with elif" })).toHaveCount(1);
+  await expect(planned.first()).toContainText("Loops: while and for");
+  await expect(planned.filter({ hasText: "More decisions with elif" })).toHaveCount(0);
   await expect(planned.filter({ hasText: "Decisions with if, elif and else" })).toHaveCount(0);
 });
 
@@ -76,7 +83,7 @@ test("course cards show the real number of published lessons", async ({ page }) 
   await page.goto("/courses");
   const status = (name: string) => page.locator("article").filter({ has: page.getByRole("link", { name, exact: true }) }).locator("p").last();
   await expect(status("C")).toHaveText("2 lessons published");
-  await expect(status("Python")).toHaveText("2 lessons published");
+  await expect(status("Python")).toHaveText("5 lessons published");
   await expect(status("C++")).toHaveText("No lessons published yet");
   await expect(status("Java")).toHaveText("No lessons published yet");
 });
@@ -86,27 +93,40 @@ test("course cards show the real number of published lessons", async ({ page }) 
 for (const [slug, course] of Object.entries(COURSES)) {
   test(`${course.name}: next and previous follow the published lessons, with no previous on the first and no next on the last`, async ({ page }) => {
     const nav = page.getByRole("navigation", { name: "Lesson navigation" });
-    const [first, last] = course.lessons;
+    const lessons = course.lessons;
+    const first = lessons[0];
+    const last = lessons[lessons.length - 1];
+
+    // Every lesson links to the next one in topic order, and every next lesson links back.
+    for (const [index, [href]] of lessons.entries()) {
+      await page.goto(href);
+      if (index === 0) await expect(nav.getByRole("link", { name: /Previous lesson/ })).toHaveCount(0);
+      else await expect(nav.getByRole("link", { name: /Previous lesson/ })).toHaveAttribute("href", lessons[index - 1][0]);
+      if (index === lessons.length - 1) await expect(nav.getByRole("link", { name: /Next lesson/ })).toHaveCount(0);
+      else await expect(nav.getByRole("link", { name: /Next lesson/ })).toHaveAttribute("href", lessons[index + 1][0]);
+    }
 
     await page.goto(first[0]);
-    await expect(nav.getByRole("link", { name: /Previous lesson/ })).toHaveCount(0);
-    await nav.getByRole("link", { name: `Next lesson ${last[1]}` }).click();
-    await expect(page).toHaveURL(new RegExp(`${last[0]}$`));
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText(last[1]);
+    if (lessons.length > 1) {
+      await nav.getByRole("link", { name: `Next lesson ${lessons[1][1]}` }).click();
+      await expect(page).toHaveURL(new RegExp(`${lessons[1][0]}$`));
+      await expect(page.getByRole("heading", { level: 1 })).toHaveText(lessons[1][1]);
+    }
 
+    await page.goto(last[0]);
     await expect(nav.getByRole("link", { name: /Next lesson/ })).toHaveCount(0);
     await expect(nav).toContainText(`This is the last published lesson in the ${course.name} course.`);
     await nav.getByRole("link", { name: `Back to the ${course.name} course` }).click();
     await expect(page).toHaveURL(new RegExp(`/courses/${slug}$`));
 
     await page.goto(last[0]);
-    await nav.getByRole("link", { name: `Previous lesson ${first[1]}` }).click();
-    await expect(page).toHaveURL(new RegExp(`${first[0]}$`));
+    await nav.getByRole("link", { name: `Previous lesson ${lessons[lessons.length - 2][1]}` }).click();
+    await expect(page).toHaveURL(new RegExp(`${lessons[lessons.length - 2][0]}$`));
   });
 }
 
 test("unknown lesson addresses return the 404 page", async ({ page }) => {
-  for (const path of ["/courses/c/no-such-lesson", "/courses/cpp/variables", "/courses/python/first-program"]) {
+  for (const path of ["/courses/c/no-such-lesson", "/courses/cpp/variables", "/courses/python/loops"]) {
     const response = await page.goto(path);
     expect(response?.status(), path).toBe(404);
   }

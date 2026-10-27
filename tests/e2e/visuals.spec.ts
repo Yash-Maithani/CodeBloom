@@ -8,6 +8,7 @@ type Trace = { steps: Array<{ line: number; variables: Array<{ name: string; val
 const VISUALS = [
   { path: "/courses/python/variables", id: "change", file: "python/variables_change" },
   { path: "/courses/python/decisions", id: "vote", file: "python/vote" },
+  { path: "/courses/python/elif", id: "ticket", file: "python/elif_ticket" },
 ];
 const traceOf = (file: string): Trace => JSON.parse(readFileSync(`content/examples/${file}.trace.json`, "utf8"));
 const outputLines = (output: string) => (output === "" ? [] : output.replace(/\n$/, "").split("\n"));
@@ -207,4 +208,18 @@ test.describe("without JavaScript", () => {
     await expect(table).toHaveCount(1);
     await expect(table.locator("tbody tr")).toHaveCount(5);
   });
+});
+
+test("the elif visual runs only the lines of the first true condition, and never the skipped ones", async ({ page }) => {
+  const visual = await open(page, "/courses/python/elif", "ticket");
+  const seen: string[] = [];
+  for (let i = 0; i < 4; i++) {
+    await visual.getByRole("button", { name: "Next step" }).click();
+    seen.push(...(await visual.locator("[data-current]").evaluateAll((x) => x.map((e) => e.getAttribute("data-trace-line")!))));
+    // Step 2 checks the if line (false); step 3 is where Python has jumped to the elif line, 4.
+    if (i === 2) await expect(visual.locator("[data-step-text]")).toContainText("Python went from line 2 to line 4.");
+  }
+  // Line 3 (the if group), and lines 6 and 7 (the else group) never ran.
+  expect(seen).toEqual(["1", "2", "4", "5"]);
+  await expect(visual.locator("[data-output-so-far]")).toContainText("Standard ticket");
 });

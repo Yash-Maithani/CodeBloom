@@ -202,7 +202,14 @@ test("at 320px the playground fits without page scroll", async ({ page }) => {
 
 test("each Python lesson example links to its playground page, which starts from the verified file", async ({ page }) => {
   const opened: string[] = [];
-  for (const lesson of ["/courses/python/variables", "/courses/python/decisions"]) {
+  const titles: Record<string, RegExp> = {
+    "/courses/python/first-program": /^Your first Python program/,
+    "/courses/python/variables": /^Variables/,
+    "/courses/python/input-output": /^Input and output/,
+    "/courses/python/decisions": /^Making decisions/,
+    "/courses/python/elif": /^More decisions with elif/,
+  };
+  for (const [lesson, title] of Object.entries(titles)) {
     await page.goto(lesson);
     const hrefs = await page.locator("[data-playground-link]").evaluateAll((links) => links.map((link) => link.getAttribute("href")!));
     for (const href of hrefs) {
@@ -210,12 +217,30 @@ test("each Python lesson example links to its playground page, which starts from
       const file = href.replace("/playground/", "");
       const source = readFileSync(`content/examples/${file}.py`, "utf8").replace(/\r\n?/g, "\n").replace(/\n$/, "");
       await expect(page.locator("[data-code]")).toHaveValue(source);
-      await expect(page.getByRole("main").getByRole("link", { name: /^(Variables|Making decisions)/ })).toHaveAttribute("href", lesson);
+      await expect(page.getByRole("main").getByRole("link", { name: title })).toHaveAttribute("href", lesson);
       opened.push(file);
     }
   }
   // Runnable examples and fixes only; practice questions never link, because their output is the answer.
-  expect(opened.sort()).toEqual(["python/compare", "python/delivery_fee", "python/type_error_fixed", "python/variables_change", "python/variables_types", "python/vote"]);
+  // Examples that show a mistake get no link; the fix of a mistake does (elif_right_order, type_error_fixed).
+  expect(opened.sort()).toEqual([
+    "python/compare",
+    "python/delivery_fee",
+    "python/elif_grade",
+    "python/elif_right_order",
+    "python/elif_separate",
+    "python/elif_ticket",
+    "python/first_hello",
+    "python/first_order",
+    "python/io_age",
+    "python/io_greet",
+    "python/io_sum",
+    "python/io_type",
+    "python/type_error_fixed",
+    "python/variables_change",
+    "python/variables_types",
+    "python/vote",
+  ]);
 });
 
 test("C lessons have no playground link, and an unknown example is a 404", async ({ page }) => {
@@ -236,4 +261,44 @@ test.describe("without JavaScript", () => {
     await expect(page.locator("noscript p")).toContainText("Running code needs JavaScript.");
     await expect(page.locator("[data-controls]")).toBeHidden();
   });
+});
+
+// Examples that read input (name.input.txt). The verified output has each typed
+// line echoed after its prompt, simulated by scripts/lib/python-input.py. These
+// tests run the real playground and compare, so the simulation is checked
+// against what a learner really sees.
+
+const INPUT_EXAMPLES = ["io_greet", "io_type", "io_age", "io_sum"];
+const readText = (file: string) => readFileSync(file, "utf8").replace(/\r\n?/g, "\n");
+
+test("an example with an input file opens with the Input box filled, and its real output is the verified output", async ({ page }) => {
+  for (const name of INPUT_EXAMPLES) {
+    await page.goto(`/playground/python/${name}`, { waitUntil: "networkidle" });
+    const inputFile = readText(`content/examples/python/${name}.input.txt`).replace(/\n$/, "");
+    await expect(page.locator("[data-input]"), name).toHaveValue(inputFile);
+    const playground = page.locator("[data-playground]");
+    await playground.getByRole("button", { name: "Run" }).click();
+    await expect(playground).toHaveAttribute("data-state", "finished", { timeout: 60_000 });
+    expect(await page.locator("[data-run-output]").innerText(), `${name}: playground output`).toBe(readText(`content/examples/python/${name}.expected.txt`));
+  }
+});
+
+test("Reset code puts back both the code and the Input box", async ({ page }) => {
+  await page.goto("/playground/python/io_greet", { waitUntil: "networkidle" });
+  const code = readText("content/examples/python/io_greet.py").replace(/\n$/, "");
+  await page.locator("[data-code]").fill("print('changed')");
+  await page.locator("[data-input]").fill("somebody else\nand more");
+  await page.getByRole("button", { name: "Reset code" }).click();
+  await expect(page.locator("[data-code]")).toHaveValue(code);
+  await expect(page.locator("[data-input]")).toHaveValue("Ada");
+  await expect(page.getByText("The code and the Input box are back to the example.")).toHaveCount(1);
+});
+
+test("an example without input starts with an empty Input box, and Reset empties it again", async ({ page }) => {
+  await page.goto("/playground/python/first_hello", { waitUntil: "networkidle" });
+  await expect(page.locator("[data-input]")).toHaveValue("");
+  await page.locator("[data-input]").fill("typed by the learner");
+  await page.getByRole("button", { name: "Reset code" }).click();
+  await expect(page.locator("[data-input]")).toHaveValue("");
+  await expect(page.getByText("The code is back to the example. The Input box is empty.")).toHaveCount(1);
 });

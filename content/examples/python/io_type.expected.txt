@@ -1,0 +1,2 @@
+Type something: 42
+<class 'str'>

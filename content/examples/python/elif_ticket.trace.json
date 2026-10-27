@@ -1,0 +1,48 @@
+{
+  "steps": [
+    {
+      "line": 1,
+      "variables": [
+        {
+          "name": "age",
+          "value": "15",
+          "type": "int"
+        }
+      ],
+      "output": ""
+    },
+    {
+      "line": 2,
+      "variables": [
+        {
+          "name": "age",
+          "value": "15",
+          "type": "int"
+        }
+      ],
+      "output": ""
+    },
+    {
+      "line": 4,
+      "variables": [
+        {
+          "name": "age",
+          "value": "15",
+          "type": "int"
+        }
+      ],
+      "output": ""
+    },
+    {
+      "line": 5,
+      "variables": [
+        {
+          "name": "age",
+          "value": "15",
+          "type": "int"
+        }
+      ],
+      "output": "Standard ticket\n"
+    }
+  ]
+}

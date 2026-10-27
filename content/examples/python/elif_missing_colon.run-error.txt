@@ -1,0 +1,4 @@
+  File "elif_missing_colon.py", line 4
+    elif age < 65
+                 ^
+SyntaxError: expected ':'

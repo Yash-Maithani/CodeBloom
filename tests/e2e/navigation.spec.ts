@@ -10,6 +10,16 @@ const EXPECTED_PAGES = [
   "/playground/python/compare",
   "/playground/python/vote",
   "/playground/python/delivery_fee",
+  "/playground/python/first_hello",
+  "/playground/python/first_order",
+  "/playground/python/io_greet",
+  "/playground/python/io_type",
+  "/playground/python/io_age",
+  "/playground/python/io_sum",
+  "/playground/python/elif_ticket",
+  "/playground/python/elif_grade",
+  "/playground/python/elif_separate",
+  "/playground/python/elif_right_order",
   "/courses",
   "/courses/c",
   "/courses/cpp",
@@ -17,8 +27,11 @@ const EXPECTED_PAGES = [
   "/courses/python",
   "/courses/c/first-program",
   "/courses/c/variables",
+  "/courses/python/first-program",
   "/courses/python/variables",
+  "/courses/python/input-output",
   "/courses/python/decisions",
+  "/courses/python/elif",
 ];
 
 async function internalLinks(page: Page): Promise<string[]> {
