@@ -12,28 +12,13 @@
 import { Fragment, useState, useSyncExternalStore } from "react";
 import { ArrowRight } from "lucide-react";
 import { tokenStyles } from "@/components/code-block";
+import { OutputLines } from "@/components/output-lines";
 import { InlineText } from "@/components/prose";
 import { buttonStyles } from "@/components/styles";
 import type { RenderedStep, RenderedVisual } from "@/lib/lessons";
 import { plainText } from "@/lib/prose";
 
 const noSubscription = () => () => {};
-
-/** Program output as real separate lines in monospace; "Line 1:" is read before each line. */
-export function OutputSoFar({ text }: { text: string }) {
-  if (text === "") return <span className="italic">nothing yet</span>;
-  const lines = text.split("\n");
-  return (
-    <span className="block overflow-x-auto font-mono text-mono whitespace-pre">
-      {lines.map((line, index) => (
-        <span key={index} className="block">
-          {lines.length > 1 && <span className="sr-only">{`Line ${index + 1}: `}</span>}
-          {line}
-        </span>
-      ))}
-    </span>
-  );
-}
 
 /** What changed on a step, in words. Built only from the trace. */
 export function changesInWords(step: RenderedStep): string {
@@ -145,7 +130,7 @@ export function StepThrough({ visual }: { visual: RenderedVisual }) {
         <div>
           <p className="text-sm font-bold">Output so far</p>
           <div data-output-so-far className="mt-2 rounded-panel border border-l-3 border-rule border-l-ink-muted bg-code px-4 py-3">
-            <OutputSoFar text={step?.output ?? ""} />
+            <OutputLines text={step?.output ?? ""} empty="nothing yet" />
           </div>
         </div>
       </div>
@@ -156,7 +141,7 @@ export function StepThrough({ visual }: { visual: RenderedVisual }) {
         {edge ?? (
           <>
             {heading}. {step ? changesInWords(step) : "No variables."} {step?.note ? `${plainText(step.note)} ` : ""}
-            Output so far: <OutputSoFar text={step?.output ?? ""} />
+            Output so far: <OutputLines text={step?.output ?? ""} empty="nothing yet" scroll={false} />
           </>
         )}
       </div>
@@ -181,7 +166,9 @@ export function StepThrough({ visual }: { visual: RenderedVisual }) {
 /** The text equivalent (FR-V3): every step in a table. Rendered on the server. */
 export function TraceTable({ visual }: { visual: RenderedVisual }) {
   return (
-    <div className="overflow-x-auto">
+    // On a narrow screen the table scrolls sideways, so it can take focus and
+    // keyboard users can scroll it, like the code blocks (WCAG 2.1.1).
+    <div tabIndex={0} role="region" aria-label={`All steps as a table: ${plainText(visual.title)}`} className="overflow-x-auto">
       <table data-trace-table className="w-full border-collapse text-left text-sm">
         <caption className="sr-only">All steps of: {plainText(visual.title)}</caption>
         <thead>
@@ -197,7 +184,7 @@ export function TraceTable({ visual }: { visual: RenderedVisual }) {
             <th scope="row" className="py-2 pr-4 font-normal">Start</th>
             <td className="py-2 pr-4">Nothing has run yet</td>
             <td className="py-2 pr-4">None</td>
-            <td className="py-2"><OutputSoFar text="" /></td>
+            <td className="py-2"><OutputLines text="" empty="nothing yet" /></td>
           </tr>
           {visual.steps.map((step, index) => (
             <tr key={index} className="border-b border-rule align-top">
@@ -214,7 +201,7 @@ export function TraceTable({ visual }: { visual: RenderedVisual }) {
                 ))}
                 {step.variables.length === 0 && "None"}
               </td>
-              <td className="py-2"><OutputSoFar text={step.output} /></td>
+              <td className="py-2"><OutputLines text={step.output} empty="nothing yet" /></td>
             </tr>
           ))}
         </tbody>

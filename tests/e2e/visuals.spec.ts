@@ -179,6 +179,23 @@ test("at 360px the visual fits without page scroll, and with reduced motion the 
   expect(duration).toBe("0s");
 });
 
+test("every area that scrolls sideways can take keyboard focus, even at 320px", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 800 });
+  for (const { path, id, file } of VISUALS) {
+    const visual = await open(page, path, id);
+    await visual.locator("[data-trace-details] summary").click();
+    for (let i = 0; i < traceOf(file).steps.length; i++) await visual.getByRole("button", { name: "Next step" }).click();
+    const unreachable = await visual.evaluate((root) =>
+      [...root.querySelectorAll<HTMLElement>("*")]
+        .filter((el) => el.scrollWidth > el.clientWidth + 1 && /auto|scroll/.test(getComputedStyle(el).overflowX))
+        .filter((el) => el.tabIndex < 0)
+        .map((el) => el.outerHTML.slice(0, 80)),
+    );
+    expect(unreachable, path).toEqual([]);
+    await expect(visual.getByRole("region", { name: /^All steps as a table/ })).toHaveAttribute("tabindex", "0");
+  }
+});
+
 test.describe("without JavaScript", () => {
   test.use({ javaScriptEnabled: false });
   test("the stepper is hidden and the full table is shown open", async ({ page }) => {
