@@ -86,23 +86,34 @@ export function CodeBlock({
 }: CodeBlockProps) {
   const [notesHidden, setNotesHidden] = useState(false);
   const [activeNote, setActiveNote] = useState<number | null>(null);
-  const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">("idle");
+  // Every click stores a NEW object, even when the result is the same as last
+  // time (copied again, failed again). React only reacts to a changed value, so
+  // a bare "copied" string set twice does nothing: the timer below would not
+  // restart and screen readers would not be told again. `attempt` also keys the
+  // status message, so each click adds a fresh message for them to announce.
+  const [copy, setCopy] = useState<{ result: "idle" | "copied" | "failed"; attempt: number }>({
+    result: "idle",
+    attempt: 0,
+  });
   const notesTitleId = useId();
 
-  // "Copied" goes back to "Copy code" after two seconds (DESIGN.md section 7).
+  // "Copied" goes back to "Copy code" two seconds after the LAST click
+  // (DESIGN.md section 7). A new click changes `copy`, which clears the old
+  // timer before it can fire and starts a new one.
   useEffect(() => {
-    if (copyState !== "copied") return;
-    const timer = setTimeout(() => setCopyState("idle"), 2000);
+    if (copy.result !== "copied") return;
+    const timer = setTimeout(() => setCopy((current) => ({ ...current, result: "idle" })), 2000);
     return () => clearTimeout(timer);
-  }, [copyState]);
+  }, [copy]);
 
   async function copyCode() {
+    let result: "copied" | "failed" = "copied";
     try {
       await navigator.clipboard.writeText(code);
-      setCopyState("copied");
     } catch {
-      setCopyState("failed");
+      result = "failed";
     }
+    setCopy((current) => ({ result, attempt: current.attempt + 1 }));
   }
 
   const noteStartingAt = new Map(notes.map((note, index) => [note.startLine, index]));
@@ -134,19 +145,21 @@ export function CodeBlock({
               </button>
             )}
             <button type="button" onClick={copyCode} className={buttonStyles.secondary}>
-              {copyState === "copied" ? "Copied" : "Copy code"}
+              {copy.result === "copied" ? "Copied" : "Copy code"}
             </button>
           </div>
         </div>
 
-        {/* Announces the copy result. Visible only when copying failed. */}
+        {/* Announces the copy result. Visible only when copying failed. The
+            region itself stays in the page; each click replaces the keyed
+            message inside it, and screen readers announce what is added. */}
         <p
           role="status"
-          className={copyState === "failed" ? "flex items-center gap-2 border-b border-rule px-4 py-2 text-sm" : "sr-only"}
+          className={copy.result === "failed" ? "flex items-center gap-2 border-b border-rule px-4 py-2 text-sm" : "sr-only"}
         >
-          {copyState === "failed" && <CircleAlert aria-hidden="true" size={20} strokeWidth={1.75} className="shrink-0 text-error" />}
-          {copyState === "copied" && "Code copied"}
-          {copyState === "failed" && "Copy failed. Select the code and copy it manually."}
+          {copy.result === "failed" && <CircleAlert aria-hidden="true" size={20} strokeWidth={1.75} className="shrink-0 text-error" />}
+          {copy.result === "copied" && <span key={copy.attempt}>Code copied</span>}
+          {copy.result === "failed" && <span key={copy.attempt}>Copy failed. Select the code and copy it manually.</span>}
         </p>
 
         <div className="lg:grid lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">

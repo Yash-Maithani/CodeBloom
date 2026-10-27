@@ -50,6 +50,7 @@ Milestone 1 was merged by the owner in pull request 3 (`6bc50d3`).
 | Four lessons, 30 examples | Verified in browser | Text approved by the owner; 25 new examples, 7 of them meant to fail |
 | Homepage and course status text from lesson data | Verified in browser | "Lessons explain", "first lessons are published for C and Python", lesson counts, example links to its lesson |
 | `docs/lesson-authoring.md` | Done | Draft, verify, review, publish; capture commands checked against the real files |
+| Copy code announces every click | Tested | Follow-up from Milestone 1. A second click inside two seconds is announced again, and "Copied" resets two seconds after the last click. `src/components/code-block.tsx`, `tests/e2e/copy.spec.ts` |
 
 ## In progress
 
@@ -60,10 +61,9 @@ Nothing beyond owner review of Milestone 2.
 1. Owner reviews Milestone 2 and opens the pull request.
 2. Owner decides on the teaching-quality proposals from `design:design-critique` (verification log, 2026-10-27). They change approved text, so none was applied.
 3. Commit `26bdb0b` says "26 new example files" and "nine are meant to fail"; the correct numbers are 25 and 7. Fixing the message needs a history rewrite before the branch is merged, which needs owner approval.
-4. Follow-up (pre-existing, Milestone 1): a second Copy code click within two seconds is not announced again. Suggested as a separate task.
-5. Launch items still open (brief Section 16): the final favicon, social sharing metadata, and removing `/dev/tokens`.
-6. A real screen reader walkthrough (NVDA or VoiceOver) of a lesson page; Milestone 3 requires one for practice questions.
-7. Owner answers the open decisions in `SPEC.md` Section 10 as each milestone needs them.
+4. Launch items still open (brief Section 16): the final favicon, social sharing metadata, and removing `/dev/tokens`.
+5. A real screen reader walkthrough (NVDA or VoiceOver) of a lesson page; Milestone 3 requires one for practice questions.
+6. Owner answers the open decisions in `SPEC.md` Section 10 as each milestone needs them.
 
 ## Stack and versions (checked 2026-10-26)
 
@@ -184,6 +184,7 @@ The OFL allows free use, self-hosting and embedding in a website; the font files
 | 2026-10-27 | Lighthouse 13.5.0 mobile (outside the repo) | `/courses/c/first-program` 97, `/courses/python/variables` 95, `/courses/python/decisions` 96, `/courses/c` 94 performance; accessibility, best practices and SEO 100 on all four; CLS 0. |
 | 2026-10-27 | `docs/lesson-authoring.md` capture commands | Rerun against the committed files: identical byte for byte. The first version of the Python error command kept the full path; corrected with `sed` before committing. |
 | 2026-10-26 | Windows simulation: CRLF copy of the whole tree, Node 20.20.2, Linux | `npm ci` exit 0 with two notices only (`EBADENGINE` for Node 22.18 and the ESLint 9 deprecation). `lint`, `typecheck`, `build` (homepage renders), `test:e2e` 45 of 45, `check:examples` 5 of 5, `test:runner` 12 of 12, `verify:browser` 114 of 114 all exit 0. Found and fixed on the way: `test:runner` used a glob that `node --test` only understands from Node 21 on (now an explicit file path, tested on Node 20.20.2 and 22.22.0); `test:unit` cannot run on Node 20, and its real minimum is Node 22.18.0 (measured), not the 22.13 that `engines` said. |
+| 2026-10-27 | Copy code repeat clicks (follow-up queued in Milestone 1) | Cause: the state was a plain string, so a second click inside two seconds set "copied" to "copied". React saw no change, so the timer kept counting from the first click and nothing new was added to the status region for screen readers. Fix: each click stores a new object with an attempt number; the effect restarts the two-second timer, and the status message is keyed by the attempt, so each click adds a new message. 4 new tests in `tests/e2e/copy.spec.ts`, written first and run on the unfixed code: 3 failed (the second click was not announced; the label had already reset at 3000 ms, 2000 ms after the first click; a repeated failure was not announced) and 1 passed, a click after the label had reset, as a control. With the fix 4 of 4 pass. The label timing uses Playwright's fake clock, so it is not a race. "Announced" is checked as text added to the live region (a MutationObserver), which is what screen readers react to; a real screen reader was not used. Gates: `lint`, `typecheck`, `build` exit 0; `test:e2e` 95 of 95; `check:examples` 30 of 30; `test:runner` 26 of 26; `test:unit` 71 of 71; `verify:browser` 114 of 114; `npm audit` 0 vulnerabilities. |
 
 ### What `verify:browser` covers
 
