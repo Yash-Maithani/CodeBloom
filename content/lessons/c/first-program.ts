@@ -84,16 +84,39 @@ export const cFirstProgram: LessonSource = {
   ],
   practice: [
     {
+      kind: "predict-output",
       question: "What does this program print? Think about where each line of output ends.",
       example: { file: "c/practice_print", notes: [] },
-      explanation:
-        "Line 4 has no `\\n`, so line 5's text continues on the same line. Line 5 ends with `\\n`, so line 6's text starts a new line.",
+      correctPosition: 2,
+      wrongOutputs: [
+        { text: "Good\nmorning\neveryone", why: "`printf` never starts a new line by itself. Line 4 has no `\\n`, so `morning` continues right after `Good `." },
+        { text: "Good morning everyone", why: "Line 5 ends with `\\n`, which starts a new line, so `everyone` appears on the next line." },
+      ],
+      hints: ["Find every `\\n` in the program.", "Does `printf` start a new line on its own?"],
+      explanation: "Line 4 has no `\\n`, so line 5's text continues on the same line. Line 5 ends with `\\n`, so line 6's text starts a new line.",
     },
     {
+      kind: "predict-output",
       question: "What does this program print?",
       example: { file: "c/practice_newline", notes: [] },
-      explanation:
-        "One `printf` can print several lines. Each `\\n` inside the text starts a new line, so `A` and `B` appear on separate lines.",
+      correctPosition: 3,
+      wrongOutputs: [
+        { text: "A\\nB", why: "`\\n` is written as two characters in the source code, but it means one thing: start a new line. It is never printed as a backslash and an n." },
+        { text: "AB", why: "The `\\n` between A and B starts a new line, so B is printed on the line below A." },
+      ],
+      hints: ["What does `\\n` mean inside the text of `printf`?", "How many `\\n` are there between `A` and `B`?"],
+      explanation: "One `printf` can print several lines. Each `\\n` inside the text starts a new line, so `A` and `B` appear on separate lines.",
+    },
+    {
+      kind: "choice",
+      question: "You compile `first_program.c`, then change the message in the source code and run `./first_program` again without compiling. What do you see?",
+      options: [
+        { text: "The new message, because the computer reads the `.c` file each time.", why: "The processor runs the machine code in the program file, not the source code. Until you compile again, that file still holds the old instructions." },
+        { text: "The old message.", why: "The program file only changes when you compile, so it still contains the old instructions.", correct: true },
+        { text: "An error, because the source code changed.", why: "Running a program does not look at the source file, so changing it cannot cause an error at this point." },
+      ],
+      hints: ["Which file does `./first_program` run: the source code or the machine code?", "When does the program file change?"],
+      explanation: "Compiling turns source code into a separate program file. Running uses that file, so after a change you compile again before you run.",
     },
   ],
   recap: [

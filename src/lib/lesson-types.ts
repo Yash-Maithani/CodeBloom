@@ -36,12 +36,42 @@ export type Mistake = {
   fixExample?: LessonExample;
 };
 
-/** A question with a written solution. The example's output is shown only in the solution. */
-export type PracticeQuestion = {
+/** A wrong prediction of a program's output, and the misconception it stands for.
+ *  `text` is exactly what the learner would expect to see ("" means nothing is printed). */
+export type WrongOutput = { text: string; why: string };
+
+/** An option of a multiple-choice question. Exactly one option is `correct`. */
+export type ChoiceOption = { text: string; why: string; correct?: true };
+
+type QuestionBase = {
   question: string;
-  example: LessonExample;
+  /** One to three, revealed one at a time */
+  hints: string[];
+  /** Shown in the solution, and as the feedback for a correct prediction */
   explanation: string;
 };
+
+/**
+ * Predict the output. The correct option is the example's verified output,
+ * read from its .expected.txt at build time and never typed here. The build
+ * refuses a wrong output that equals the real output.
+ */
+export type PredictOutputQuestion = QuestionBase & {
+  kind: "predict-output";
+  example: LessonExample;
+  wrongOutputs: WrongOutput[];
+  /** Where the correct option appears among the options, counting from 1 */
+  correctPosition: number;
+};
+
+/** A conceptual question. Claims about what a program prints must point to a verified example. */
+export type ChoiceQuestion = QuestionBase & {
+  kind: "choice";
+  options: ChoiceOption[];
+};
+
+/** A practice question (SPEC.md FR-P1 to FR-P5). Its solution can always be opened. */
+export type PracticeQuestion = PredictOutputQuestion | ChoiceQuestion;
 
 export type LessonSource = {
   /** Course slug from content/courses.ts, which is also the code language */

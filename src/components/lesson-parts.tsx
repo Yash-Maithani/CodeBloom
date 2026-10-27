@@ -6,6 +6,7 @@ import Link from "next/link";
 import { TriangleAlert } from "lucide-react";
 import { CodeBlock } from "@/components/code-block";
 import { OutputPanel } from "@/components/output-panel";
+import { PracticeSet, type PracticeItem } from "@/components/practice-set";
 import { InlineText } from "@/components/prose";
 import { backLinkStyles, buttonStyles } from "@/components/styles";
 import type { LoadedLesson, RenderedExample } from "@/lib/lessons";
@@ -81,37 +82,46 @@ export function Mistakes({ lesson }: { lesson: LoadedLesson }) {
   });
 }
 
-const practiceLabel = (example: RenderedExample, index: number) => `${example.languageLabel} code for practice question ${index + 1}`;
+const practiceLabel = (language: string, index: number) => `${language} code for practice question ${index + 1}`;
 
+/** Practice questions: the code and solutions are rendered here on the server,
+ *  the interaction happens in the client component PracticeSet. */
 export function Practice({ lesson }: { lesson: LoadedLesson }) {
-  return (
-    <ol className="mt-6 flex flex-col gap-12">
-      {lesson.practice.map((question, index) => (
-        <li key={question.rendered.id}>
-          <p className="max-w-measure">
-            <strong>Question {index + 1}.</strong> <InlineText text={question.question} />
-          </p>
-          <div className="mt-4">
-            <LessonCodeBlock example={question.rendered} regionLabel={practiceLabel(question.rendered, index)} showOutput={false} />
-          </div>
-          {/* Native disclosure: works with Enter and Space, and screen readers
-              announce whether it is open, with no JavaScript. */}
-          <details className="group mt-4" data-solution={question.rendered.id}>
-            <summary className={`${buttonStyles.secondary} cursor-pointer list-none [&::-webkit-details-marker]:hidden`}>
-              <span className="group-open:hidden">Show solution</span>
-              <span className="hidden group-open:inline">Hide solution</span>
-            </summary>
-            <div className="mt-4 max-w-lesson">
-              <OutputPanel kind={question.rendered.kind} text={question.rendered.result} of={practiceLabel(question.rendered, index)} />
-              <p className="mt-4 max-w-measure">
-                <InlineText text={question.explanation} />
+  const language = lesson.course.name;
+  const items: PracticeItem[] = lesson.practice.map((question, index) => {
+    const answer = question.options.find((option) => option.correct)!;
+    return {
+      question: question.source.question,
+      hints: question.source.hints,
+      options: question.options,
+      code: question.rendered && (
+        <LessonCodeBlock example={question.rendered} regionLabel={practiceLabel(language, index)} showOutput={false} />
+      ),
+      solution: (
+        // Native disclosure: works with Enter and Space and is announced as
+        // open or closed, with no JavaScript. Available at any time (FR-P4).
+        <details className="group" data-solution={index + 1}>
+          <summary className={`${buttonStyles.secondary} cursor-pointer list-none [&::-webkit-details-marker]:hidden`}>
+            <span className="group-open:hidden">Show solution</span>
+            <span className="hidden group-open:inline">Hide solution</span>
+          </summary>
+          <div className="mt-4 max-w-lesson">
+            {question.rendered ? (
+              <OutputPanel kind={question.rendered.kind} text={question.rendered.result} of={practiceLabel(language, index)} />
+            ) : (
+              <p className="max-w-measure">
+                <strong>Answer:</strong> <InlineText text={answer.text} />
               </p>
-            </div>
-          </details>
-        </li>
-      ))}
-    </ol>
-  );
+            )}
+            <p className="mt-4 max-w-measure">
+              <InlineText text={question.source.explanation} />
+            </p>
+          </div>
+        </details>
+      ),
+    };
+  });
+  return <PracticeSet items={items} />;
 }
 
 const navLinkStyles =

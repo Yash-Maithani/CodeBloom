@@ -105,16 +105,41 @@ export const pythonVariables: LessonSource = {
   ],
   practice: [
     {
-      question: "What does this program print? Work it out before you open the solution.",
+      kind: "predict-output",
+      question: "What does this program print? Work it out before you check.",
       example: { file: "python/practice_score", notes: [] },
-      explanation:
-        "Line 2 works out the right side first, using the current value of `score`: 10 + 5. Then `score` is reassigned to the result.",
+      correctPosition: 1,
+      wrongOutputs: [
+        { text: "10", why: "Line 2 does change `score`. `=` is an instruction, not a statement that must be true: Python works out `score + 5` and gives that new value to `score` before line 3 runs." },
+        { text: "score", why: "`print(score)` shows the value that `score` refers to, not the name. Only text in quotes is shown as written." },
+        { text: "10\n15", why: "Lines 1 and 2 only give `score` a value; they show nothing. Only `print` produces output, and this program calls it once, on line 3." },
+      ],
+      hints: ["Work through the lines in order and keep track of the value of `score` after each one.", "On line 2, Python works out the right side first, using the value `score` has at that moment.", "How many times does the program call `print`?"],
+      explanation: "Line 2 works out the right side first, using the current value of `score`: 10 + 5. Then `score` is reassigned to the result.",
     },
     {
+      kind: "predict-output",
       question: "What type does Python report here?",
       example: { file: "python/practice_quotes", notes: [] },
-      explanation:
-        "The quotes make it text. `\"17\"` looks like a number, but to Python it is a `str` made of the characters 1 and 7. Without the quotes, it would be an `int`.",
+      correctPosition: 2,
+      wrongOutputs: [
+        { text: "<class 'int'>", why: "The quotes around 17 make it text. Without them it would be an `int`." },
+        { text: "17", why: "`type()` gives the type of a value, not the value itself." },
+      ],
+      hints: ["Look closely at line 1. What do the quote marks around 17 mean?", "`type()` reports what kind of value it is given."],
+      explanation: "The quotes make it text. `\"17\"` looks like a number, but to Python it is a `str` made of the characters 1 and 7. Without the quotes, it would be an `int`.",
+    },
+    {
+      kind: "choice",
+      question: "In Python, what happens when `age = 17` is followed later by `age = \"seventeen\"`?",
+      options: [
+        { text: "`age` now refers to a `str` value, and Python allows it.", why: "In Python, values have types and names do not, so a name can be reassigned to a value of a different type. The types example in this lesson shows it on lines 5 and 6.", correct: true },
+        { text: "Python stops with a `TypeError`, because `age` was an `int`.", why: "The type belongs to the value, not to the name. Reassigning `age` to text is allowed; a `TypeError` happens when an operation gets the wrong type, as in joining text and a number with `+`." },
+        { text: "The value 17 is turned into the text \"seventeen\".", why: "The second line does not change the value 17. It makes the name `age` refer to a different value." },
+        { text: "`age` now holds both values.", why: "A variable refers to one value at a time. After the second line, `age` refers only to \"seventeen\"." },
+      ],
+      hints: ["In Python, does a type belong to the name or to the value?", "Look back at the types example: what does line 6 show after line 5 runs?"],
+      explanation: "Giving an existing name a new value is reassigning it. Python checks types when an operation uses a value, not when a name gets a new one.",
     },
   ],
   recap: [
