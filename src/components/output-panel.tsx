@@ -11,7 +11,12 @@ const headings: Record<ExpectationKind, string> = {
   "run-error": "Error message",
 };
 
-export function OutputPanel({ kind, text }: { kind: ExpectationKind; text: string }) {
+/**
+ * `of` names the code this result belongs to, for example "Python code: The fix".
+ * The panel is a focusable, named region like the code above it, so keyboard
+ * users can scroll a long error message sideways (WCAG 2.1.1).
+ */
+export function OutputPanel({ kind, text, of }: { kind: ExpectationKind; text: string; of: string }) {
   const isError = kind !== "output";
   return (
     <div className={`rounded-panel border border-l-3 border-rule bg-code ${isError ? "border-l-error" : "border-l-ink-muted"}`}>
@@ -19,7 +24,13 @@ export function OutputPanel({ kind, text }: { kind: ExpectationKind; text: strin
         {isError && <CircleX aria-hidden="true" size={20} strokeWidth={1.75} className="shrink-0 text-error" />}
         {headings[kind]}
       </p>
-      <pre data-output={kind} className="overflow-x-auto px-4 pt-1 pb-4 font-mono text-mono">
+      <pre
+        tabIndex={0}
+        role="region"
+        aria-label={`${headings[kind]} for ${of}`}
+        data-output={kind}
+        className="overflow-x-auto px-4 pt-1 pb-4 font-mono text-mono"
+      >
         <code>{text}</code>
       </pre>
     </div>

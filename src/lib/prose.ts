@@ -130,6 +130,8 @@ export function parseProse(source: string, name: string, options: BlockOptions):
       else fail(`unknown placeholder {{${kind}${id ? ` ${id}` : ""}}}; use {{example <id>}} or {{analogy}}`);
     } else if (group.some((line) => line.includes("{{") || line.includes("}}"))) {
       fail("a placeholder must be on a line of its own");
+    } else if (!group[0].startsWith("- ") && group.slice(1).some((line) => line.startsWith("- ") || line.startsWith("## "))) {
+      fail("a list or heading needs a blank line before it");
     } else if (group[0].startsWith("## ")) {
       if (!options.headings) fail("headings are not allowed in this file");
       if (group.length > 1) fail("a heading must have a blank line after it");
@@ -145,6 +147,11 @@ export function parseProse(source: string, name: string, options: BlockOptions):
     start = end;
   }
   return blocks;
+}
+
+/** The words of a short text without its markup, for screen reader names and page descriptions. */
+export function plainText(text: string): string {
+  return parseInline(text, "plainText").map((part) => part.text).join("");
 }
 
 /** Every link in a list of blocks, for checking that each one leads to a real page. */

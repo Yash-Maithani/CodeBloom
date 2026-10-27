@@ -4,7 +4,7 @@ import type { Course } from "@content/courses";
 // A real count, never a promise (DESIGN.md section 7, cards).
 function statusText(lessonCount: number) {
   if (lessonCount === 0) return "No lessons published yet";
-  return lessonCount === 1 ? "1 lesson" : `${lessonCount} lessons`;
+  return lessonCount === 1 ? "1 lesson published" : `${lessonCount} lessons published`;
 }
 
 // One language on the homepage and the courses page (DESIGN.md section 7, cards).

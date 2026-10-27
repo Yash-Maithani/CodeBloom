@@ -113,7 +113,11 @@ export function CodeBlock({
 
   return (
     <figure className="max-w-lesson" data-example={exampleId}>
-      {caption && <figcaption className="mb-3 text-sm text-ink-muted">{caption}</figcaption>}
+      {caption && (
+        <figcaption className="mb-3 text-sm text-ink-muted">
+          <InlineText text={caption} />
+        </figcaption>
+      )}
 
       <div className="rounded-panel border border-rule bg-code">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-rule px-4 py-2">
@@ -245,7 +249,7 @@ export function CodeBlock({
 
       {showOutput && (
         <div className="mt-4">
-          <OutputPanel kind={kind} text={expectedOutput} />
+          <OutputPanel kind={kind} text={expectedOutput} of={regionLabel} />
         </div>
       )}
     </figure>

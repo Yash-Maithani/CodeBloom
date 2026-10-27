@@ -75,8 +75,8 @@ for (const slug of ["cpp", "java"]) {
 test("course cards show the real number of published lessons", async ({ page }) => {
   await page.goto("/courses");
   const status = (name: string) => page.locator("article").filter({ has: page.getByRole("link", { name, exact: true }) }).locator("p").last();
-  await expect(status("C")).toHaveText("2 lessons");
-  await expect(status("Python")).toHaveText("2 lessons");
+  await expect(status("C")).toHaveText("2 lessons published");
+  await expect(status("Python")).toHaveText("2 lessons published");
   await expect(status("C++")).toHaveText("No lessons published yet");
   await expect(status("Java")).toHaveText("No lessons published yet");
 });

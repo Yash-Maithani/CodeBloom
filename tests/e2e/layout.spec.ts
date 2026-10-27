@@ -47,7 +47,7 @@ for (const path of ["/courses/c/first-program", "/courses/c/variables", "/course
 test("at 1440px the notes sit in a column beside the code", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
-  const code = await page.locator("pre[role=region]").boundingBox();
+  const code = await page.locator("pre[role=region]:has([data-line])").boundingBox();
   const notes = await page.locator("[data-notes-list]").boundingBox();
   expect(notes!.width).toBeGreaterThan(100);
   expect(notes!.x).toBeGreaterThanOrEqual(code!.x + code!.width - 1);

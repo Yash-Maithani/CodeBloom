@@ -5,7 +5,7 @@ import { courses, findCourse } from "@content/courses";
 import { NoteCallout } from "@/components/callout";
 import { Container } from "@/components/container";
 import { InlineText } from "@/components/prose";
-import { buttonStyles, textLinkStyles } from "@/components/styles";
+import { backLinkStyles, buttonStyles, textLinkStyles } from "@/components/styles";
 import { publishedByCourse } from "@/lib/site-lessons";
 
 // One page per course, built at build time from content/courses.ts and the
@@ -38,7 +38,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
   return (
     <Container className="py-12 md:py-16">
       <div className="max-w-measure">
-        <Link href="/courses" className={`inline-flex py-3 text-sm ${textLinkStyles}`}>
+        <Link href="/courses" className={backLinkStyles}>
           All courses
         </Link>
         <h1 className="mt-4 font-heading text-3xl font-semibold">{course.name}</h1>
@@ -57,15 +57,9 @@ export default async function CoursePage({ params }: CoursePageProps) {
           </Link>
         )}
 
-        <h2 className="mt-12 font-heading text-2xl font-semibold">Who this course is for</h2>
-        <p className="mt-4 text-base">
-          Complete beginners and students taking a {course.name} course. You do not need any
-          programming experience.
-        </p>
-
         {lessons.length > 0 && (
           <>
-            <h2 className="mt-12 font-heading text-2xl font-semibold">Lessons</h2>
+            <h2 className="mt-12 font-heading text-2xl font-semibold md:mt-16">Lessons</h2>
             <ol data-lessons className="mt-6 flex list-decimal flex-col gap-6 pl-8 text-base">
               {lessons.map((lesson) => (
                 <li key={lesson.href}>
@@ -81,10 +75,16 @@ export default async function CoursePage({ params }: CoursePageProps) {
           </>
         )}
 
+        <h2 className="mt-12 font-heading text-2xl font-semibold md:mt-16">Who this course is for</h2>
+        <p className="mt-4 text-base">
+          Complete beginners and students taking a {course.name} course. You do not need any
+          programming experience.
+        </p>
+
         {planned.length > 0 && (
           <>
-            <h2 className="mt-12 font-heading text-2xl font-semibold">Planned topics</h2>
-            <p className="mt-2 text-ink-muted">Planned and subject to change, in the order they are planned.</p>
+            <h2 className="mt-12 font-heading text-2xl font-semibold md:mt-16">Planned topics</h2>
+            <p className="mt-2 text-ink-muted">Planned and subject to change. Listed in course order.</p>
             {/* Plain text on purpose: these topics have no lesson page yet (SPEC.md FR-C2). */}
             <ul data-planned-topics className="mt-6 flex list-disc flex-col gap-2 pl-8 text-base">
               {planned.map((topic) => (

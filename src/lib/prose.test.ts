@@ -3,7 +3,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { linksIn, parseInline, parseProse, ProseError } from "./prose.ts";
+import { linksIn, parseInline, parseProse, plainText, ProseError } from "./prose.ts";
 
 const LESSON = { headings: true, placeholders: true };
 const CONCEPT = { headings: false, placeholders: false };
@@ -72,6 +72,15 @@ test("a placeholder inside a paragraph or next to other lines is refused", () =>
   fails(() => parseProse("Text {{example a}} more.\n", "t.md", LESSON), /must be on a line of its own/);
   fails(() => parseProse("{{example a}}\nmore text\n", "t.md", LESSON), /blank line before and after/);
   fails(() => parseProse("## Heading\ntext\n", "t.md", LESSON), /blank line after/);
+});
+
+test("a list or heading right after a paragraph line is refused, not joined into the paragraph", () => {
+  fails(() => parseProse("Here are the rules:\n- one\n- two\n", "t.md", LESSON), /needs a blank line before it/);
+  fails(() => parseProse("Some text\n## Heading\n", "t.md", LESSON), /needs a blank line before it/);
+});
+
+test("plainText keeps the words and drops the markup", () => {
+  assert.equal(plainText("A **second** `int` value"), "A second int value");
 });
 
 test("error messages name the file and line", () => {

@@ -9,9 +9,7 @@ import { OutputPanel } from "@/components/output-panel";
 import { InlineText } from "@/components/prose";
 import { buttonStyles, textLinkStyles } from "@/components/styles";
 import type { LoadedLesson, RenderedExample } from "@/lib/lessons";
-
-/** Titles may contain `code`; screen reader labels use the words without the backticks. */
-const plain = (text: string) => text.replaceAll("`", "").replaceAll("**", "");
+import { plainText as plain } from "@/lib/prose";
 
 export function LessonCodeBlock({
   example,
@@ -83,6 +81,8 @@ export function Mistakes({ lesson }: { lesson: LoadedLesson }) {
   });
 }
 
+const practiceLabel = (example: RenderedExample, index: number) => `${example.languageLabel} code for practice question ${index + 1}`;
+
 export function Practice({ lesson }: { lesson: LoadedLesson }) {
   return (
     <ol className="mt-6 flex flex-col gap-12">
@@ -92,11 +92,7 @@ export function Practice({ lesson }: { lesson: LoadedLesson }) {
             <strong>Question {index + 1}.</strong> <InlineText text={question.question} />
           </p>
           <div className="mt-4">
-            <LessonCodeBlock
-              example={question.rendered}
-              regionLabel={`${question.rendered.languageLabel} code for practice question ${index + 1}`}
-              showOutput={false}
-            />
+            <LessonCodeBlock example={question.rendered} regionLabel={practiceLabel(question.rendered, index)} showOutput={false} />
           </div>
           {/* Native disclosure: works with Enter and Space, and screen readers
               announce whether it is open, with no JavaScript. */}
@@ -106,7 +102,7 @@ export function Practice({ lesson }: { lesson: LoadedLesson }) {
               <span className="hidden group-open:inline">Hide solution</span>
             </summary>
             <div className="mt-4 max-w-lesson">
-              <OutputPanel kind={question.rendered.kind} text={question.rendered.result} />
+              <OutputPanel kind={question.rendered.kind} text={question.rendered.result} of={practiceLabel(question.rendered, index)} />
               <p className="mt-4 max-w-measure">
                 <InlineText text={question.explanation} />
               </p>

@@ -12,7 +12,7 @@ test("< > & and quotes inside inline code and plain text are rendered as text, n
   const html = renderToStaticMarkup(createElement(InlineText, { text: "Use `#include <stdio.h>` and `a && b < c > d`, or 'x' & \"y\"." }));
   assert.equal(
     html,
-    '<span>Use <code class="font-mono">#include &lt;stdio.h&gt;</code> and <code class="font-mono">a &amp;&amp; b &lt; c &gt; d</code>, or &#x27;x&#x27; &amp; &quot;y&quot;.</span>',
+    '<span>Use <code class="font-mono wrap-anywhere">#include &lt;stdio.h&gt;</code> and <code class="font-mono wrap-anywhere">a &amp;&amp; b &lt; c &gt; d</code>, or &#x27;x&#x27; &amp; &quot;y&quot;.</span>',
   );
 });
 
@@ -28,7 +28,7 @@ test("a whole prose file renders headings, paragraphs, lists and links with esca
   const blocks = parseProse("## A < B\n\nText with `<b>` & [a link](/courses).\n\n- one\n", "t.md", { headings: true, placeholders: true });
   const html = renderToStaticMarkup(createElement(ProseBlocks, { blocks }));
   assert.match(html, /<h2[^>]*>A &lt; B<\/h2>/);
-  assert.match(html, /<code class="font-mono">&lt;b&gt;<\/code> &amp; /);
+  assert.match(html, /<code class="font-mono wrap-anywhere">&lt;b&gt;<\/code> &amp; /);
   assert.match(html, /<a[^>]*href="\/courses"[^>]*>a link<\/a>/);
   assert.match(html, /<ul[^>]*><li>one<\/li><\/ul>/);
   assert.doesNotMatch(html, /<b>/);

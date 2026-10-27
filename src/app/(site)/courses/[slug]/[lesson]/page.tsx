@@ -5,8 +5,9 @@ import { AnalogyCallout } from "@/components/callout";
 import { Container } from "@/components/container";
 import { LessonCodeBlock, LessonNav, Mistakes, Practice } from "@/components/lesson-parts";
 import { InlineText, ProseBlocks } from "@/components/prose";
-import { textLinkStyles } from "@/components/styles";
+import { backLinkStyles, textLinkStyles } from "@/components/styles";
 import { neighbours, sameConceptElsewhere, type LoadedLesson } from "@/lib/lessons";
+import { plainText } from "@/lib/prose";
 import { allLessons } from "@/lib/site-lessons";
 
 // One page per published lesson, built at build time. Drafts and unknown
@@ -36,11 +37,9 @@ export async function generateMetadata(props: LessonPageProps): Promise<Metadata
   if (!lesson) return {};
   return {
     title: `${lesson.source.title} in ${lesson.course.name}`,
-    description: lesson.source.objective.replaceAll("`", ""),
+    description: plainText(lesson.source.objective),
   };
 }
-
-const plain = (text: string) => text.replaceAll("`", "");
 
 export default async function LessonPage(props: LessonPageProps) {
   const { lessons, lesson } = await findPublished(props);
@@ -49,12 +48,12 @@ export default async function LessonPage(props: LessonPageProps) {
   const sameConcept = sameConceptElsewhere(lessons, lesson);
   const courseHref = `/courses/${lesson.course.slug}`;
   // Numbers for examples without a caption, so every code region has its own name.
-  const exampleIds = lesson.body.flatMap((block) => (block.type === "example" ? [block.example.id] : []));
+  const uncaptioned = lesson.body.flatMap((block) => (block.type === "example" && !block.example.caption ? [block.example.id] : []));
 
   return (
     <Container className="py-12 md:py-16">
       <div className="max-w-measure">
-        <Link href={courseHref} className={`inline-flex py-3 text-sm ${textLinkStyles}`}>
+        <Link href={courseHref} className={backLinkStyles}>
           {lesson.course.name} course
         </Link>
         <h1 className="mt-4 font-heading text-3xl font-semibold">{lesson.source.title}</h1>
@@ -65,7 +64,7 @@ export default async function LessonPage(props: LessonPageProps) {
 
       {lesson.concept && (
         <section aria-labelledby="the-idea" className="max-w-measure text-base">
-          <h2 id="the-idea" className="mt-12 font-heading text-2xl font-semibold">
+          <h2 id="the-idea" className="mt-12 font-heading text-2xl font-semibold md:mt-16">
             The idea
           </h2>
           {sameConcept.length > 0 && (
@@ -103,12 +102,12 @@ export default async function LessonPage(props: LessonPageProps) {
             );
           }
           const { example } = block;
-          const exampleNumber = exampleIds.indexOf(example.id) + 1;
+          const exampleNumber = uncaptioned.indexOf(example.id) + 1;
           return (
             <div key={index} className="mt-8">
               <LessonCodeBlock
                 example={example}
-                regionLabel={`${example.languageLabel} code: ${example.caption ? plain(example.caption) : `example ${exampleNumber}`}`}
+                regionLabel={`${example.languageLabel} code: ${example.caption ? plainText(example.caption) : `example ${exampleNumber}`}`}
               />
             </div>
           );
@@ -116,7 +115,7 @@ export default async function LessonPage(props: LessonPageProps) {
 
         {lesson.mistakes.length > 0 && (
           <section aria-labelledby="common-mistakes" className="max-w-lesson">
-            <h2 id="common-mistakes" className="mt-16 font-heading text-2xl font-semibold">
+            <h2 id="common-mistakes" className="mt-12 font-heading text-2xl font-semibold md:mt-16">
               Common mistakes
             </h2>
             <Mistakes lesson={lesson} />
@@ -125,16 +124,16 @@ export default async function LessonPage(props: LessonPageProps) {
 
         {lesson.practice.length > 0 && (
           <section aria-labelledby="practice">
-            <h2 id="practice" className="mt-16 font-heading text-2xl font-semibold">
+            <h2 id="practice" className="mt-12 font-heading text-2xl font-semibold md:mt-16">
               Practice
             </h2>
-            <p className="mt-4 max-w-measure">Work out each answer first, then open its solution to check.</p>
+            <p className="mt-4 max-w-measure">Try each question before you open its solution.</p>
             <Practice lesson={lesson} />
           </section>
         )}
 
         <section aria-labelledby="recap" className="max-w-measure">
-          <h2 id="recap" className="mt-16 font-heading text-2xl font-semibold">
+          <h2 id="recap" className="mt-12 font-heading text-2xl font-semibold md:mt-16">
             Recap
           </h2>
           <ul className="mt-4 flex list-disc flex-col gap-2 pl-8">

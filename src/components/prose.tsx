@@ -12,7 +12,9 @@ function InlineNodes({ parts }: { parts: Inline[] }) {
     switch (part.type) {
       case "code":
         return (
-          <code key={index} className="font-mono">
+          // Inline code may wrap where it would overflow a narrow screen (WCAG 1.4.10).
+          // Code blocks never wrap (DESIGN.md section 4).
+          <code key={index} className="font-mono wrap-anywhere">
             {part.text}
           </code>
         );
@@ -46,7 +48,7 @@ export function ProseBlocks({ blocks }: { blocks: ProseBlock[] }) {
     switch (block.type) {
       case "heading":
         return (
-          <h2 key={index} className="mt-12 font-heading text-2xl font-semibold">
+          <h2 key={index} className="mt-12 font-heading text-2xl font-semibold md:mt-16">
             {block.text}
           </h2>
         );
