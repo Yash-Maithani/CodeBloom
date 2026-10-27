@@ -1,6 +1,7 @@
 // Reads a runnable example and its real output from content/examples/ at build
 // time. Server only: it uses the file system, so it never reaches the browser.
 
+import "server-only";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { normalizeLineEndings } from "./line-endings.ts";

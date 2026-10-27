@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit",
     "test:e2e": "npm run build && playwright test",
     "test:runner": "node --test scripts/check-examples.test.mjs",
-    "test:unit": "node --test \"src/**/*.test.ts\"",
+    "test:unit": "node --conditions=react-server --test \"src/**/*.test.ts\"",
     "check:examples": "node scripts/check-examples.mjs",
     "verify:browser": "node scripts/verify-browser.mjs"
   },
@@ -19,6 +19,7 @@
     "next": "^16.4.3",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
+    "server-only": "0.0.1",
     "shiki": "4.5.0"
   },
   "devDependencies": {

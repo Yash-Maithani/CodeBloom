@@ -4,7 +4,8 @@
 // for our static pages), and only the finished tokens travel to the browser.
 // Never import this file from a component marked "use client": that would send
 // Shiki and its grammar files to every visitor. CodeBlock imports only the
-// types below, and `npm run test:e2e` checks that no Shiki code is downloaded.
+// types below. The `server-only` import makes a client import a build error,
+// and `npm run test:e2e` also checks that no Shiki code is downloaded.
 //
 // How it works: Shiki reads the code with a real grammar for the language and
 // names every piece with TextMate scope names such as "keyword.control" or
@@ -13,6 +14,7 @@
 // "Syntax colors"): keyword, literal, comment and plain. CodeBlock turns each
 // role into an existing design token, so no color value is defined here.
 
+import "server-only";
 import { createHighlighter, type ThemeRegistrationRaw } from "shiki";
 import type { CodeLanguage } from "@/lib/examples";
 import { normalizeLineEndings } from "./line-endings.ts";
