@@ -7,7 +7,7 @@ import { TriangleAlert } from "lucide-react";
 import { CodeBlock } from "@/components/code-block";
 import { OutputPanel } from "@/components/output-panel";
 import { InlineText } from "@/components/prose";
-import { buttonStyles, textLinkStyles } from "@/components/styles";
+import { backLinkStyles, buttonStyles } from "@/components/styles";
 import type { LoadedLesson, RenderedExample } from "@/lib/lessons";
 import { plainText as plain } from "@/lib/prose";
 
@@ -147,7 +147,7 @@ export function LessonNav({
           ) : (
             <div className="p-4">
               <p>This is the last published lesson in the {courseName} course.</p>
-              <Link href={`/courses/${lesson.course.slug}`} className={`inline-flex py-3 ${textLinkStyles}`}>
+              <Link href={`/courses/${lesson.course.slug}`} className={backLinkStyles}>
                 Back to the {courseName} course
               </Link>
             </div>
