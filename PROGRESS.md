@@ -6,9 +6,9 @@ Last updated: 2026-10-27
 
 ## Current milestone
 
-**Milestone 4: educational visualizations.** Implemented and Tested (Chromium only; light and dark; 320 to 1440px; keyboard only; reduced motion). Two step-through visuals, both Python: "watch the value of `apples`" in Python Variables and "watch which lines run" in Python Decisions. Not yet Verified in browser with a real screen reader. Awaiting owner review and a pull request opened by the owner. Nothing is Deployed.
+**Milestone 5: Python playground.** Implemented and Tested (Chromium only; light and dark; 320 to 1440px; keyboard only). Python runs in the browser with Pyodide 314.0.7, self-hosted, in a Web Worker: `/playground` and one page per runnable Python lesson example. Not yet Verified in browser with a real screen reader or on a real phone. Awaiting owner review and a pull request opened by the owner. Nothing is Deployed.
 
-Milestone 3 was merged by the owner in pull request 5 (`b70ba48`). Its screen reader walkthrough is deferred by the owner's decision and stays open (checklist below); Milestone 3 is marked Verified only after the owner reports the results. Milestone 2 was merged in pull request 4 (`fe8edd2`).
+Milestone 4 was merged by the owner in pull request 6 (`2a6a7a5`). The Milestone 3 screen reader walkthrough is deferred by the owner's decision and stays open (checklist below). Milestone 3 was merged in pull request 5 (`b70ba48`).
 
 ### Screen reader checklist for the owner (one full question)
 
@@ -76,18 +76,24 @@ Windows, Narrator (Windows key + Ctrl + Enter) or NVDA, in Edge or Chrome, on `/
 | Step-through visual component (D52, D53) | Tested | `src/components/step-through.tsx`, `VisualBlock` in `lesson-parts.tsx`; Back, Next step, Start again; live announcements; table as text equivalent |
 | Two visuals in Python Variables and Python Decisions | Tested | Notes approved by the owner word for word; Decisions declares `branches: { 2: false }`, checked against the trace |
 | Shared output lines component (D54) | Tested | `src/components/output-lines.tsx`, used by practice options and the visuals |
+| Milestone 4 | Done | Merged by the owner in pull request 6 (`2a6a7a5`) |
+| Pyodide 314.0.7, self-hosted (D56) | Tested | `scripts/prepare-playground.mjs` copies the five files from the installed package to `public/pyodide/314.0.7/` before dev and build; not committed |
+| Python worker and runner (D57, D58, D59) | Tested | `src/workers/python-worker.ts` (compiled to `public/python-worker.mjs`), `src/lib/python-runner.ts`, `src/lib/playground.ts`: fresh Python per run, 5 s limit, 10,000 character cap, no network, errors read without Pyodide's frames |
+| Playground page and states (D60, D61) | Tested | `src/components/playground.tsx`, `playground-page.tsx`: textarea editor, Input box, real download progress, Stop, Reset code, "Your run" with one wording per ending |
+| Lesson links and example pages (D62) | Tested | "Try it in the playground" under the 6 runnable Python examples; `/playground/python/<example>` static pages |
 
 ## In progress
 
-Nothing beyond owner review of Milestone 4 and the owner's Milestone 3 screen reader walkthrough.
+Nothing beyond owner review of Milestone 5 and the owner's Milestone 3 screen reader walkthrough.
 
 ## Outstanding tasks
 
-1. Owner runs the screen reader checklist above and reports the results; then Milestone 3 can be marked Verified in browser. Deferred by the owner; kept open.
-2. Owner reviews Milestone 4 and opens the pull request from `claude/milestone-4`.
-3. A screen reader pass over one visual (Next step, the ends, the table) when the owner does the Milestone 3 walkthrough; not done.
-4. Launch items still open (brief Section 16): the final favicon, social sharing metadata, and removing `/dev/tokens`.
-5. Owner answers the open decisions in `SPEC.md` Section 10 as each milestone needs them. Decision 3 (remembering completed lessons) stays open.
+1. Owner reviews Milestone 5 and opens the pull request from `claude/milestone-5`.
+2. Measure the first Python start on a real mid-range phone (Chromium's CPU throttling does not reach workers, so the emulated numbers understate CPU time).
+3. Owner runs the screen reader checklist above and reports the results; then Milestone 3 can be marked Verified in browser. Deferred by the owner; kept open.
+4. A screen reader pass over one visual and one playground run (Next step, the ends, the table) when the owner does the Milestone 3 walkthrough; not done.
+5. Launch items still open (brief Section 16): the final favicon, social sharing metadata, removing `/dev/tokens`, and a privacy policy that says the playground runs on the learner's device and sends nothing (owner requirement). The host must serve `.wasm` as `application/wasm`, apply the worker's Content Security Policy and the immutable cache header, and ideally compress the files.
+6. Owner answers the open decisions in `SPEC.md` Section 10 as each milestone needs them. Decision 3 (remembering completed lessons) stays open.
 
 ## Stack and versions (checked 2026-10-26)
 
@@ -104,6 +110,7 @@ Nothing beyond owner review of Milestone 4 and the owner's Milestone 3 screen re
 | @types/node | 22.20.5 | Matches the Node 22 in use |
 | lucide-react | 1.61.0 | Icons (ISC). Added in Milestone 1, see D22 |
 | shiki | 4.5.0 (exact) | Syntax highlighting, server only (MIT, 4 MB plus 14 MB of grammars and themes in `node_modules`, none sent to browsers). See D21 |
+| pyodide | 314.0.7 (exact) | Python 3.14.2 in WebAssembly for the playground (MPL-2.0; Python under the PSF license). 13.5 MB of files served from `public/pyodide/`, none in the JavaScript bundle. Pulls in `ws` and `@types/emscripten`, used only when Pyodide runs under Node. See D56 |
 | server-only | 0.0.1 (exact) | Makes a client import of server code a build error (MIT, no dependencies, two tiny files). See D36 |
 | Node, npm | 22.22.0, 10.9.4 | `engines` asks for Node 22.18 or newer, see D31 |
 
@@ -154,6 +161,14 @@ The OFL allows free use, self-hosting and embedding in a website; the font files
 - The tracer records top-level variables only. A visual of a program with functions would not show their local variables; the build would still show a correct but incomplete picture, so do not use one until the tracer records frames.
 - A value is shown as Python's `repr`, so a string appears with quotes (`'Ana'`). That is what Python shows, but the panel does not explain it yet.
 - The stepper's JavaScript is in the shared lesson page chunk, so C lessons without a visual also download it (about 1.5 KB gzip). Loading it only on pages with a visual would need a dynamic import; not worth it at this size.
+- The playground was tested in Chromium only. Pyodide 314 needs module workers and WebAssembly; Firefox and Safari were not tested.
+- The first run downloads 13.5 MB of Python files (about 6.3 MB if the host compresses them). Measured in Chromium against a local server: first start 3.2 s unthrottled, 8.1 s on 4G (9 Mbps), 34.6 s on Lighthouse's slow 4G (1.6 Mbps); later starts 2.2 to 2.6 s from the browser cache. CPU throttling does not reach workers, so a slow phone will be slower than these numbers.
+- The browser cannot limit memory. A program that keeps growing a list runs until the 5 second limit; one huge allocation may raise `MemoryError` or crash the worker, which is shown as "Python stopped unexpectedly". On a phone the tab itself could be closed by the browser.
+- Same-site requests are blocked by deleting the network functions in the worker; other sites are blocked by the worker's Content Security Policy. A learner who found a way to restore a network function could read this site's public pages, which they can open anyway.
+- Typing input while a program runs is not supported: it would need cross-origin isolation (COOP and COEP headers). Input comes from the Input box, one line per `input()` call.
+- Only Python's standard library is available. `import numpy` and similar fail with a message saying so.
+- Auto-inserted indentation (Enter, Tab, Shift+Tab) is not part of the browser's undo history; typed text is.
+- The playground's script (about 6 KB gzip) is prefetched by Next on every page with a link to it, which is every page through the header.
 - The trace table is always a tab stop, even when it does not scroll, for the same reason as D40.
 - `copy.spec.ts` no longer depends on real time (fixed 2026-10-27, see the verification log). It failed once in a full run during Milestone 4. I could not reproduce that run, so the cause below was found by forcing the condition, not by catching the original failure.
 
@@ -242,6 +257,18 @@ The OFL allows free use, self-hosting and embedding in a website; the font files
 | 2026-10-27 | Lighthouse 13.5.0 mobile (outside the repo), three runs | `/courses/python/variables` performance 90, 93, 93; `/courses/python/decisions` 93, 96, 94. Accessibility, best practices and SEO 100 on every run; CLS 0. Milestone 3 measured 94 and 94, so this is within the known run-to-run variance. |
 | 2026-10-27 | `docs/lesson-authoring.md` trace command | Rerun against the committed traces: identical byte for byte. |
 | 2026-10-27 | Final gates on the Milestone 4 code | `lint` and `typecheck` exit 0; `build` all routes static, only the two known font warnings; `test:e2e` 126 of 126; `check:examples` 30 of 30 (record unchanged); `test:runner` 30 of 30; `test:unit` 84 of 84; `verify:browser` 114 of 114 (33 contrast pairs); `npm audit` 0 vulnerabilities. |
+| 2026-10-27 | Milestone 5 start | `main` at `2a6a7a5589c90c564e1ab49aeadef579b4429fc6` (Milestone 4 merged). New branch `claude/milestone-5` (D63). |
+| 2026-10-27 | Pyodide checks before the plan (scratchpad) | Official docs: 314.0.7 is current (Python 3.14.2), module workers only, interrupts need SharedArrayBuffer and so cross-origin isolation. Sizes of the five files: 13.5 MB raw, about 6.3 MB gzip. Start times in the Known limitations. CodeMirror 6 for Python measured at 104 KB brotli (122 KB gzip) minimal and 128 KB (151 KB) with `basicSetup`; the textarea was chosen (D60). A worker-only Content Security Policy blocked another site while Pyodide still loaded. |
+| 2026-10-27 | `npm run test:unit` | 97 of 97: 13 new (Python error reading with messages captured from Pyodide 314.0.7: runtime, nested function, syntax, indentation, input, package hint removed; Input box lines; runner with a fake worker: nothing before Run, fresh worker per run, time limit, output cap at exactly the limit, error kinds, failed download and retry, Stop during download, crash). |
+| 2026-10-27 | `npm run test:e2e` (playground and navigation) | 15 playground tests with the real Python: nothing downloaded before Run and progress "x of 13.5 MB" from real bytes; output, no output, syntax and runtime errors; endless loop stopped after 5 s with earlier output kept and the next run working; output cut at exactly 10,000 characters; Input box and too little input; fresh Python per run (a changed builtin and module do not leak); no network functions and no packages; the original fetch gone from the whole prototype chain and the worker's policy header; Stop during download and Reset code; failed download and retry; keyboard only (Tab, Shift+Tab, Enter indentation, Esc then Tab, announcement, focus on Run); 320px; lesson links open the verified files; C lessons have no link and unknown examples are 404; without JavaScript. Two navigation tests updated: the new pages, and a card count that had only passed because the last header link used to open `/courses`. |
+| 2026-10-27 | Negative controls | Build with the time limit at 60 s, no output cap and the network removal turned off: the time limit, output cap and "fetch is gone" tests all failed. On that build a probe found the original fetch, reached this site, and was blocked from another origin (`localhost:3301`) by the worker's policy. Build with the policy also removed: the same probe reached the other origin (its server logged the request). All restored. |
+| 2026-10-27 | Browser cache check | Two workers in one persistent Chromium profile: the second made no requests to the server (server log). Playwright's request events also list cache hits, so tests check which files load, not how often. |
+| 2026-10-27 | `design:accessibility-review` with axe-core 4.14.0 (outside the repo) | 32 scans: `/playground` and `/playground/python/vote`, idle, finished, error and timeout, light and dark, 360 and 1440px: 0 violations, 0 items needing review. Contrast: status icons 6.69 to 7.10 light and 7.43 to 8.45 dark, status and output text 15.95 and 13.13, code 14.17 and 15.03, hints 6.95 and 8.00, input border 3.94 and 4.68 (non-text). Reflow at 320px with text spacing: no page scroll on both playground pages and a lesson. The lesson link inside a sentence on the example pages is 21px tall, the inline-link exception of WCAG 2.5.5, as for other links in prose. No real screen reader. |
+| 2026-10-27 | `design:ux-copy` | Three error lines now say what to do: syntax ("The error message below shows where."), runtime ("The error message below says what went wrong.") and too little input (no `EOFError` jargon; "Add one line to the Input box for each `input()` call."). Other text kept. |
+| 2026-10-27 | `/security-review` | No high or medium findings. Learner code runs only in the learner's worker; no code is accepted from an address; output is React text; the example route takes names from a fixed list; the worker policy has no `'unsafe-eval'`. |
+| 2026-10-27 | Bundle size (all JavaScript under `.next/static`) | Before (`main`, `2a6a7a5`): 14 files, 601.1 KB raw, 187.9 KB gzip. After: 15 files, 616.6 KB raw, 194.0 KB gzip (+15.5 KB raw, +6.1 KB gzip). Pyodide is not part of it. Per page: homepage and `/playground` 146.6 KB gzip, a lesson 154.9 KB (the playground script is prefetched through the header link). |
+| 2026-10-27 | Lighthouse 13.5.0 mobile, one run each | `/playground` performance 98, `/courses/python/variables` 98; accessibility, best practices and SEO 100; CLS 0; no Pyodide request on page load. |
+| 2026-10-27 | Final gates on the Milestone 5 code | `lint` and `typecheck` exit 0; `build` all routes static, only the two known font warnings; `test:e2e` 142 of 142; `check:examples` 30 of 30 (record unchanged); `test:runner` 30 of 30; `test:unit` 97 of 97; `verify:browser` 114 of 114; `npm audit` 0 vulnerabilities. |
 | 2026-10-26 | Windows simulation: CRLF copy of the whole tree, Node 20.20.2, Linux | `npm ci` exit 0 with two notices only (`EBADENGINE` for Node 22.18 and the ESLint 9 deprecation). `lint`, `typecheck`, `build` (homepage renders), `test:e2e` 45 of 45, `check:examples` 5 of 5, `test:runner` 12 of 12, `verify:browser` 114 of 114 all exit 0. Found and fixed on the way: `test:runner` used a glob that `node --test` only understands from Node 21 on (now an explicit file path, tested on Node 20.20.2 and 22.22.0); `test:unit` cannot run on Node 20, and its real minimum is Node 22.18.0 (measured), not the 22.13 that `engines` said. |
 | 2026-10-27 | Copy code repeat clicks (follow-up queued in Milestone 1) | Cause: the state was a plain string, so a second click inside two seconds set "copied" to "copied". React saw no change, so the timer kept counting from the first click and nothing new was added to the status region for screen readers. Fix: each click stores a new object with an attempt number; the effect restarts the two-second timer, and the status message is keyed by the attempt, so each click adds a new message. 4 new tests in `tests/e2e/copy.spec.ts`, written first and run on the unfixed code: 3 failed (the second click was not announced; the label had already reset at 3000 ms, 2000 ms after the first click; a repeated failure was not announced) and 1 passed, a click after the label had reset, as a control. With the fix 4 of 4 pass. The label timing uses Playwright's fake clock, so it is not a race. "Announced" is checked as text added to the live region (a MutationObserver), which is what screen readers react to; a real screen reader was not used. Gates: `lint`, `typecheck`, `build` exit 0; `test:e2e` 95 of 95; `check:examples` 30 of 30; `test:runner` 26 of 26; `test:unit` 71 of 71; `verify:browser` 114 of 114; `npm audit` 0 vulnerabilities. |
 | 2026-10-27 | Re-review of the `backLinkStyles` code-review finding | The original log entry names the finding but records neither its text nor a reason, so this is a fresh review of the code, not a reconstruction of the reviewer's thinking. Concern: links back to the page above should look and behave the same everywhere. Measured in Chromium at 360 and 1440 px: the course page link, the lesson page link and the end-of-lesson "Back to the ... course" link all render at 16px and 48px tall. The in-prose links, which are body size, render at 18px and use only `textLinkStyles`; `backLinkStyles` is used on no body-size link, so that wording of the finding does not describe the code. One real but minor defect: the end-of-lesson link repeated the classes inline without `text-sm`, so it matched only because its container inherits 16px. Moved into the 18px lesson body it would have grown to 18px while the shared links stayed at 16px. Fixed: it now uses `backLinkStyles`; measured before and after, identical (16px, 184 by 48 px at both widths). Kept as they are: `text-sm` in `backLinkStyles` (16px is the interface size in `DESIGN.md`, and these links sit above the heading, not inside prose); the 404 links and the footer links, which repeat `inline-flex py-3` but have other roles (forward navigation, a footer list), so sharing the back link style would couple unrelated things. No test added: the change has no visual effect, so a test would pass both before and after and could not show that the fix works. |
@@ -321,6 +348,14 @@ Screenshots are saved to `screenshots/` (`light-360.png`, `light-1440.png`, `dar
 | D53 | 2026-10-27 | No new dependency for visuals: HTML and CSS boxes and one client component; the only motion is the existing 120ms colour change of the current line | `CLAUDE.md` dependency rules; `DESIGN.md` Motion. |
 | D54 | 2026-10-27 | The practice output lines component moved to `src/components/output-lines.tsx` and is shared with the visuals; inside a screen-reader-only announcement it does not scroll | Second real use (`CLAUDE.md`), and the fix for the axe finding. |
 | D55 | 2026-10-27 | Milestone 4 work on a new branch `claude/milestone-4` from `main` at `b70ba48` | Owner instruction: no force-push. |
+| D56 | 2026-10-27 | Python runs in the browser with Pyodide 314.0.7 (exact), self-hosted: the files are copied from the npm package before each build and not committed | Owner approved. No third-party request (privacy), a strict policy is possible, and Python is available whenever the site is. Costs 13.5 MB of static files per deploy. |
+| D57 | 2026-10-27 | Every run gets a fresh Python; a replacement worker starts in the background after each run | Owner approved (option A). Reusing one Python leaked a changed builtin and a changed module into the next run (measured). |
+| D58 | 2026-10-27 | Limits: 5 s per run (download and start excluded), then the worker is terminated; output cut off at 10,000 characters; network functions deleted along the worker's prototype chain; the worker served with `default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'`; no packages | Owner approved. No COOP or COEP headers: termination needs no shared memory. |
+| D59 | 2026-10-27 | `input()` reads from an Input box filled before running, one line per call; the lines are shown in the output as a terminal would | Owner approved. Typing during a run would need cross-origin isolation. |
+| D60 | 2026-10-27 | Editor: a labelled textarea with a line-number gutter and indentation keys; not CodeMirror or Monaco | Owner approved. No library; works natively on phones and with screen readers. The textarea is uncontrolled so React never moves the cursor. |
+| D61 | 2026-10-27 | Download progress shows real bytes: the three fetched files are counted as they arrive; the two script files, loaded with `import()`, are counted once each has arrived | Owner requirement: real progress, never estimated. |
+| D62 | 2026-10-27 | Runnable Python examples and fixes in published lessons link to their own static playground page; practice questions never link | Practice output is the answer. |
+| D63 | 2026-10-27 | Milestone 5 work on a new branch `claude/milestone-5` from `main` at `2a6a7a5` | Owner instruction. |
 
 ## Environment (verified 2026-10-26, cloud session)
 
@@ -328,20 +363,20 @@ Node 22.22.0, npm 10.9.4, Python 3.13, gcc and g++ 13.3, OpenJDK and javac 21. P
 
 ## Git
 
-- Working branch: `claude/milestone-4` (Milestone 4), created from `main` at `b70ba48` (D55).
-- `main` at `b70ba48` (Milestone 3 merged by the owner); unchanged by Claude.
-- For the latest commit on this branch, run `git log -1 origin/claude/milestone-4`.
+- Working branch: `claude/milestone-5` (Milestone 5), created from `main` at `2a6a7a5` (D63).
+- `main` at `2a6a7a5` (Milestone 4 merged by the owner); unchanged by Claude.
+- For the latest commit on this branch, run `git log -1 origin/claude/milestone-5`.
 
 ## Next recommended task
 
-Owner reviews Milestone 4 and opens the pull request. The Milestone 3 screen reader walkthrough stays open; one visual can be checked in the same sitting. Milestone 5 gets acceptance criteria when it is planned (`SPEC.md` Section 9).
+Owner reviews Milestone 5 and opens the pull request. Before launch, measure the first Python start on a real phone and confirm the host serves the Pyodide files and headers correctly. Milestone 6 gets acceptance criteria when it is planned.
 
 ## Resuming work
 
 ```
 # Needs Node 22.18 or newer. Windows: use WSL for check:examples (see Known limitations).
 npm ci                      # install exactly what package-lock.json says
-npm run dev                 # development server on http://localhost:3000
+npm run dev                 # development server on http://localhost:3000 (copies the Pyodide files first)
 npm run lint
 npm run typecheck
 npm run build

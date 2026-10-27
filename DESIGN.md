@@ -267,6 +267,21 @@ Numbered, because the text can refer to "the first practice question". Each ques
 - **Solution:** the native "Show solution" disclosure (secondary button style, "Hide solution" when open, instant, no JavaScript) stays available at any time. Inside: the verified output panel, or "Answer:" with the correct option for a multiple-choice question, then the explanation.
 - Hints appear below the feedback as `sheet` rows with a `rule-strong` left bar and a bold "Hint 1:".
 
+### Playground
+
+A page for running Python in the browser (`/playground`, and `/playground/python/<example>` for a lesson example). Left-aligned: h1 "Python playground", a lead saying the code runs on the learner's device and nothing is saved or sent, a small `ink-muted` line "Python only. C, C++ and Java are not yet supported in the playground." For a lesson example, a line links back to its lesson.
+
+- **Layout:** two columns from 1024px (code and input left, "Your run" right), one column below. Nothing scrolls the page sideways at 320px; code and output scroll inside their boxes.
+- **Code box:** a labelled textarea ("Python code") on `code` with a 1px `rule-strong` border and an `ink-muted` line-number gutter, `text-mono`, no wrapping, no spellcheck or autocorrect. Its frame shows the standard focus ring. Tab adds 4 spaces, Shift+Tab removes them, Enter keeps the indentation and adds a level after a colon; Esc then Tab leaves the box, as the hint below it says.
+- **Input box:** a labelled textarea ("Input") with the hint "If your program uses `input()`, type one line here for each call before you press Run."
+- **Controls:** "Run" (primary), "Stop" (secondary, only while downloading or running), "Reset code" (secondary). Run stays focusable while busy, with `aria-disabled`, and says the program is already running. The controls appear only once the page is interactive; their space is reserved. Before the first run, a small `ink-muted` note gives the real download size.
+- **Your run:** an h2 "Your run" over a `sheet` panel with a `rule-strong` border, so it never looks like the verified "Expected output". A status line on top with an icon and words: no icon while idle, downloading, starting or running; `success` check-circle for finished; `error` x-circle for an error; `warning` triangle for a time limit, cut-off output, Stop or a failed download. Below it the output in `text-mono`, then for a Python error an "Error message" block with the message as Python prints it. Cleared at the start of every run.
+- **Download progress:** "Downloading Python: 4.2 of 13.5 MB" from the bytes really received, with a native progress bar in `accent`. Then "Starting Python…".
+- **Announcements:** state changes go to a polite live region ("Downloading Python.", "Finished. 2 lines of output.", the error or limit sentence). Progress numbers are shown but not announced.
+- **Lesson link:** "Try it in the playground" under each runnable Python example, in the back link style, with the example's name for screen readers.
+- **Without JavaScript:** the code is shown, the controls are hidden, and a note says running code needs JavaScript.
+- **Motion:** none beyond the shared colour changes.
+
 ### Lesson navigation
 
 After the recap, above a `rule` divider: up to two bordered links (`sheet` background, `rule-strong` border, `accent-tint` on hover), "Previous lesson" on the left and "Next lesson" on the right, each a small `ink-muted` label above the lesson title. They follow published lessons in course order. The first lesson has no previous link and the last has no next link (absent, not disabled). The last lesson says "This is the last published lesson in the <course> course." with a link back to the course. No arrows are added to the text.

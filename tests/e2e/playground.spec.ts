@@ -60,11 +60,11 @@ test("normal output, no output, syntax error and runtime error each have their o
 
   run = await runCode(page, "print('hi'\n");
   expect(run.state).toBe("error");
-  expect(run.status).toBe("Python could not run your program: there is a mistake on line 1. Nothing ran.");
+  expect(run.status).toBe("Python could not run your program: there is a mistake on line 1. Nothing ran. The error message below shows where.");
   expect(run.error).toBe("  File \"main.py\", line 1\n    print('hi'\n         ^\nSyntaxError: '(' was never closed");
 
   run = await runCode(page, "print('before')\nprint(1/0)");
-  expect(run.status).toBe("Your program stopped with an error on line 2.");
+  expect(run.status).toBe("Your program stopped with an error on line 2. The error message below says what went wrong.");
   expect(run.output).toBe("before\n");
   expect(run.error).toBe("Traceback (most recent call last):\n  File \"main.py\", line 2, in <module>\n    print(1/0)\n          ~^~\nZeroDivisionError: division by zero");
   expect(run.error).not.toContain("_pyodide");
@@ -98,7 +98,7 @@ test("the Input box gives one line per input() call; too few lines is explained"
   let run = await runCode(page, "name = input('Name? ')\nage = int(input())\nprint(name, age + 1)", "Ana\n17\n");
   expect(run.output).toBe("Name? Ana\n17\nAna 18\n");
   run = await runCode(page, "a = input()\nb = input()", "only one");
-  expect(run.status).toBe("Your program asked for more input than the Input box has (EOFError on line 2).");
+  expect(run.status).toBe("Your program asked for more input than the Input box has. Add one line to the Input box for each input() call.");
 });
 
 test("every run is a fresh Python: a changed builtin or module does not leak into the next run", async ({ page }) => {

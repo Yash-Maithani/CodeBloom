@@ -39,10 +39,10 @@ export function describe(phase: Phase, printed: boolean): { text: string; tone: 
       return { text: printed ? "Finished." : "Finished. Your program printed nothing.", tone: "success" };
     case "error": {
       const where = end.error.line ? ` on line ${end.error.line}` : "";
-      if (end.error.kind === "syntax") return { text: `Python could not run your program: there is a mistake${where}. Nothing ran.`, tone: "error" };
-      if (end.error.kind === "input") return { text: `Your program asked for more input than the Input box has (${end.error.name}${where}).`, tone: "error" };
+      if (end.error.kind === "syntax") return { text: `Python could not run your program: there is a mistake${where}. Nothing ran. The error message below shows where.`, tone: "error" };
+      if (end.error.kind === "input") return { text: "Your program asked for more input than the Input box has. Add one line to the Input box for each input() call.", tone: "error" };
       if (end.error.kind === "package") return { text: "This playground has only Python's standard library, so packages such as numpy are not available.", tone: "error" };
-      return { text: `Your program stopped with an error${where}.`, tone: "error" };
+      return { text: `Your program stopped with an error${where}. The error message below says what went wrong.`, tone: "error" };
     }
     case "timeout":
       return { text: `Stopped after ${TIME_LIMIT_MS / 1000} seconds. Your program may have a loop that never ends.`, tone: "warning" };

@@ -102,6 +102,10 @@ How to make one:
 
 On the page, the learner starts at "Start. Nothing has run yet.", and moves with Back, Next step and Start again; nothing plays by itself. Each step is announced to screen readers, and "All steps as a table" gives the same information as text. Without JavaScript the table is shown open instead.
 
+### 3c. Playground links
+
+Every runnable Python example and fix in a published lesson gets "Try it in the playground" automatically, and its own page at `/playground/python/<name>` that starts from the verified file. Nothing to write. Practice questions never get a link, because their output is the answer. An example that uses `input()` would need the learner to fill the Input box; say so in the prose. C, C++ and Java examples get no link until the playground supports them.
+
 ## 4. The prose (`<slug>.md` and concept files)
 
 A small subset of Markdown. Anything else stops the build with a message saying what to change.
