@@ -10,7 +10,7 @@ import { PracticeSet, type PracticeItem } from "@/components/practice-set";
 import { InlineText } from "@/components/prose";
 import { StepThrough, TraceTable } from "@/components/step-through";
 import { backLinkStyles, buttonStyles } from "@/components/styles";
-import type { LoadedLesson, RenderedExample, RenderedVisual } from "@/lib/lessons";
+import { opensInPlayground, type LoadedLesson, type RenderedExample, type RenderedVisual } from "@/lib/lessons";
 import { plainText as plain } from "@/lib/prose";
 
 export function LessonCodeBlock({
@@ -18,13 +18,17 @@ export function LessonCodeBlock({
   regionLabel,
   mistake,
   showOutput,
+  playground,
 }: {
   example: RenderedExample;
   regionLabel: string;
   mistake?: boolean;
   showOutput?: boolean;
+  /** Adds "Try it in the playground" (only for examples that open there; see opensInPlayground) */
+  playground?: boolean;
 }) {
   return (
+    <>
     <CodeBlock
       caption={example.caption}
       regionLabel={regionLabel}
@@ -38,6 +42,14 @@ export function LessonCodeBlock({
       showOutput={showOutput}
       exampleId={example.id}
     />
+    {playground && opensInPlayground(example) && (
+      <p className="mt-2">
+        <Link href={`/playground/${example.id}`} className={backLinkStyles} data-playground-link>
+          Try it in the playground<span className="sr-only">: {regionLabel}</span>
+        </Link>
+      </p>
+    )}
+    </>
   );
 }
 
@@ -75,7 +87,7 @@ export function Mistakes({ lesson }: { lesson: LoadedLesson }) {
         <Labeled label="Fix:" text={mistake.fix} />
         {mistake.renderedFix && (
           <div className="mt-4">
-            <LessonCodeBlock example={mistake.renderedFix} regionLabel={`${language} code: the fix for ${plain(mistake.title)}`} />
+            <LessonCodeBlock playground example={mistake.renderedFix} regionLabel={`${language} code: the fix for ${plain(mistake.title)}`} />
           </div>
         )}
       </section>

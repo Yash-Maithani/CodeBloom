@@ -5,7 +5,7 @@ import "server-only";
 import path from "node:path";
 import { courses } from "@content/courses";
 import { lessonSources } from "@content/lessons";
-import { buildLessons, publishedIn, type LoadedLesson } from "./lessons.ts";
+import { buildLessons, opensInPlayground, publishedIn, type LoadedLesson, type RenderedExample } from "./lessons.ts";
 import { RECORD_PATH } from "./verified.ts";
 
 let cache: Promise<LoadedLesson[]> | undefined;
@@ -24,6 +24,19 @@ export function allLessons(): Promise<LoadedLesson[]> {
 export async function publishedByCourse(): Promise<Map<string, LoadedLesson[]>> {
   const lessons = await allLessons();
   return new Map(courses.map((course) => [course.slug, publishedIn(lessons, course)]));
+}
+
+/** Every example a published lesson links to the playground, with that lesson. Each gets its own playground page. */
+export async function playgroundExamples(): Promise<Array<{ example: RenderedExample; lesson: LoadedLesson }>> {
+  const python = (await publishedByCourse()).get("python") ?? [];
+  return python.flatMap((lesson) =>
+    [
+      ...lesson.body.flatMap((block) => (block.type === "example" ? [block.example] : [])),
+      ...lesson.mistakes.flatMap((mistake) => (mistake.renderedFix ? [mistake.renderedFix] : [])),
+    ]
+      .filter(opensInPlayground)
+      .map((example) => ({ example, lesson })),
+  );
 }
 
 /** "C", "C and Python", "C, C++ and Python" */

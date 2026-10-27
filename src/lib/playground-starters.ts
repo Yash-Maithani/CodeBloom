@@ -22,6 +22,6 @@ export async function loadStarter(file: string): Promise<{ id: string; code: str
 export async function pythonDownloadBytes(): Promise<number> {
   const folder = path.join(/*turbopackIgnore: true*/ process.cwd(), "public", "pyodide", PYODIDE_VERSION);
   const files = ["pyodide.mjs", "pyodide.asm.mjs", "pyodide-lock.json", "python_stdlib.zip", "pyodide.asm.wasm"];
-  const sizes = await Promise.all(files.map((file) => stat(/*turbopackIgnore: true*/ path.join(folder, file)).then((s) => s.size)));
+  const sizes = await Promise.all(files.map((file) => stat(path.join(/*turbopackIgnore: true*/ folder, file)).then((s) => s.size)));
   return sizes.reduce((sum, size) => sum + size, 0);
 }

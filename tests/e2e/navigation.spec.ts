@@ -4,6 +4,12 @@ import { expect, test, type Page } from "@playwright/test";
 const EXPECTED_PAGES = [
   "/",
   "/playground",
+  "/playground/python/variables_change",
+  "/playground/python/variables_types",
+  "/playground/python/type_error_fixed",
+  "/playground/python/compare",
+  "/playground/python/vote",
+  "/playground/python/delivery_fee",
   "/courses",
   "/courses/c",
   "/courses/cpp",

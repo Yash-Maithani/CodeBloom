@@ -98,6 +98,9 @@ export const sameOutput = (a: string, b: string) => {
   const tidy = (text: string) => text.replace(/\r\n?/g, "\n").split("\n").map((line) => line.trimEnd()).join("\n").replace(/\n+$/, "");
   return tidy(a) === tidy(b);
 };
+/** A runnable Python example on a lesson page opens in the playground. Practice never does: its output is the answer. */
+export const opensInPlayground = (example: RenderedExample) => example.id.startsWith("python/") && example.kind === "output";
+
 export const lessonHref = (course: string, slug: string) => `/courses/${course}/${slug}`;
 
 function plainOnly(text: string, where: string) {

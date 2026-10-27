@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { expect, test, type Page } from "@playwright/test";
 
 // The Python playground (SPEC.md Milestone 5) with the real Pyodide worker.
@@ -197,6 +198,33 @@ test("at 320px the playground fits without page scroll", async ({ page }) => {
   await open(page);
   await runCode(page, "print('a fairly long line of output that is wider than a phone screen, so it scrolls')");
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
+});
+
+test("each Python lesson example links to its playground page, which starts from the verified file", async ({ page }) => {
+  const opened: string[] = [];
+  for (const lesson of ["/courses/python/variables", "/courses/python/decisions"]) {
+    await page.goto(lesson);
+    const hrefs = await page.locator("[data-playground-link]").evaluateAll((links) => links.map((link) => link.getAttribute("href")!));
+    for (const href of hrefs) {
+      await page.goto(href);
+      const file = href.replace("/playground/", "");
+      const source = readFileSync(`content/examples/${file}.py`, "utf8").replace(/\r\n?/g, "\n").replace(/\n$/, "");
+      await expect(page.locator("[data-code]")).toHaveValue(source);
+      await expect(page.getByRole("main").getByRole("link", { name: /^(Variables|Making decisions)/ })).toHaveAttribute("href", lesson);
+      opened.push(file);
+    }
+  }
+  // Runnable examples and fixes only; practice questions never link, because their output is the answer.
+  expect(opened.sort()).toEqual(["python/compare", "python/delivery_fee", "python/type_error_fixed", "python/variables_change", "python/variables_types", "python/vote"]);
+});
+
+test("C lessons have no playground link, and an unknown example is a 404", async ({ page }) => {
+  for (const lesson of ["/courses/c/first-program", "/courses/c/variables"]) {
+    await page.goto(lesson);
+    await expect(page.locator("[data-playground-link]")).toHaveCount(0);
+  }
+  expect((await page.goto("/playground/python/practice_fee"))?.status()).toBe(404);
+  expect((await page.goto("/playground/c/hello"))?.status()).toBe(404);
 });
 
 test.describe("without JavaScript", () => {

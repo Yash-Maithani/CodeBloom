@@ -1,30 +1,11 @@
 import type { Metadata } from "next";
-import { Container } from "@/components/container";
-import { Playground } from "@/components/playground";
-import { loadStarter, pythonDownloadBytes } from "@/lib/playground-starters";
+import { PlaygroundPage } from "@/components/playground-page";
 
 export const metadata: Metadata = {
   title: "Python playground",
   description: "Write Python and run it in your browser. Your code stays on your device.",
 };
 
-export default async function PlaygroundPage() {
-  const [starter, downloadBytes] = await Promise.all([loadStarter("hello"), pythonDownloadBytes()]);
-  return (
-    <Container className="py-12 md:py-16">
-      <h1 className="font-heading text-3xl font-semibold">Python playground</h1>
-      <p className="mt-4 max-w-measure text-lg">
-        Write Python and run it in your browser. Your code runs on your device: nothing is saved or sent anywhere.
-      </p>
-      <p className="mt-2 max-w-measure text-sm text-ink-muted">Python only. C, C++ and Java are not yet supported in the playground.</p>
-      <noscript>
-        <p className="mt-6 max-w-measure rounded-panel border border-l-3 border-rule border-l-warning bg-sheet px-4 py-3">
-          Running code needs JavaScript. You can still copy the code below and run it with Python on your computer.
-        </p>
-      </noscript>
-      <div className="mt-8">
-        <Playground starter={starter.code} downloadBytes={downloadBytes} />
-      </div>
-    </Container>
-  );
+export default function Page() {
+  return <PlaygroundPage file="hello" />;
 }
