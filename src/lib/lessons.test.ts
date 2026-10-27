@@ -91,6 +91,8 @@ const EXAMPLE_FILES = {
   "examples/python/show.expected.txt": "1\n",
   "examples/python/oops.py": "print(y)\n",
   "examples/python/oops.run-error.txt": "NameError\n",
+  "examples/python/q.py": "x = 1\nprint(x)\n",
+  "examples/python/q.expected.txt": "1\n",
 };
 
 const lesson = (overrides: Partial<LessonSource> = {}): LessonSource => ({
@@ -231,4 +233,89 @@ test("a published course with a single lesson has neither previous nor next", as
   const { run } = await build({ sources: [lesson({ status: "published" })], files: {}, verified: ["python/show"] });
   const lessons = await run();
   assert.deepEqual(neighbours(lessons, lessons[0]), { number: 1, previous: undefined, next: undefined });
+});
+
+// ---------- practice questions (Milestone 3) ----------
+
+const predictQuestion = (overrides: Record<string, unknown> = {}) => ({
+  kind: "predict-output" as const,
+  question: "What does it print?",
+  example: { file: "python/q", notes: [] },
+  correctPosition: 2,
+  wrongOutputs: [
+    { text: "x", why: "`print(x)` shows the value, not the name." },
+    { text: "", why: "Line 2 prints." },
+  ],
+  hints: ["Follow `x`."],
+  explanation: "Line 1 sets `x` to 1.",
+  ...overrides,
+});
+
+const choiceQuestion = (options: Array<{ text: string; why: string; correct?: true }>, overrides: Record<string, unknown> = {}) => ({
+  kind: "choice" as const,
+  question: "Which is right?",
+  options,
+  hints: ["Think."],
+  explanation: "Because.",
+  ...overrides,
+});
+
+const threeOptions = [
+  { text: "A", why: "Not A." },
+  { text: "B", why: "Yes.", correct: true as const },
+  { text: "C", why: "Not C." },
+];
+
+test("practice: the correct option is the verified output, placed at correctPosition", async () => {
+  const { run } = await build({ sources: [lesson({ practice: [predictQuestion()] })], files: {} });
+  const [loaded] = await run();
+  assert.deepEqual(
+    loaded.practice[0].options.map((option) => [option.text, option.correct]),
+    [["x", false], ["1", true], ["", false]],
+  );
+});
+
+test("practice: a wrong output equal to the real output stops the build, even with other spacing or line endings", async () => {
+  for (const text of ["1", "1\n", "1  ", "1\r\n\r\n"]) {
+    await rejects(
+      { sources: [lesson({ practice: [predictQuestion({ wrongOutputs: [{ text, why: "w" }, { text: "2", why: "w" }] })] })], files: {} },
+      /wrong output 1 is the real output of python\/q/,
+    );
+  }
+});
+
+test("practice: predict-output limits and checks", async () => {
+  const q = (overrides: Record<string, unknown>) => ({ sources: [lesson({ practice: [predictQuestion(overrides)] })], files: {} });
+  await rejects(q({ wrongOutputs: [{ text: "2", why: "w" }] }), /two or three wrong outputs/);
+  await rejects(q({ correctPosition: 4 }), /correctPosition must be between 1 and 3/);
+  await rejects(q({ wrongOutputs: [{ text: "2", why: "w" }, { text: "2 ", why: "w" }] }), /two wrong outputs are the same/);
+  await rejects(q({ wrongOutputs: [{ text: "2", why: "" }, { text: "3", why: "w" }] }), /wrong output 1 why: must not be empty/);
+  await rejects(q({ example: { file: "python/oops", notes: [] } }), /python\/oops is a run-error example; allowed here: output/);
+});
+
+test("practice: hints must number one to three and pass the text checks", async () => {
+  const q = (hints: string[]) => ({ sources: [lesson({ practice: [predictQuestion({ hints })] })], files: {} });
+  await rejects(q([]), /needs one to three hints/);
+  await rejects(q(["a", "b", "c", "d"]), /needs one to three hints/);
+  await rejects(q(["A `broken hint"]), /hint 1: a backtick is not closed/);
+});
+
+test("practice: a choice question needs three or four distinct options and exactly one correct", async () => {
+  const q = (options: Array<{ text: string; why: string; correct?: true }>) => ({ sources: [lesson({ practice: [choiceQuestion(options)] })], files: {} });
+  const { run } = await build(q(threeOptions));
+  const [loaded] = await run();
+  assert.deepEqual(loaded.practice[0].options.map((option) => option.correct), [false, true, false]);
+  assert.equal(loaded.practice[0].rendered, undefined);
+  await rejects(q(threeOptions.slice(0, 2)), /three or four options/);
+  await rejects(q(threeOptions.map((o) => ({ text: o.text, why: o.why }))), /exactly one option must be correct/);
+  await rejects(q([...threeOptions, { text: "D", why: "w", correct: true }]), /exactly one option must be correct/);
+  await rejects(q([...threeOptions, { text: "A", why: "again" }]), /two options are the same/);
+  await rejects(q([{ text: "A", why: "" }, ...threeOptions.slice(1)]), /option 1 why: must not be empty/);
+});
+
+test("practice: a published lesson's question examples go through the publish gate", async () => {
+  await rejects(
+    { sources: [lesson({ status: "published", practice: [predictQuestion({ example: { file: "python/other", notes: [] } })] })], files: { "examples/python/other.py": "print(2)\n", "examples/python/other.expected.txt": "2\n" }, verified: ["python/show"] },
+    /python\/other has never been verified/,
+  );
 });

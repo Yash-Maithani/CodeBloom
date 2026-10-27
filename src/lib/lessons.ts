@@ -30,6 +30,16 @@ export type RenderedExample = {
   result: string;
 };
 
+/** An answer option ready for the page. `output` options are shown as program output. */
+export type RenderedOption = { text: string; why: string; correct: boolean; output: boolean };
+
+export type RenderedQuestion = {
+  source: PracticeQuestion;
+  /** The program for predict-the-output questions */
+  rendered?: RenderedExample;
+  options: RenderedOption[];
+};
+
 export type LessonBlock =
   | { type: "prose"; block: Exclude<ProseBlock, { type: "placeholder" }> }
   | { type: "example"; example: RenderedExample }
@@ -43,7 +53,7 @@ export type LoadedLesson = {
   concept?: ProseBlock[];
   body: LessonBlock[];
   mistakes: Array<Mistake & { rendered: RenderedExample; renderedFix?: RenderedExample }>;
-  practice: Array<PracticeQuestion & { rendered: RenderedExample }>;
+  practice: RenderedQuestion[];
 };
 
 export type BuildInput = {
@@ -55,6 +65,12 @@ export type BuildInput = {
 };
 
 const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+
+/** Output compared as a learner reads it: line endings, trailing spaces and trailing blank lines do not count. */
+export const sameOutput = (a: string, b: string) => {
+  const tidy = (text: string) => text.replace(/\r\n?/g, "\n").split("\n").map((line) => line.trimEnd()).join("\n").replace(/\n+$/, "");
+  return tidy(a) === tidy(b);
+};
 export const lessonHref = (course: string, slug: string) => `/courses/${course}/${slug}`;
 
 function plainOnly(text: string, where: string) {
@@ -172,12 +188,42 @@ export async function buildLessons({ courses, sources, contentRoot, recordPath }
         renderedFix: mistake.fixExample ? await render(mistake.fixExample, `${where}, fix`, ["output"]) : undefined,
       });
     }
-    const practice = [];
+    const practice: RenderedQuestion[] = [];
     for (const [i, question] of source.practice.entries()) {
       const where = `${name}, practice ${i + 1}`;
       plainOnly(question.question, `${where}, question`);
       plainOnly(question.explanation, `${where}, explanation`);
-      practice.push({ ...question, rendered: await render(question.example, where, ["output"]) });
+      if (question.hints.length < 1 || question.hints.length > 3) throw new Error(`${where}: needs one to three hints`);
+      question.hints.forEach((hint, h) => plainOnly(hint, `${where}, hint ${h + 1}`));
+      if (question.kind === "predict-output") {
+        const rendered = await render(question.example, where, ["output"]);
+        const wrong = question.wrongOutputs;
+        if (wrong.length < 2 || wrong.length > 3) throw new Error(`${where}: needs two or three wrong outputs`);
+        if (!Number.isInteger(question.correctPosition) || question.correctPosition < 1 || question.correctPosition > wrong.length + 1) {
+          throw new Error(`${where}: correctPosition must be between 1 and ${wrong.length + 1}`);
+        }
+        for (const [w, option] of wrong.entries()) {
+          plainOnly(option.why, `${where}, wrong output ${w + 1} why`);
+          // The guard: a typed wrong option can never be the real output.
+          if (sameOutput(option.text, rendered.result)) {
+            throw new Error(`${where}: wrong output ${w + 1} is the real output of ${rendered.id}; a wrong option must differ from it`);
+          }
+          if (wrong.some((other, o) => o < w && sameOutput(other.text, option.text))) throw new Error(`${where}: two wrong outputs are the same`);
+        }
+        const options: RenderedOption[] = wrong.map((option) => ({ text: option.text, why: option.why, correct: false, output: true }));
+        options.splice(question.correctPosition - 1, 0, { text: rendered.result, why: question.explanation, correct: true, output: true });
+        practice.push({ source: question, rendered, options });
+      } else {
+        const { options } = question;
+        if (options.length < 3 || options.length > 4) throw new Error(`${where}: needs three or four options`);
+        if (options.filter((option) => option.correct).length !== 1) throw new Error(`${where}: exactly one option must be correct`);
+        for (const [o, option] of options.entries()) {
+          plainOnly(option.text, `${where}, option ${o + 1}`);
+          plainOnly(option.why, `${where}, option ${o + 1} why`);
+          if (options.some((other, p) => p < o && other.text === option.text)) throw new Error(`${where}: two options are the same`);
+        }
+        practice.push({ source: question, options: options.map((option) => ({ text: option.text, why: option.why, correct: !!option.correct, output: false })) });
+      }
     }
 
     lessons.push({ source, course, href: lessonHref(source.course, source.slug), concept, body, mistakes, practice });

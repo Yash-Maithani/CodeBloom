@@ -50,10 +50,30 @@ The type is `LessonSource` in `src/lib/lesson-types.ts`. Text fields may use `` 
 | `analogy` | no | `title`, `text` and `limit`. `limit` (where the comparison stops being accurate) is required. Place it in the prose with `{{analogy}}` |
 | `examples` | at least one | Runnable examples by id: `file` (`"python/variables_change"`), optional `caption`, and `notes`. Each is placed in the prose with `{{example <id>}}` |
 | `mistakes` | no | Each: `title`, `example` (may fail, or run with surprising output), `whatHappens`, optional `howToRead` and `whyEasyToMiss`, `fix`, optional `fixExample` |
-| `practice` | no | Each: `question`, `example` (output hidden until "Show solution"), `explanation` |
+| `practice` | no | Interactive questions, two kinds; see section 3a |
 | `recap` | at least 2 | Short points |
 
 Fields shown after a label ("Where the comparison stops:", "What happens:", "Fix:") start in lowercase unless the first word is a name.
+
+### 3a. Practice questions
+
+Each question has `question`, `hints` (one to three, revealed one at a time) and `explanation` (shown in the solution, which the learner can open at any time). Two kinds:
+
+| Kind | Fields | What the build checks |
+|---|---|---|
+| `"predict-output"` | `example` (a runnable example whose output is hidden), `wrongOutputs` (two or three `{ text, why }`), `correctPosition` (1 to the number of options) | The example is verified. The correct option is its `.expected.txt`, read at build time: you never type it. No wrong output may equal the real output (line endings, trailing spaces and trailing blank lines ignored), and no two may be the same. `text: ""` means "Nothing is printed" |
+| `"choice"` | `options` (three or four `{ text, why, correct? }`) | Exactly one option is `correct`; no two options are the same |
+
+Writing good questions:
+
+- Ask something the learner must work out by following the code, not something they can repeat from the lesson's wording.
+- Every wrong option stands for one real misconception, and its `why` corrects that misconception specifically, not "this is wrong".
+- Give every option the same shape and length, so the right one does not stand out.
+- A wrong output option is written exactly as the learner would expect to see it, line by line. The page shows it as real lines in monospace.
+- Hints are steps toward the answer, not the answer.
+- A choice question must not claim what a program prints unless the claim is shown by a verified example in the lesson. A fact about the language that is not output (for example "C does not allow declaring the same name twice in one block") must be tested before you write it; record how in `PROGRESS.md`.
+
+On the page, a question counts as answered when the learner checks the correct option; opening the solution does not count. Nothing is stored: the count is for the current page visit only.
 
 **Margin notes** (`notes`): `{ startLine, endLine, text }`, counting from line 1, in order, not overlapping. Explain the lines that matter, not every line. A note must not restate the output; the output panel shows it. The page adds "Line 4:" for screen readers, so do not start a note with the line number.
 
@@ -125,7 +145,7 @@ Teaching quality is separate from passing checks. Before publishing, read the wh
 - No simplification is misleading (for example: Python has types; reading an uninitialized C variable is undefined behavior).
 - Prose and notes never state output that is not shown in a verified panel.
 - Each mistake shows the wrong code, what happens, and the fix.
-- Each practice solution is checked against its question.
+- Each practice solution, wrong option and hint is checked against its question, and each wrong option's explanation addresses its own misconception.
 
 Then run the skills `CLAUDE.md` names for lesson screens: `design:design-critique` (teaching quality), `design:ux-copy` for any new interface text, and `design:accessibility-review` before a milestone is verified. Record the results in `PROGRESS.md`. A lesson meets `SPEC.md`'s "verified" definition only when all of this is done.
 
@@ -144,4 +164,6 @@ Set `status: "published"`, then run every check in `CLAUDE.md` (Quality gates), 
 | `does not lead to a page` / `points to a draft lesson` | Fix the link, or publish the target first |
 | `code blocks are not allowed` and other `line N:` messages | The prose uses Markdown outside the subset (section 4) |
 | `lines X to Y are outside` | A note points at a line the example does not have |
+| `wrong output N is the real output` | A wrong option equals what the program really prints; change it to a real misconception |
+| `exactly one option must be correct` / `needs one to three hints` / `two or three wrong outputs` | A practice question is outside its limits (section 3a) |
 | `error message differs` (from `check:examples`) | The compiler or interpreter printed something else; see section 5, Toolchain |

@@ -87,15 +87,40 @@ export const cVariables: LessonSource = {
   ],
   practice: [
     {
+      kind: "predict-output",
       question: "What does this program print?",
       example: { file: "c/practice_score", notes: [] },
-      explanation:
-        "Line 5 works out the right side using the current value of `score`, 10 + 5, then stores the result in `score`.",
+      correctPosition: 2,
+      wrongOutputs: [
+        { text: "10", why: "Line 5 changes `score`: C works out `score + 5` using the current value, 10, then stores 15 in `score` before line 6 runs." },
+        { text: "%d", why: "`%d` is a placeholder: `printf` replaces it with the value of `score`, so the characters %d never appear." },
+      ],
+      hints: ["Follow the value of `score` line by line, starting at line 4.", "On line 5, the right side is worked out first, using the value `score` has at that moment.", "What does `printf` put in place of `%d`?"],
+      explanation: "Line 5 works out the right side using the current value of `score`, 10 + 5, then stores the result in `score`.",
     },
     {
+      kind: "predict-output",
       question: "What does this program print?",
       example: { file: "c/practice_truncate", notes: [] },
+      correctPosition: 1,
+      wrongOutputs: [
+        { text: "10", why: "C does not round when it stores a decimal number in an `int`. It drops the decimal part, so 9.99 becomes 9." },
+        { text: "9.99", why: "`count` is an `int`, which holds only whole numbers, so the decimal part is dropped when the value is stored. `%d` then prints a whole number." },
+      ],
+      hints: ["What kind of number can an `int` hold?", "Look at the 2.75 example under Common mistakes. Compare the number in the code with what it printed. Which part of the number went missing?"],
       explanation: "`count` is an `int`, so it keeps only the whole-number part. C does not round.",
+    },
+    {
+      kind: "choice",
+      question: "`apples` was declared earlier with `int apples = 3;`. Which line changes its value to 10?",
+      options: [
+        { text: "`int apples = 10;`", why: "That is a second declaration of the same name. C does not allow declaring the same name twice in one block, so compilation fails. To change an existing variable, leave out the type." },
+        { text: "`10 = apples;`", why: "C stores the value on the right in the variable named on the left. A number cannot receive a value, so compilation fails." },
+        { text: "`apples = 10;`", why: "The variable already exists, so there is no type: C stores 10 in `apples`.", correct: true },
+        { text: "`apples = 10`", why: "Every instruction ends with a semicolon. Without it, compilation fails, as in the missing-semicolon mistake in Your first C program." },
+      ],
+      hints: ["`apples` already exists. Do you need to give its type again?", "Which side of `=` names the variable that receives the value?"],
+      explanation: "A declaration (type, name, value) creates a variable once. After that, `name = value;` changes it.",
     },
   ],
   recap: [

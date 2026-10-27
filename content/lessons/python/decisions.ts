@@ -113,15 +113,41 @@ export const pythonDecisions: LessonSource = {
   ],
   practice: [
     {
+      kind: "predict-output",
       question: "This is the delivery program again, with a larger order. What does it print?",
       example: { file: "python/practice_fee", notes: [] },
-      explanation:
-        "80 is not less than 50, so the condition is `False` and Python skips lines 4 and 5. `delivery_fee` keeps its starting value, 0, and line 6 runs as always.",
+      correctPosition: 3,
+      wrongOutputs: [
+        { text: "Small order: delivery costs extra\nDelivery fee: 5", why: "80 is not less than 50, so the condition is `False` and Python skips both indented lines, 4 and 5." },
+        { text: "Delivery fee: 5", why: "Line 4 is indented, so it belongs to the `if` and is skipped too. `delivery_fee` keeps its starting value." },
+        { text: "", why: "Line 6 is not indented, so it is not part of the `if`. It runs every time, whatever the condition was." },
+      ],
+      hints: ["Is 80 less than 50?", "Which lines are indented under the `if`, and which are not?"],
+      explanation: "80 is not less than 50, so the condition is `False` and Python skips lines 4 and 5. `delivery_fee` keeps its starting value, 0, and line 6 runs as always.",
     },
     {
+      kind: "predict-output",
       question: "What does this program print? Look closely at the two comparisons.",
       example: { file: "python/practice_compare", notes: [] },
+      correctPosition: 1,
+      wrongOutputs: [
+        { text: "True\nTrue", why: "`>` means strictly greater than. 50 is not greater than 50, so `score > 50` is `False`. Only `>=` includes the value itself." },
+        { text: "50\n50", why: "`print(score >= 50)` shows the answer to the comparison, a `bool`, not the value of `score`." },
+      ],
+      hints: ["What is the difference between `>=` and `>`?", "What kind of value does a comparison give?"],
       explanation: "`>=` includes the value itself, so 50 >= 50 is `True`. `>` does not, so 50 > 50 is `False`.",
+    },
+    {
+      kind: "choice",
+      question: "Which line checks whether `age` is exactly 18?",
+      options: [
+        { text: "`if age >= 18:`", why: "That is also true for 19, 40 or any larger age. \"Exactly 18\" needs a test for equality." },
+        { text: "`if age = 18:`", why: "A single `=` gives a variable a value; it cannot ask a question. Python stops with a `SyntaxError`, as the first common mistake in this lesson shows." },
+        { text: "`if age == 18:`", why: "`==` asks whether two values are equal, and the line ends with a colon.", correct: true },
+        { text: "`if age == 18`", why: "Every `if` line must end with a colon. Without it, Python stops with a `SyntaxError` before running any line." },
+      ],
+      hints: ["Which symbol asks whether two values are equal?", "What must every `if` line end with?"],
+      explanation: "`==` compares two values and gives `True` or `False`; `if condition:` then decides which lines run.",
     },
   ],
   recap: [

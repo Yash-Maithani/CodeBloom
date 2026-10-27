@@ -19,13 +19,15 @@ for (const [path, width] of [["/", 360], ["/", 1440], ["/courses/python/variable
     await page.goto(path);
 
     const expected = await page.evaluate(() =>
-      [...document.querySelectorAll<HTMLElement>("a[href], button, summary, [tabindex='0'], pre")]
+      [...document.querySelectorAll<HTMLElement>("a[href], button, summary, [tabindex='0'], pre, input[type=radio]")]
+        // Tab stops once per radio group, on its first option while none is chosen.
+        .filter((el) => !(el instanceof HTMLInputElement) || el === document.querySelector(`input[name="${CSS.escape(el.name)}"]`))
         // Chromium makes a panel that scrolls sideways focusable by itself, so
         // keyboard users can scroll it (a long error message on a phone).
         .filter((el) => el.tagName !== "PRE" || el.hasAttribute("tabindex") || el.scrollWidth > el.clientWidth)
         // checkVisibility also leaves out what is inside a closed "Show solution".
         .filter((el) => el.checkVisibility() || el.getAttribute("href") === "#main")
-        .map((el) => el.textContent?.trim() || el.getAttribute("aria-label") || el.tagName),
+        .map((el) => (el instanceof HTMLInputElement ? `radio ${el.closest("label")?.textContent?.trim()}` : el.textContent?.trim() || el.getAttribute("aria-label") || el.tagName)),
     );
 
     const reached: string[] = [];
@@ -37,7 +39,7 @@ for (const [path, width] of [["/", 360], ["/", 1440], ["/courses/python/variable
         const ringOwner = el.closest("article") ?? el;
         const style = getComputedStyle(ringOwner);
         return {
-          label: el.textContent?.trim() || el.getAttribute("aria-label") || el.tagName,
+          label: el instanceof HTMLInputElement ? `radio ${el.closest("label")?.textContent?.trim()}` : el.textContent?.trim() || el.getAttribute("aria-label") || el.tagName,
           isBody: el === document.body,
           ring: `${style.outlineWidth} ${style.outlineStyle}`,
         };

@@ -127,7 +127,7 @@ export default async function LessonPage(props: LessonPageProps) {
             <h2 id="practice" className="mt-12 font-heading text-2xl font-semibold md:mt-16">
               Practice
             </h2>
-            <p className="mt-4 max-w-measure">Try each question before you open its solution.</p>
+            <p className="mt-4 max-w-measure">Choose an answer and check it. Hints and the solution are there when you want them.</p>
             <Practice lesson={lesson} />
           </section>
         )}

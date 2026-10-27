@@ -171,7 +171,9 @@ Confirmed by the owner on 2026-10-27.
 - Course and lesson navigation work (FR-C1, FR-C2, FR-L5).
 - At least three lessons on three different concepts meet the verified definition in Section 6. The same concept taught in another language is a separate lesson page and must also be verified, but it counts once.
 
-### Milestone 3: practice
+### Milestone 3: practice [C]
+
+Confirmed by the owner on 2026-10-27. The screen reader walkthrough is done by the owner (Narrator or NVDA on Windows), using the checklist in `PROGRESS.md`.
 
 - FR-P1 to FR-P5 met for every published lesson that has exercises.
 - Keyboard-only and screen reader walkthrough of a full question recorded in `PROGRESS.md`.
