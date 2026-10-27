@@ -1,0 +1,30 @@
+{
+  "about": "Written by npm run check:examples when every example passes. Do not edit by hand. The site build refuses to show an example whose files no longer match these hashes.",
+  "examples": {
+    "c/hello": {
+      "kind": "output",
+      "source": "c0ca960ac7e0638470fb6e8947af490de04189d390420e15510ec1c8cdb94a9d",
+      "expected": "cf06366b358707b65a0241f462d4920a51a19073e9d26304d94b9da86a903b11"
+    },
+    "cpp/hello": {
+      "kind": "output",
+      "source": "3a66e9ecb63a0bb97d09b9c120ba7eb76557f7c76451d199deffead3e75f42f2",
+      "expected": "cf06366b358707b65a0241f462d4920a51a19073e9d26304d94b9da86a903b11"
+    },
+    "java/Hello": {
+      "kind": "output",
+      "source": "ac4b873534183ac4ef702e75d75d2f9ec30e933ec0d16f1ef87f1041a36bf3f3",
+      "expected": "cf06366b358707b65a0241f462d4920a51a19073e9d26304d94b9da86a903b11"
+    },
+    "python/hello": {
+      "kind": "output",
+      "source": "cb46ce7f29b8cc271d6f51b161d1968c8838be235b8618b2927520e267e4a9e0",
+      "expected": "cf06366b358707b65a0241f462d4920a51a19073e9d26304d94b9da86a903b11"
+    },
+    "python/vote": {
+      "kind": "output",
+      "source": "54ad40e5635c6cd75a2a6fa579c0101a8e3a22ca83b117b5697a8e8df9b1fcae",
+      "expected": "942345b0d500c5524e638a6cbb45dbd8663332385016eafedcbb2af1ad6f1c06"
+    }
+  }
+}

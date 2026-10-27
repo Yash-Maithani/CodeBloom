@@ -12,11 +12,27 @@
 //   - Guards that do exist: no shell, a timeout per step, an output size cap,
 //     a minimal environment, a fresh temporary work folder per example, and
 //     refusal of symbolic links and unexpected files.
+//
+// Every example has exactly one expectation file next to it:
+//   name.expected.txt       every step succeeds; standard output must match exactly.
+//   name.compile-error.txt  the compile step fails (C, C++ and Java only);
+//                           its error output must match exactly.
+//   name.run-error.txt      compiling succeeds, the program exits with an error,
+//                           prints nothing to standard output, and its error
+//                           output must match exactly.
+// Error output is compared after two changes only: line endings become \n, and
+// the folders of the source file and the work folder are removed from paths,
+// so "/home/.../c/undeclared.c:6:20" is compared as "undeclared.c:6:20".
+// Error messages are matched exactly against the toolchain recorded in
+// PROGRESS.md (gcc 13.3, Python 3.13, UTF-8 locale). If a new compiler words a
+// message differently, the check fails and a person reviews the new message.
+// Nothing here ever rewrites an expectation file.
 
 import { spawn } from "node:child_process";
-import { mkdtemp, readdir, realpath, readFile, rm } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { mkdtemp, readdir, realpath, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join, sep } from "node:path";
+import { dirname, join, sep } from "node:path";
 
 export const DEFAULT_TIMEOUT_MS = 10_000;
 const MAX_OUTPUT_BYTES = 64 * 1024;
@@ -25,10 +41,11 @@ const NAME_PATTERN = /^[A-Za-z][A-Za-z0-9_]*$/;
 // One entry per language. A new language is a new entry plus a content folder,
 // not new runner code. `steps` returns the commands to run in order; every
 // step must exit with code 0, and the LAST step's standard output is the
-// example's output.
+// example's output. `compiles: true` means the first step is the compiler.
 export const LANGUAGES = {
   c: {
     label: "C",
+    compiles: true,
     extension: ".c",
     steps: ({ source, name, workDir }) => [
       { command: "gcc", args: ["-std=c17", "-Wall", "-Wextra", "-Werror", source, "-o", join(workDir, name)] },
@@ -37,6 +54,7 @@ export const LANGUAGES = {
   },
   cpp: {
     label: "C++",
+    compiles: true,
     extension: ".cpp",
     steps: ({ source, name, workDir }) => [
       { command: "g++", args: ["-std=c++17", "-Wall", "-Wextra", "-Werror", source, "-o", join(workDir, name)] },
@@ -45,6 +63,7 @@ export const LANGUAGES = {
   },
   java: {
     label: "Java",
+    compiles: true,
     extension: ".java",
     // The file name must match the public class name, as Java requires.
     steps: ({ source, name, workDir }) => [
@@ -54,13 +73,20 @@ export const LANGUAGES = {
   },
   python: {
     label: "Python",
+    compiles: false,
     extension: ".py",
     // -I isolates Python from user settings and the current folder; -B skips .pyc files.
     steps: ({ source }) => [{ command: "python3", args: ["-I", "-B", source] }],
   },
 };
 
-const EXPECTED_SUFFIX = ".expected.txt";
+// The three kinds of expectation file, by suffix.
+export const EXPECTATIONS = {
+  output: ".expected.txt",
+  "compile-error": ".compile-error.txt",
+  "run-error": ".run-error.txt",
+};
+const SUFFIXES = Object.entries(EXPECTATIONS);
 
 // Windows line endings (\r\n) and old Mac ones (\r) become \n before output is
 // compared, so an expected file saved on Windows still matches. Nothing else is
@@ -148,7 +174,8 @@ async function discover(root, languages) {
       continue;
     }
     const sources = [];
-    const expectedNames = new Set();
+    // Example name -> list of [kind, file name] expectation files found for it.
+    const expectations = new Map();
     for (const entry of entries) {
       const id = `${key}/${entry.name}`;
       if (entry.isSymbolicLink() || !entry.isFile()) {
@@ -160,8 +187,10 @@ async function discover(root, languages) {
         problems.push(`${id}: resolves outside the examples folder`);
         continue;
       }
-      if (entry.name.endsWith(EXPECTED_SUFFIX)) {
-        expectedNames.add(entry.name.slice(0, -EXPECTED_SUFFIX.length));
+      const expectation = SUFFIXES.find(([, suffix]) => entry.name.endsWith(suffix));
+      if (expectation) {
+        const name = entry.name.slice(0, -expectation[1].length);
+        expectations.set(name, [...(expectations.get(name) ?? []), [expectation[0], entry.name]]);
       } else if (entry.name.endsWith(language.extension)) {
         const name = entry.name.slice(0, -language.extension.length);
         if (!NAME_PATTERN.test(name)) {
@@ -170,23 +199,36 @@ async function discover(root, languages) {
         }
         sources.push({ key, language, name, file: entry.name, source: join(dir, entry.name) });
       } else {
-        problems.push(`${id}: unexpected file (expected ${language.extension} or ${EXPECTED_SUFFIX} files only)`);
+        problems.push(`${id}: unexpected file (expected ${language.extension}, ${SUFFIXES.map(([, suffix]) => suffix).join(", ")} files only)`);
       }
     }
     if (sources.length === 0) problems.push(`${key}: no examples found, so nothing would be checked`);
     for (const example of sources) {
-      if (!expectedNames.has(example.name)) {
-        problems.push(`${key}/${example.file}: missing ${example.name}${EXPECTED_SUFFIX}`);
+      const found = expectations.get(example.name) ?? [];
+      expectations.delete(example.name);
+      if (found.length === 0) {
+        problems.push(`${key}/${example.file}: missing ${example.name}${EXPECTATIONS.output} (or a .compile-error.txt or .run-error.txt file)`);
+      } else if (found.length > 1) {
+        problems.push(`${key}/${example.file}: has ${found.map(([, file]) => file).join(" and ")}; an example has exactly one expectation file`);
+      } else if (found[0][0] === "compile-error" && !language.compiles) {
+        problems.push(`${key}/${found[0][1]}: ${language.label} has no separate compile step; use ${example.name}${EXPECTATIONS["run-error"]}`);
       } else {
-        examples.push({ ...example, expected: join(dir, example.name + EXPECTED_SUFFIX) });
+        examples.push({ ...example, kind: found[0][0], expected: join(dir, found[0][1]) });
       }
-      expectedNames.delete(example.name);
     }
-    for (const orphan of expectedNames) {
-      problems.push(`${key}/${orphan}${EXPECTED_SUFFIX}: no example file with this name`);
+    for (const [name, found] of expectations) {
+      for (const [, file] of found) problems.push(`${key}/${file}: no example file named ${name}${language.extension}`);
     }
   }
   return { examples, problems };
+}
+
+/** Error output with \n line endings and without the folders of the source and work folder. */
+async function normalizeErrorOutput(text, example, workDir) {
+  let result = normalizeLineEndings(text);
+  const folders = new Set([dirname(example.source), await realpath(dirname(example.source)), workDir, await realpath(workDir)]);
+  for (const folder of folders) result = result.split(folder + sep).join("");
+  return result;
 }
 
 async function checkOne(example, timeoutMs) {
@@ -194,20 +236,38 @@ async function checkOne(example, timeoutMs) {
   const started = Date.now();
   const workDir = await mkdtemp(join(tmpdir(), "codebloom-example-"));
   const finishedWith = (ok, message) => ({ id, ok, message, ms: Date.now() - started });
+  const describe = (step) => `${step.command} ${step.args[0] ?? ""}`.trim();
   try {
     const env = { PATH: process.env.PATH ?? "", LANG: "C.UTF-8", HOME: workDir, TMPDIR: workDir };
     const steps = example.language.steps({ source: example.source, name: example.name, workDir });
+    // The step that is meant to fail, if any: the compiler, or the program itself.
+    const failingStep =
+      example.kind === "compile-error" ? 0 : example.kind === "run-error" ? steps.length - 1 : -1;
     let last;
-    for (const step of steps) {
+    for (const [index, step] of steps.entries()) {
       last = await runProcess(step.command, step.args, { cwd: workDir, env, timeoutMs });
-      const what = `${step.command} ${step.args[0] ?? ""}`.trim();
       if (last.startError) {
         return finishedWith(false, `could not start "${step.command}" (${last.startError.code ?? last.startError.message}). Is it installed and on PATH?`);
       }
-      if (last.timedOut) return finishedWith(false, `timed out after ${timeoutMs} ms while running: ${what}`);
-      if (last.tooMuchOutput) return finishedWith(false, `printed more than ${MAX_OUTPUT_BYTES} bytes while running: ${what}`);
+      if (last.timedOut) return finishedWith(false, `timed out after ${timeoutMs} ms while running: ${describe(step)}`);
+      if (last.tooMuchOutput) return finishedWith(false, `printed more than ${MAX_OUTPUT_BYTES} bytes while running: ${describe(step)}`);
+      if (index === failingStep) {
+        if (last.code === 0) {
+          const what = example.kind === "compile-error" ? "compiled without an error" : "ran without an error";
+          return finishedWith(false, `expected an error, but it ${what} (${describe(step)})`);
+        }
+        if (example.kind === "run-error" && last.stdout !== "") {
+          return finishedWith(false, `a run-error example must print nothing to standard output before failing, but it printed ${JSON.stringify(last.stdout)}`);
+        }
+        const expected = normalizeLineEndings(await readFile(example.expected, "utf8"));
+        const actual = await normalizeErrorOutput(last.stderr, example, workDir);
+        if (actual !== expected) {
+          return finishedWith(false, `error message differs\n  expected: ${JSON.stringify(expected)}\n  actual:   ${JSON.stringify(actual)}`);
+        }
+        return finishedWith(true, `fails as expected (${example.kind}) with the recorded message`);
+      }
       if (last.code !== 0) {
-        return finishedWith(false, `exited with code ${last.code ?? last.signal} while running: ${what}\n${last.stderr.trimEnd()}`);
+        return finishedWith(false, `exited with code ${last.code ?? last.signal} while running: ${describe(step)}\n${last.stderr.trimEnd()}`);
       }
     }
     const expected = normalizeLineEndings(await readFile(example.expected, "utf8"));
@@ -222,9 +282,49 @@ async function checkOne(example, timeoutMs) {
   }
 }
 
+// ---------- the verification record ----------
+//
+// When every example passes, the check writes content/verified-examples.json:
+// for each example, a SHA-256 hash of its source and of its expectation file,
+// both taken after line endings become \n (so a Windows checkout gives the same
+// hashes). The site build recomputes these hashes for every example a published
+// page shows, and stops if one is missing or different (src/lib/verified.ts).
+// The record is sorted and has no dates or versions, so rerunning the check
+// without changes writes exactly the same file.
+
+const sha256 = (text) => createHash("sha256").update(normalizeLineEndings(text), "utf8").digest("hex");
+
+export const RECORD_ABOUT =
+  "Written by npm run check:examples when every example passes. Do not edit by hand. The site build refuses to show an example whose files no longer match these hashes.";
+
+async function buildRecord(examples) {
+  const entries = [];
+  for (const example of examples) {
+    entries.push([
+      `${example.key}/${example.name}`,
+      {
+        kind: example.kind,
+        source: sha256(await readFile(example.source, "utf8")),
+        expected: sha256(await readFile(example.expected, "utf8")),
+      },
+    ]);
+  }
+  entries.sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
+  return { about: RECORD_ABOUT, examples: Object.fromEntries(entries) };
+}
+
+/** Writes the record only for a run where everything passed. Returns true if it wrote. */
+export async function writeRecordIfPassed(result, file) {
+  if (!result.ok || !result.record) return false;
+  await writeFile(file, JSON.stringify(result.record, null, 2) + "\n");
+  return true;
+}
+
 export async function checkExamples({ root, languages = LANGUAGES, timeoutMs = DEFAULT_TIMEOUT_MS }) {
   const { examples, problems } = await discover(root, languages);
   const results = [];
   for (const example of examples) results.push(await checkOne(example, timeoutMs));
-  return { ok: problems.length === 0 && results.every((r) => r.ok), problems, results };
+  const ok = problems.length === 0 && results.every((r) => r.ok);
+  // The record exists only for a run where every example passed.
+  return { ok, problems, results, record: ok ? await buildRecord(examples) : undefined };
 }
