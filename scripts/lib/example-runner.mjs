@@ -20,6 +20,12 @@
 //   name.run-error.txt      compiling succeeds, the program exits with an error,
 //                           prints nothing to standard output, and its error
 //                           output must match exactly.
+// A Python example may also have name.input.txt: the lines a person types. Each
+// input() call reads one line, and the line is echoed after its prompt, as a
+// terminal and the playground show it (scripts/lib/python-input.py explains why
+// the echo is simulated). Only an example that succeeds (name.expected.txt) may
+// have one: an error example must print nothing before it fails, and a prompt
+// and echoed input would be printed first. No example with input has a trace.
 // Error output is compared after two changes only: line endings become \n, and
 // the folders of the source file and the work folder are removed from paths,
 // so "/home/.../c/undeclared.c:6:20" is compared as "undeclared.c:6:20".
@@ -78,6 +84,8 @@ export const LANGUAGES = {
     extension: ".py",
     // -I isolates Python from user settings and the current folder; -B skips .pyc files.
     steps: ({ source }) => [{ command: "python3", args: ["-I", "-B", source] }],
+    // The same, for an example with an input file: input is fed by python-input.py.
+    inputSteps: ({ source, input }) => [{ command: "python3", args: ["-I", "-B", INPUT_RUNNER, source, input] }],
     // Step-through visuals: python-trace.py runs the example line by line.
     trace: ({ source }) => ({ command: "python3", args: ["-I", "-B", TRACER, source] }),
   },
@@ -97,6 +105,10 @@ const SUFFIXES = Object.entries(EXPECTATIONS);
 // value and the output so far, not only the final output.
 export const TRACE_SUFFIX = ".trace.json";
 const TRACER = fileURLToPath(new URL("./python-trace.py", import.meta.url));
+
+// An optional input file: name.input.txt next to a Python example, one line per input() call.
+export const INPUT_SUFFIX = ".input.txt";
+const INPUT_RUNNER = fileURLToPath(new URL("./python-input.py", import.meta.url));
 
 // Windows line endings (\r\n) and old Mac ones (\r) become \n before output is
 // compared, so an expected file saved on Windows still matches. Nothing else is
@@ -187,6 +199,7 @@ async function discover(root, languages) {
     // Example name -> list of [kind, file name] expectation files found for it.
     const expectations = new Map();
     const traces = new Map();
+    const inputs = new Map();
     for (const entry of entries) {
       const id = `${key}/${entry.name}`;
       if (entry.isSymbolicLink() || !entry.isFile()) {
@@ -201,6 +214,8 @@ async function discover(root, languages) {
       const expectation = SUFFIXES.find(([, suffix]) => entry.name.endsWith(suffix));
       if (entry.name.endsWith(TRACE_SUFFIX)) {
         traces.set(entry.name.slice(0, -TRACE_SUFFIX.length), entry.name);
+      } else if (entry.name.endsWith(INPUT_SUFFIX)) {
+        inputs.set(entry.name.slice(0, -INPUT_SUFFIX.length), entry.name);
       } else if (expectation) {
         const name = entry.name.slice(0, -expectation[1].length);
         expectations.set(name, [...(expectations.get(name) ?? []), [expectation[0], entry.name]]);
@@ -212,7 +227,7 @@ async function discover(root, languages) {
         }
         sources.push({ key, language, name, file: entry.name, source: join(dir, entry.name) });
       } else {
-        problems.push(`${id}: unexpected file (expected ${language.extension}, ${[...SUFFIXES.map(([, suffix]) => suffix), TRACE_SUFFIX].join(", ")} files only)`);
+        problems.push(`${id}: unexpected file (expected ${language.extension}, ${[...SUFFIXES.map(([, suffix]) => suffix), TRACE_SUFFIX, INPUT_SUFFIX].join(", ")} files only)`);
       }
     }
     if (sources.length === 0) problems.push(`${key}: no examples found, so nothing would be checked`);
@@ -221,6 +236,20 @@ async function discover(root, languages) {
       expectations.delete(example.name);
       const traceFile = traces.get(example.name);
       traces.delete(example.name);
+      const inputFile = inputs.get(example.name);
+      inputs.delete(example.name);
+      if (inputFile && !language.inputSteps) {
+        problems.push(`${key}/${inputFile}: input files are only supported for Python examples`);
+        continue;
+      }
+      if (inputFile && found.length === 1 && found[0][0] !== "output") {
+        problems.push(`${key}/${inputFile}: only an example with ${example.name}${EXPECTATIONS.output} can have an input file (an error example must print nothing before it fails)`);
+        continue;
+      }
+      if (inputFile && traceFile) {
+        problems.push(`${key}/${inputFile}: an example with an input file cannot have a trace`);
+        continue;
+      }
       if (traceFile && !language.trace) {
         problems.push(`${key}/${traceFile}: traces are only supported for Python examples`);
         continue;
@@ -241,10 +270,12 @@ async function discover(root, languages) {
           kind: found[0][0],
           expected: join(dir, found[0][1]),
           ...(traceFile ? { trace: join(dir, traceFile) } : {}),
+          ...(inputFile ? { input: join(dir, inputFile) } : {}),
         });
       }
     }
     for (const [name, file] of traces) problems.push(`${key}/${file}: no example file named ${name}${language.extension}`);
+    for (const [name, file] of inputs) problems.push(`${key}/${file}: no example file named ${name}${language.extension}`);
     for (const [name, found] of expectations) {
       for (const [, file] of found) problems.push(`${key}/${file}: no example file named ${name}${language.extension}`);
     }
@@ -268,7 +299,9 @@ async function checkOne(example, timeoutMs) {
   const describe = (step) => `${step.command} ${step.args[0] ?? ""}`.trim();
   try {
     const env = { PATH: process.env.PATH ?? "", LANG: "C.UTF-8", HOME: workDir, TMPDIR: workDir };
-    const steps = example.language.steps({ source: example.source, name: example.name, workDir });
+    const steps = example.input
+      ? example.language.inputSteps({ source: example.source, input: example.input })
+      : example.language.steps({ source: example.source, name: example.name, workDir });
     // The step that is meant to fail, if any: the compiler, or the program itself.
     const failingStep =
       example.kind === "compile-error" ? 0 : example.kind === "run-error" ? steps.length - 1 : -1;
@@ -357,6 +390,7 @@ async function buildRecord(examples) {
         source: sha256(await readFile(example.source, "utf8")),
         expected: sha256(await readFile(example.expected, "utf8")),
         ...(example.trace ? { trace: sha256(await readFile(example.trace, "utf8")) } : {}),
+        ...(example.input ? { input: sha256(await readFile(example.input, "utf8")) } : {}),
       },
     ]);
   }

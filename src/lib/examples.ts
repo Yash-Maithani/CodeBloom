@@ -35,6 +35,9 @@ export type Example = {
   kind: ExpectationKind;
   sourceFile: string;
   expectationFile: string;
+  /** For an example that reads input: the lines typed, \n line endings, without the final newline. */
+  input?: string;
+  inputFile?: string;
 };
 
 /** Removes one final newline, if there is one. Blank lines and trailing spaces stay. */
@@ -60,9 +63,12 @@ export async function readExample(
   }
   const kind = found[0];
   const expectationFile = path.join(/*turbopackIgnore: true*/ folder, file + SUFFIXES[kind]);
-  const [code, expectedOutput] = await Promise.all([
+  const inputFile = path.join(/*turbopackIgnore: true*/ folder, `${file}.input.txt`);
+  const hasInput = await access(inputFile).then(() => true, () => false);
+  const [code, expectedOutput, input] = await Promise.all([
     readFile(/*turbopackIgnore: true*/ sourceFile, "utf8"),
     readFile(/*turbopackIgnore: true*/ expectationFile, "utf8"),
+    hasInput ? readFile(/*turbopackIgnore: true*/ inputFile, "utf8") : Promise.resolve(undefined),
   ]);
   // Line endings are normalized first, so a file saved with Windows line endings
   // (\r\n) gives the same result as one with \n.
@@ -73,5 +79,6 @@ export async function readExample(
     kind,
     sourceFile,
     expectationFile,
+    ...(input === undefined ? {} : { input: withoutFinalNewline(normalizeLineEndings(input)), inputFile }),
   };
 }
