@@ -70,9 +70,9 @@ function insert(field: HTMLTextAreaElement, text: string) {
   field.dispatchEvent(new Event("input", { bubbles: true }));
 }
 
-export function Playground({ starter, downloadBytes }: { starter: string; downloadBytes: number }) {
+export function Playground({ starter, starterInput = "", downloadBytes }: { starter: string; starterInput?: string; downloadBytes: number }) {
   const [code, setCode] = useState(starter);
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState(starterInput);
   const [phase, setPhase] = useState<Phase>({ name: "idle" });
   const [chunks, setChunks] = useState<Chunk[]>([]);
   const [downloaded, setDownloaded] = useState(false);
@@ -226,8 +226,12 @@ export function Playground({ starter, downloadBytes }: { starter: string; downlo
               runner.current?.stop();
               if (codeBox.current) codeBox.current.value = starter;
               setCode(starter);
-              setInput("");
-              setAnnouncement("The code is back to the example. The Input box is empty.");
+              setInput(starterInput);
+              setAnnouncement(
+                starterInput === ""
+                  ? "The code is back to the example. The Input box is empty."
+                  : "The code and the Input box are back to the example.",
+              );
             }}
             className={buttonStyles.secondary}
           >
