@@ -23,7 +23,7 @@ export const pythonVariables: LessonSource = {
         {
           startLine: 2,
           endLine: 2,
-          text: "`print` shows a value as output. Python looks up the value of `apples` and shows it, not the word apples.",
+          text: "`print` shows a value. The text a program shows when it runs is called its **output**. Python looks up the value of `apples` and shows it, not the word apples.",
         },
         {
           startLine: 3,

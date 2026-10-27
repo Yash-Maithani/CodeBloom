@@ -19,4 +19,4 @@ In C you choose the type when you declare a variable, and it stays fixed. The ty
 
 {{example types}}
 
-Why does C want the type up front? The compiler uses it to set aside the right amount of memory, and to check your program before it runs. So in C, many mistakes are reported when you compile, before the program starts.
+Why does C want the type up front? A computer keeps a program's values in its **memory**, and different types usually need different amounts of it. The compiler uses the type to set aside the right amount, and to check your program before it runs. So in C, many mistakes are reported when you compile, before the program starts.

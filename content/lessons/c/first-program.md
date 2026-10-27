@@ -10,9 +10,11 @@ Compiling happens once, before the program runs. If the compiler finds something
 
 ## Your first program
 
-Here is a complete C program. CodeBloom compiled and ran it, and the output below is what it printed.
+Here is a complete C program. CodeBloom compiled and ran it. The text a program shows when it runs is called its **output**, and the output below is what this one printed.
 
 {{example hello}}
+
+On line 3, `int` is the type of the value `main` hands back, a whole number, and `(void)` says `main` needs no input. Every program in these lessons uses this same line.
 
 The lines between `{` and `}` are the program's instructions. They run one at a time, from top to bottom, and each one ends with a semicolon.
 

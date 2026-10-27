@@ -26,7 +26,7 @@ export const cFirstProgram: LessonSource = {
         {
           startLine: 3,
           endLine: 3,
-          text: "Every C program starts running at `main`. `main` is a **function**: a named group of instructions. `int` says `main` hands back a whole number when it finishes, and `(void)` says it needs no input. The `{` opens the group.",
+          text: "Every C program starts running at `main`. `main` is a **function**: a named group of instructions. The `{` opens the group.",
         },
         {
           startLine: 4,
@@ -36,7 +36,7 @@ export const cFirstProgram: LessonSource = {
         {
           startLine: 5,
           endLine: 5,
-          text: "`return 0;` ends `main` and hands back 0, which tells the operating system that the program finished without problems.",
+          text: "`return 0;` ends `main` and hands back the value 0 as its result. The operating system reads 0 as: the program finished without problems.",
         },
         { startLine: 6, endLine: 6, text: "The `}` closes the group that `{` opened on line 3." },
       ],

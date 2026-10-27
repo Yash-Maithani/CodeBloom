@@ -1,4 +1,4 @@
-A program often needs to remember information while it runs: a score, a price, a person's name. A **variable** is a name that a program uses to keep track of a **value**, a single piece of information such as the number 17 or a person's name. Once a value has a name, you can use the name wherever you need the value, and you can change the value while the program runs.
+A **program** is a list of instructions for a computer. Following those instructions is called running the program. A program often needs to remember information while it runs: a score, a price, a person's name. A **variable** is a name that a program uses to keep track of a **value**, a single piece of information such as the number 17 or a person's name. Once a value has a name, you can use the name wherever you need the value, and you can change the value while the program runs.
 
 Names also make programs easier to read. `price` tells the reader what a number means; a bare `250` does not. And when a value changes, you change it in one place instead of everywhere it appears.
 
