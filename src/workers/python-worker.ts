@@ -17,7 +17,7 @@ type Pyodide = {
   setStdin(options: { stdin: () => string | undefined }): void;
   setStdout(options: { write: (bytes: Uint8Array) => number }): void;
   setStderr(options: { write: (bytes: Uint8Array) => number }): void;
-  runPython(code: string, options: { filename: string }): unknown;
+  runPythonAsync(code: string, options: { filename: string }): Promise<unknown>;
 };
 type Scope = {
   postMessage(message: unknown): void;
@@ -27,8 +27,8 @@ type Scope = {
 
 const scope = self as unknown as Scope;
 const BASE = "/pyodide/314.0.7/";
-// Exact sizes of the files Python fetches while starting, written in by the
-// prepare script from the installed package. Progress counts real bytes
+// Exact sizes of the five Pyodide files, written in by the prepare script
+// from the installed package. Progress counts real bytes
 // received against these; nothing is estimated.
 const SIZES: Record<string, number> = JSON.parse("__PYODIDE_SIZES__");
 const TOTAL = Object.values(SIZES).reduce((sum, size) => sum + size, 0);
@@ -47,7 +47,7 @@ const realFetch = scope.fetch.bind(scope);
 scope.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   const response = await realFetch(input, init);
   const name = new URL(String(input instanceof Request ? input.url : input), self.location.href).pathname.replace(BASE, "");
-  if (!(name in SIZES) || !response.body) return response;
+  if (!(name in SIZES) || name.endsWith(".mjs") || !response.body) return response;
   const counter = new TransformStream<Uint8Array, Uint8Array>({
     transform(chunk, controller) {
       loaded += chunk.byteLength;
@@ -59,12 +59,23 @@ scope.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
 };
 
 async function start(): Promise<Pyodide> {
+  // The two script files are loaded with import(), whose bytes cannot be
+  // counted as they arrive; each is counted once it has fully arrived.
   const { loadPyodide } = (await import(/* webpackIgnore: true */ `${BASE}pyodide.mjs`)) as { loadPyodide(options: object): Promise<Pyodide> };
+  loaded += SIZES["pyodide.mjs"];
+  report(true);
   const python = await loadPyodide({ indexURL: BASE, packages: [] });
+  loaded += SIZES["pyodide.asm.mjs"];
   report(true);
   // Learner code gets no network: the policy already blocks other sites, and
   // these are removed so this site cannot be reached either.
-  for (const name of ["fetch", "XMLHttpRequest", "WebSocket", "EventSource", "importScripts"]) scope[name] = undefined;
+  // They are deleted along the whole prototype chain, where the browser keeps
+  // the originals (fetch lives on WorkerGlobalScope.prototype).
+  for (const name of ["fetch", "XMLHttpRequest", "WebSocket", "EventSource", "importScripts"]) {
+    for (let target: object | null = scope; target; target = Object.getPrototypeOf(target)) {
+      if (Object.prototype.hasOwnProperty.call(target, name) && !Reflect.deleteProperty(target, name)) (target as Record<string, unknown>)[name] = undefined;
+    }
+  }
   return python;
 }
 
@@ -79,7 +90,7 @@ start().then(
   (python) => {
     python.setStdout({ write: writer("out") });
     python.setStderr({ write: writer("err") });
-    scope.onmessage = ({ data }) => {
+    scope.onmessage = async ({ data }) => {
       scope.onmessage = null;
       const lines = [...data.input];
       python.setStdin({
@@ -92,7 +103,7 @@ start().then(
       });
       let error: { type: string; message: string } | null = null;
       try {
-        python.runPython(data.code, { filename: "main.py" });
+        await python.runPythonAsync(data.code, { filename: "main.py" });
       } catch (caught) {
         const value = caught as { type?: string; message?: string };
         error = { type: value.type ?? "Error", message: value.message ?? String(caught) };

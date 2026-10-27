@@ -3,7 +3,7 @@
 //   public/pyodide/<version>/  the five Pyodide files, copied unchanged from
 //                              the exact version npm installed (package-lock.json)
 //   public/python-worker.mjs   src/workers/python-worker.ts compiled to JavaScript,
-//                              with the exact sizes of the files Python fetches
+//                              with the exact size of each Pyodide file
 // Plain Node, no dependency beyond the TypeScript compiler already installed.
 
 import { copyFileSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
@@ -22,9 +22,8 @@ if (version !== expected || !workerSource.includes(`/pyodide/${version}/`)) {
   process.exit(1);
 }
 
-// pyodide.mjs and pyodide.asm.mjs are loaded with import(); the other three with fetch(), which the worker counts.
+// The worker downloads all five and counts their bytes for the progress shown.
 const FILES = ["pyodide.mjs", "pyodide.asm.mjs", "pyodide-lock.json", "python_stdlib.zip", "pyodide.asm.wasm"];
-const FETCHED = ["pyodide-lock.json", "python_stdlib.zip", "pyodide.asm.wasm"];
 
 const out = path.join(root, "public", "pyodide");
 rmSync(out, { recursive: true, force: true });
@@ -35,8 +34,8 @@ writeFileSync(
   `Pyodide ${version}, unmodified, from the npm package "pyodide".\nLicense: Mozilla Public License 2.0. Source code: https://github.com/pyodide/pyodide\nPython and its standard library: Python Software Foundation License.\n`,
 );
 
-const sizes = Object.fromEntries(FETCHED.map((file) => [file, statSync(path.join(pkgDir, file)).size]));
+const sizes = Object.fromEntries(FILES.map((file) => [file, statSync(path.join(pkgDir, file)).size]));
 const compiled = ts.transpileModule(workerSource, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext } }).outputText;
 if (!compiled.includes("__PYODIDE_SIZES__")) throw new Error("prepare-playground: the worker has no __PYODIDE_SIZES__ placeholder");
 writeFileSync(path.join(root, "public", "python-worker.mjs"), compiled.replace("__PYODIDE_SIZES__", JSON.stringify(sizes).replace(/"/g, '\\"')));
-console.log(`prepare-playground: Pyodide ${version} copied; worker written; Python fetches ${(Object.values(sizes).reduce((a, b) => a + b, 0) / 1e6).toFixed(1)} MB at first start.`);
+console.log(`prepare-playground: Pyodide ${version} copied; worker written; Python downloads ${(Object.values(sizes).reduce((a, b) => a + b, 0) / 1e6).toFixed(1)} MB at first start.`);

@@ -1,8 +1,9 @@
 import { expect, test, type Page } from "@playwright/test";
 
-// Every public page that should exist: Milestone 1 pages plus the published lessons.
+// Every public page that should exist: Milestone 1 pages, the published lessons and the playground.
 const EXPECTED_PAGES = [
   "/",
+  "/playground",
   "/courses",
   "/courses/c",
   "/courses/cpp",
@@ -57,6 +58,8 @@ test("every header link, course card and footer link opens its page", async ({ p
   };
 
   for (const [group, links] of Object.entries(groups)) {
+    // Count on the homepage, not on the page the previous group's last link opened.
+    await page.goto("/");
     const count = await links.count();
     expect(count, `${group} should have links`).toBeGreaterThan(0);
     for (let index = 0; index < count; index++) {
