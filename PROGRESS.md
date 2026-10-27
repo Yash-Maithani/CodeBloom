@@ -6,9 +6,23 @@ Last updated: 2026-10-27
 
 ## Current milestone
 
-**Milestone 2: lesson architecture.** Implemented, Tested and Verified in browser (Chromium only; light and dark; 320 to 1440px; keyboard only). Four published lessons on three concepts: Variables and data types (Python and C), Your first C program, and Making decisions with if and else (Python). Awaiting owner review and a pull request opened by the owner. Nothing is Deployed.
+**Milestone 3: interactive practice.** Implemented and Tested (Chromium only; light and dark; 320 to 1440px; keyboard only). Not yet Verified: the screen reader walkthrough is done by the owner with the checklist below, and Milestone 3 is marked Verified only after the owner reports the results. Awaiting owner review and a pull request opened by the owner. Nothing is Deployed.
 
-Milestone 1 was merged by the owner in pull request 3 (`6bc50d3`).
+Milestone 2 was merged by the owner in pull request 4 (`fe8edd2`).
+
+### Screen reader checklist for the owner (one full question)
+
+Windows, Narrator (Windows key + Ctrl + Enter) or NVDA, in Edge or Chrome, on `/courses/python/decisions` (local build or a preview). Note what is announced at each step and whether anything is missing, wrong or read twice.
+
+1. Move to the Practice heading with heading navigation (NVDA: H; Narrator: Caps Lock + H). Expect "Practice, heading level 2", then "0 of 3 questions answered correctly on this page".
+2. Press Tab until you reach Question 1. Expect the group name "Question 1. This is the delivery program again, with a larger order. What does it print?" and the first option announced as a radio button, "1 of 4".
+3. Use the arrow keys to move through the options. Expect each to be read in full, the two-line option as "Line 1: Small order: delivery costs extra Line 2: Delivery fee: 5", and the last as "Nothing is printed".
+4. Choose "Delivery fee: 5" (a wrong answer). Tab to "Check answer" and press Enter. Expect "Not quite", then "Line 4 is indented, so it belongs to the if and is skipped too...", then "Try again, or show a hint.", read without moving focus.
+5. Press Enter on "Check answer" again without changing the answer. Expect the same feedback to be read again.
+6. Tab to "Show hint 1 of 2" and press Enter. Expect "Hint 1: Is 80 less than 50?" to be read, and the button to become "Show hint 2 of 2". Press Enter again. Expect hint 2 to be read, and focus to move to "Check answer".
+7. Shift + Tab back to the options, choose "Delivery fee: 0", then Tab to "Check answer" and press Enter. Expect "Correct" and the explanation. Then check that "Answered correctly" is next to the buttons and that the summary under the heading now says "1 of 3".
+8. Tab to "Show solution" and press Enter. Expect it to be announced as expanded, with the button label now "Hide solution". Move into it and expect "Expected output for Python code for practice question 1" and "Delivery fee: 0", then the explanation.
+9. Report: anything not announced, announced twice, or confusing, with the step number.
 
 ## Completed work
 
@@ -51,18 +65,23 @@ Milestone 1 was merged by the owner in pull request 3 (`6bc50d3`).
 | Homepage and course status text from lesson data | Verified in browser | "Lessons explain", "first lessons are published for C and Python", lesson counts, example links to its lesson |
 | `docs/lesson-authoring.md` | Done | Draft, verify, review, publish; capture commands checked against the real files |
 | Copy code announces every click | Tested | Follow-up from Milestone 1. A second click inside two seconds is announced again, and "Copied" resets two seconds after the last click. `src/components/code-block.tsx`, `tests/e2e/copy.spec.ts` |
+| Milestone 2 | Done | Merged by the owner in pull request 4 (`fe8edd2`) |
+| Practice schema: predict-the-output and multiple choice (D46) | Tested | `src/lib/lesson-types.ts`; correct output read from the verified file; equality guard; build checks for options, hints and limits |
+| Interactive practice component (D47, D48) | Tested | `src/components/practice-set.tsx`: radios in a fieldset, Check answer, live feedback, hints one at a time, Answered correctly, page count; nothing stored |
+| 12 practice questions on the four lessons | Tested | Approved by the owner; 8 predict-the-output (existing verified examples), 4 multiple choice |
 | Teaching-quality wording changes (D44) | Verified in browser | Four proposals from `design:design-critique`, approved by the owner: "output" and "memory" defined at first use, "program" and "running" defined in the shared idea, the C `main` note split across three places. Note schema unchanged |
 
 ## In progress
 
-Nothing beyond owner review of Milestone 2.
+Nothing beyond owner review of Milestone 3 and the owner's screen reader walkthrough.
 
 ## Outstanding tasks
 
-1. Owner reviews Milestone 2 and opens the pull request.
-2. Launch items still open (brief Section 16): the final favicon, social sharing metadata, and removing `/dev/tokens`.
-3. A real screen reader walkthrough (NVDA or VoiceOver) of a lesson page; Milestone 3 requires one for practice questions.
-4. Owner answers the open decisions in `SPEC.md` Section 10 as each milestone needs them.
+1. Owner runs the screen reader checklist above and reports the results; then Milestone 3 can be marked Verified in browser.
+2. Owner reviews Milestone 3 and opens the pull request from `claude/milestone-3`.
+3. Owner decides on the `design:design-critique` proposals for the questions (verification log, Milestone 3). They change approved text, so none was applied.
+4. Launch items still open (brief Section 16): the final favicon, social sharing metadata, and removing `/dev/tokens`.
+5. Owner answers the open decisions in `SPEC.md` Section 10 as each milestone needs them. Decision 3 (remembering completed lessons) stays open.
 
 ## Stack and versions (checked 2026-10-26)
 
@@ -109,6 +128,10 @@ The OFL allows free use, self-hosting and embedding in a website; the font files
 - Every output and error panel is a tab stop, even when it does not scroll (D40). On a lesson page this adds one stop per example.
 - The publish gate compares file hashes only. Changing the runner's compiler flags would not invalidate the record; rerun `check:examples` after any runner change.
 - The lesson loader and publish gate read files at build time only, with Turbopack tracing turned off for those reads (D37). If a lesson page ever becomes dynamic, it would fail at run time; all lesson routes are static with `dynamicParams = false`.
+- Practice answers are in the page, so this is practice, not grading. Nothing is stored: a reload starts every question fresh (D48).
+- With JavaScript off, Check answer and the hints are hidden; the options and Show solution still work. Before the page is interactive the buttons are invisible and unfocusable, with their space reserved (CLS 0).
+- One output option scrolls inside its row at 320px (the two-line delivery option on Python Decisions); it then becomes focusable so keyboard users can scroll it.
+- The fact used in C first program question 3 (running without recompiling shows the old message) is not a `check:examples` example, because it needs the source edited after compiling. It was tested by hand (verification log, 2026-10-27).
 - On a phone, code inside a Common mistake callout has less room (callout padding plus code gutter); long lines scroll inside the panel.
 - The "Your first C program" commands were tested on Linux only; the lesson says so.
 - Keywords come from an explicit scope list in `highlight.ts`. A keyword the list misses stays plain, which is harmless; a type name such as Java's `String` is never bold. Add scopes when a lesson shows a missed keyword.
@@ -182,6 +205,17 @@ The OFL allows free use, self-hosting and embedding in a website; the font files
 | 2026-10-27 | `/security-review` | No high or medium findings. The runner still spawns without a shell with checked file names; rendering uses React text only; all lesson routes are static. |
 | 2026-10-27 | Lighthouse 13.5.0 mobile (outside the repo) | `/courses/c/first-program` 97, `/courses/python/variables` 95, `/courses/python/decisions` 96, `/courses/c` 94 performance; accessibility, best practices and SEO 100 on all four; CLS 0. |
 | 2026-10-27 | `docs/lesson-authoring.md` capture commands | Rerun against the committed files: identical byte for byte. The first version of the Python error command kept the full path; corrected with `sed` before committing. |
+| 2026-10-27 | Milestone 3 start | `main` at `fe8edd2a08e1c1320a09749bc87335fcb6d83b23` (Milestone 2 merged). New branch `claude/milestone-3` created from it on the owner's instruction (no force-push of the old branch). No SessionStart hook output appeared in this session's context; the install stamp matched `main`'s lockfile, so dependencies were current. |
+| 2026-10-27 | Facts behind the new questions, tested before writing them | Verified outputs read from the 8 practice `.expected.txt` files. Plain gcc 13.3: declaring `apples` twice in one block gives "redefinition of 'apples'"; `10 = apples;` gives "lvalue required as left operand of assignment". Python 3.13: `if age == 18` without a colon gives "SyntaxError: expected ':'". Compiling a program, editing its source and running it again without compiling printed the old message. |
+| 2026-10-27 | `npm run test:unit` | 77 of 77 (6 new for practice: correct option from the verified file at its position; wrong output equal to the real output refused, also with trailing spaces or CRLF; predict limits; hint limits and text checks; choice option rules; practice examples go through the publish gate). Negative control: equality guard turned off failed its test. |
+| 2026-10-27 | `npm run test:e2e` | 112 of 112, including 17 in the new `practice.spec.ts`: wrong answer gives that option's explanation, correct answer, nothing chosen, counted once, hints one at a time with focus kept, keyboard only (Space, arrows, Tab, Enter), fieldset and radio names including "Line 1:" for multi-line output, real separate lines in monospace, every correct predict option equals its verified file (by trying every option), solution at any time, choice solution names the answer, nothing stored across a reload, repeated check re-announced, new choice clears feedback, hints region present before the first hint, and without JavaScript. Negative control: inverting the correct-answer check failed 6 tests. |
+| 2026-10-27 | Bundle size (all JavaScript under `.next/static`) | Before (`main`, `fe8edd2`): 13 files, 578.5 KB raw, 180.7 KB gzip. After: 14 files, 594.1 KB raw, 186.3 KB gzip (+15.6 KB raw, +5.6 KB gzip, the practice chunk, measured before the code-review fixes). Final, after the fixes: 14 files, 594.5 KB raw, 186.4 KB gzip, so +16.0 KB raw and +5.7 KB gzip against `main`. The chunk is referenced only by lesson pages, not by the homepage or course pages. |
+| 2026-10-27 | Final gates on the Milestone 3 code | `lint` and `typecheck` exit 0; `build` all routes static, only the two known font warnings; `test:e2e` 112 of 112; `check:examples` 30 of 30 (record unchanged); `test:runner` 26 of 26; `test:unit` 77 of 77; `verify:browser` 114 of 114; `npm audit --omit=dev` 0 vulnerabilities. |
+| 2026-10-27 | `design:ux-copy` on practice text | No changes: "Check answer", "Choose an answer first.", "Correct" and "Not quite" (DESIGN.md wording), "Try again, or show a hint.", "Show hint 1 of 3", "Answered correctly", "1 of 3 questions answered correctly on this page", "Nothing is printed", "Answer:". |
+| 2026-10-27 | `design:accessibility-review` with axe-core 4.14.0 (outside the repo) | 32 scans: four lessons, light and dark, 360 and 1440px, before and after answering, hints and solutions. Found and fixed: the one output option that scrolls at 360px was not focusable (`scrollable-region-focusable`); now focusable only when it scrolls. After: 0 violations; only the known "partially obscured" contrast items on long code lines. Contrast measured in the browser: feedback text on success-tint 13.63 (light) and 11.84 (dark), on error-tint 13.69 and 12.27; check icon 5.98 and 6.98; x icon 6.09 and 6.94; "Answered correctly" in success 6.53 and 8.54; summary 6.95 and 8.00; selected option 13.50 and 10.15. No new target under 44px. Keyboard flow covered by Playwright. No screen reader: see the owner's checklist. |
+| 2026-10-27 | `design:design-critique` on the questions | All 8 predict questions require tracing execution; every distractor maps to a real misconception (`=` as equality, `print` showing the name, assignments printing, `%d` printed literally, rounding, `printf` adding new lines, `\n` printed literally, indentation not grouping, `>=` against `>`, a comparison printing its operand), each corrected by its own explanation. Proposals, not applied because the text is approved: (1) C first program Q3: the correct option is the only one without a "because", a shape cue; give all options the same shape; (2) Python Variables Q3: the correct option repeats the lesson's wording; phrase it as an observable consequence; (3) C Variables Q2 hint 2 points straight at the answer; make it a scaffold. Noted: after a correct answer, a later wrong check shows "Not quite" beside "Answered correctly"; both are true. |
+| 2026-10-27 | `/code-review` | 10 findings. Fixed 6: feedback tied to the checked option (a new choice clears it); every check re-announced; hints live region present before the first hint; focus after the last hint moves to Check answer, not the list; one option type; buttons hidden and unfocusable until the page is interactive. The authoring guide update was already planned. Declined 4 with reasons: the old-message fact cannot be a `check:examples` example (tested by hand); "same block" redeclaration wording kept as the owner required; one ResizeObserver per output option is negligible (about ten per page). |
+| 2026-10-27 | Lighthouse 13.5.0 mobile (outside the repo) | Performance: `/courses/c/first-program` 96, `/courses/c/variables` 95, `/courses/python/variables` 94, `/courses/python/decisions` 94. Accessibility, best practices and SEO 100 on all four. CLS 0 everywhere. |
 | 2026-10-26 | Windows simulation: CRLF copy of the whole tree, Node 20.20.2, Linux | `npm ci` exit 0 with two notices only (`EBADENGINE` for Node 22.18 and the ESLint 9 deprecation). `lint`, `typecheck`, `build` (homepage renders), `test:e2e` 45 of 45, `check:examples` 5 of 5, `test:runner` 12 of 12, `verify:browser` 114 of 114 all exit 0. Found and fixed on the way: `test:runner` used a glob that `node --test` only understands from Node 21 on (now an explicit file path, tested on Node 20.20.2 and 22.22.0); `test:unit` cannot run on Node 20, and its real minimum is Node 22.18.0 (measured), not the 22.13 that `engines` said. |
 | 2026-10-27 | Copy code repeat clicks (follow-up queued in Milestone 1) | Cause: the state was a plain string, so a second click inside two seconds set "copied" to "copied". React saw no change, so the timer kept counting from the first click and nothing new was added to the status region for screen readers. Fix: each click stores a new object with an attempt number; the effect restarts the two-second timer, and the status message is keyed by the attempt, so each click adds a new message. 4 new tests in `tests/e2e/copy.spec.ts`, written first and run on the unfixed code: 3 failed (the second click was not announced; the label had already reset at 3000 ms, 2000 ms after the first click; a repeated failure was not announced) and 1 passed, a click after the label had reset, as a control. With the fix 4 of 4 pass. The label timing uses Playwright's fake clock, so it is not a race. "Announced" is checked as text added to the live region (a MutationObserver), which is what screen readers react to; a real screen reader was not used. Gates: `lint`, `typecheck`, `build` exit 0; `test:e2e` 95 of 95; `check:examples` 30 of 30; `test:runner` 26 of 26; `test:unit` 71 of 71; `verify:browser` 114 of 114; `npm audit` 0 vulnerabilities. |
 | 2026-10-27 | Re-review of the `backLinkStyles` code-review finding | The original log entry names the finding but records neither its text nor a reason, so this is a fresh review of the code, not a reconstruction of the reviewer's thinking. Concern: links back to the page above should look and behave the same everywhere. Measured in Chromium at 360 and 1440 px: the course page link, the lesson page link and the end-of-lesson "Back to the ... course" link all render at 16px and 48px tall. The in-prose links, which are body size, render at 18px and use only `textLinkStyles`; `backLinkStyles` is used on no body-size link, so that wording of the finding does not describe the code. One real but minor defect: the end-of-lesson link repeated the classes inline without `text-sm`, so it matched only because its container inherits 16px. Moved into the 18px lesson body it would have grown to 18px while the shared links stayed at 16px. Fixed: it now uses `backLinkStyles`; measured before and after, identical (16px, 184 by 48 px at both widths). Kept as they are: `text-sm` in `backLinkStyles` (16px is the interface size in `DESIGN.md`, and these links sit above the heading, not inside prose); the 404 links and the footer links, which repeat `inline-flex py-3` but have other roles (forward navigation, a footer list), so sharing the back link style would couple unrelated things. No test added: the change has no visual effect, so a test would pass both before and after and could not show that the fix works. |
@@ -250,19 +284,24 @@ Screenshots are saved to `screenshots/` (`light-360.png`, `light-1440.png`, `dar
 | D44 | 2026-10-27 | Teaching-quality wording from `design:design-critique`, applied as approved: (1) "output" is defined where it first appears, in the Python Variables `print` note and in the sentence before the first C example; (2) "memory" is defined in C Variables; (3) the C `main` note is reshaped: line 3 keeps `main`, function and `{`, the `return 0;` note now says it hands back a value as its result, and a new paragraph after the example explains `int` and `(void)`; (4) the shared idea defines "program" and "running" before using them | Owner approved. Proposal 3 is a reshape and not a literal split, because the build rejects two notes on one line; the note schema was not changed. The critique pointed at "C lesson 1 note 3" for the "output" definition, but that note says "prints", so the definition went where the word first appears. |
 | D45 | 2026-10-27 | No history rewrite; the owner squash-merges the Milestone 2 branch | Owner decision. Commit `26bdb0b` keeps its wrong counts ("26 new example files", "nine are meant to fail"; the correct numbers are 25 and 7) because the squash commit message replaces it. |
 
+| D46 | 2026-10-27 | Practice question kinds: predict-the-output as options, with the correct option read from the verified `.expected.txt` and typed wrong options that the build refuses if they equal the real output; and multiple choice with exactly one correct option | Owner approved. Options rather than typed answers, so a spacing slip is not marked as a misunderstanding. |
+| D47 | 2026-10-27 | One client component (`practice-set.tsx`) for the interaction; code blocks and solutions stay server-rendered and are passed in. Buttons appear only once the page is interactive (`useSyncExternalStore`) | Client JavaScript only where interaction needs it (`CLAUDE.md`); no visible control that does nothing before hydration. |
+| D48 | 2026-10-27 | No browser storage, accounts or server storage for practice; the count says "on this page" | Owner decision. `SPEC.md` open decision 3 stays open. |
+| D49 | 2026-10-27 | Milestone 3 work on a new branch `claude/milestone-3` from `main` at `fe8edd2` | Owner instruction: no force-push of the merged Milestone 2 branch. |
+
 ## Environment (verified 2026-10-26, cloud session)
 
 Node 22.22.0, npm 10.9.4, Python 3.13, gcc and g++ 13.3, OpenJDK and javac 21. Playwright 1.63.0 with Chromium is pre-installed. Tool usage rules are in `CLAUDE.md`.
 
 ## Git
 
-- Working branch: `claude/happy-mendel-nacad1` (Milestone 2), created from `main` at `6bc50d3`.
-- `main` at `6bc50d3` (Milestone 1 merged by the owner); unchanged by Claude.
-- For the latest commit on this branch, run `git log -1 origin/claude/happy-mendel-nacad1`.
+- Working branch: `claude/milestone-3` (Milestone 3), created from `main` at `fe8edd2` (D49).
+- `main` at `fe8edd2` (Milestone 2 merged by the owner); unchanged by Claude.
+- For the latest commit on this branch, run `git log -1 origin/claude/milestone-3`.
 
 ## Next recommended task
 
-Owner reviews Milestone 2 (and the teaching proposals in the verification log) and opens the pull request. After the owner merges it: Milestone 3, practice, planned in a new session, starting from its acceptance criteria in `SPEC.md` Section 9 and the `practice` field in `src/lib/lesson-types.ts`.
+Owner runs the screen reader checklist, reviews Milestone 3 and opens the pull request. After the merge: Milestone 4, educational visualizations, planned in a new session from its acceptance criteria in `SPEC.md` Section 9.
 
 ## Resuming work
 

@@ -257,9 +257,15 @@ Left-aligned, in this order: a back link to the course ("Python course"), the h1
 - **Shared idea:** under the "The idea" heading, a small `ink-muted` line "This part is the same in the C lesson." links the same concept in the other languages that have a published lesson. It is left out when there is none.
 - **Analogy callout:** titled "Analogy: <title>", with a bold "Where the comparison stops:" paragraph.
 
-### Practice questions (Milestone 2)
+### Practice questions
 
-Numbered, because the text can refer to "the first practice question". Each has the question with a bold "Question 1.", the code block without its output, and a native disclosure (`details` and `summary`) styled as a secondary button. Its label reads "Show solution" when closed and "Hide solution" when open. It opens instantly and needs no JavaScript. Inside: the real output panel and a written explanation. No grading, hints or progress until Milestone 3.
+Numbered, because the text can refer to "the first practice question". Each question is a `fieldset` whose legend is a bold "Question 1." plus the question, then (for predict-the-output) the code block without its output, then the options as described in "Quiz and feedback" below.
+
+- **Output options:** program output is shown as real separate lines in `text-mono`, never described in words ("10 then 15"). Screen readers hear "Line 1:", "Line 2:" before each line. An option for no output reads "Nothing is printed" in italic sans. Output never wraps; on a narrow screen a long line scrolls inside its option, which then becomes focusable.
+- **Controls:** "Check answer" (primary) and "Show hint 1 of 3" (secondary) in one row. They appear only once the page is interactive; their space is reserved so nothing moves.
+- **Status:** after a correct check, "Answered correctly" with a check-circle icon in `success`, beside the buttons. Under the Practice heading, a small `ink-muted` line "1 of 3 questions answered correctly on this page". Nothing is stored, so the line says "on this page".
+- **Solution:** the native "Show solution" disclosure (secondary button style, "Hide solution" when open, instant, no JavaScript) stays available at any time. Inside: the verified output panel, or "Answer:" with the correct option for a multiple-choice question, then the explanation.
+- Hints appear below the feedback as `sheet` rows with a `rule-strong` left bar and a bold "Hint 1:".
 
 ### Lesson navigation
 
