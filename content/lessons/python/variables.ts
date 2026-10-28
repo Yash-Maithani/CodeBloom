@@ -101,7 +101,7 @@ export const pythonVariables: LessonSource = {
       },
       whatHappens:
         "Python will not join text and a number, and it does not guess what you meant. It stops with a `TypeError`. \"Concatenate\" means join pieces of text end to end: the message says `+` can only join a `str` to another `str`, and it got an `int`. This is Python checking types while the program runs.",
-      fix: "give `print` the two values separated by a comma instead. It shows them one after the other, with a space between.",
+      fix: "give `print` the two values separated by a comma instead. It shows them one after the other, with a space between. The next lesson, Numbers and arithmetic, shows another fix: converting the number to text with `str()`.",
       fixExample: {
         file: "python/type_error_fixed",
         caption: "The fix",

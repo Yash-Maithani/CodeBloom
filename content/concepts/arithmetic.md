@@ -1,0 +1,3 @@
+Programs calculate: prices, totals, averages, times. C, C++, Java and Python all write addition, subtraction and multiplication with `+`, `-` and `*`, use `/` for division, and follow the order of operations from maths class: multiplication and division before addition and subtraction, with brackets first. All four also have an operator for the remainder after dividing whole numbers, written `%`.
+
+They differ in what dividing one whole number by another gives, and in what the remainder is for negative numbers. Decimal numbers also have a limit in all four: many cannot be stored exactly, so tiny errors can appear in results. How each language shows them differs, so each lesson covers its own rules.

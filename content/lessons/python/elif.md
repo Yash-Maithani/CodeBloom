@@ -6,7 +6,7 @@ In [Making decisions with if and else](/courses/python/decisions), an `if` and a
 
 {{example ticket}}
 
-Python checks the conditions from the top and stops at the first true one. The condition on line 4 does not need to say `age >= 13`: Python only reaches line 4 when line 2 was `False`, so `age` is already 13 or more.
+Python checks the conditions from the top and stops at the first true one. The condition on line 4 does not need to say `age >= 13`: Python only reaches line 4 when line 2 was `False`, so `age` is already 13 or more. To check two things in one condition, such as an age that is at least 13 and under 65, see [Combining conditions with and, or and not](/courses/python/conditions), the next lesson.
 
 {{visual ticket}}
 

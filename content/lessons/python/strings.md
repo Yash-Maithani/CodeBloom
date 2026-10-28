@@ -14,7 +14,7 @@ Unlike a list, a string cannot have one of its characters replaced. The first mi
 
 {{example join}}
 
-Joining works only between strings. To put a number into a message, an **f-string** is easier. Write `f` directly before the opening quote, and put a name or a calculation inside curly brackets. Python replaces each pair of brackets with its value.
+Joining works only between strings, so a number needs `str()` first, as in [Numbers and arithmetic](/courses/python/numbers). An **f-string** is easier. Write `f` directly before the opening quote, and put a name or a calculation inside curly brackets. Python replaces each pair of brackets with its value.
 
 {{example fstring}}
 

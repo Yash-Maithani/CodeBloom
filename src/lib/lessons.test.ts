@@ -33,6 +33,7 @@ test("every real lesson loads, passes its checks and the publish gate", async ()
   assert.deepEqual(lessons.map((l) => `${l.href} ${l.source.status}`).sort(), [
     "/courses/c/first-program published",
     "/courses/c/variables published",
+    "/courses/python/conditions published",
     "/courses/python/decisions published",
     "/courses/python/dictionaries published",
     "/courses/python/elif published",
@@ -42,6 +43,7 @@ test("every real lesson loads, passes its checks and the publish gate", async ()
     "/courses/python/input-output published",
     "/courses/python/lists published",
     "/courses/python/loops published",
+    "/courses/python/numbers published",
     "/courses/python/strings published",
     "/courses/python/variables published",
   ]);
@@ -55,19 +57,27 @@ test("real courses: previous and next follow published lessons in topic order", 
   assert.equal(first.number, 1);
   assert.equal(first.previous, undefined, "the first lesson has no previous lesson");
   assert.equal(first.next?.href, "/courses/c/variables");
-  // Python topic order: first program, variables, input and output, decisions, elif, loops, functions, lists, strings, dictionaries, files.
+  // Python topic order: first program, variables, numbers, input and output, decisions, elif, conditions, loops, functions, lists, strings, dictionaries, files.
   const python = courses.find((course) => course.slug === "python")!;
-  assert.deepEqual(publishedIn(lessons, python).map((l) => l.source.slug), ["first-program", "variables", "input-output", "decisions", "elif", "loops", "functions", "lists", "strings", "dictionaries", "files"]);
+  assert.deepEqual(publishedIn(lessons, python).map((l) => l.source.slug), ["first-program", "variables", "numbers", "input-output", "decisions", "elif", "conditions", "loops", "functions", "lists", "strings", "dictionaries", "files"]);
   const pythonFirst = neighbours(lessons, find(lessons, "/courses/python/first-program"));
   assert.equal(pythonFirst.number, 1);
   assert.equal(pythonFirst.previous, undefined);
   assert.equal(pythonFirst.next?.href, "/courses/python/variables");
   const middle = neighbours(lessons, find(lessons, "/courses/python/input-output"));
-  assert.equal(middle.number, 3);
-  assert.equal(middle.previous?.href, "/courses/python/variables");
+  assert.equal(middle.number, 4);
+  assert.equal(middle.previous?.href, "/courses/python/numbers");
   assert.equal(middle.next?.href, "/courses/python/decisions");
+  const numbers = neighbours(lessons, find(lessons, "/courses/python/numbers"));
+  assert.equal(numbers.number, 3);
+  assert.equal(numbers.previous?.href, "/courses/python/variables");
+  assert.equal(numbers.next?.href, "/courses/python/input-output");
+  const conditions = neighbours(lessons, find(lessons, "/courses/python/conditions"));
+  assert.equal(conditions.number, 7);
+  assert.equal(conditions.previous?.href, "/courses/python/elif");
+  assert.equal(conditions.next?.href, "/courses/python/loops");
   const last = neighbours(lessons, find(lessons, "/courses/python/files"));
-  assert.equal(last.number, 11);
+  assert.equal(last.number, 13);
   assert.equal(last.previous?.href, "/courses/python/dictionaries");
   assert.equal(last.next, undefined, "the last lesson has no next lesson");
   for (const slug of ["cpp", "java"]) assert.deepEqual(publishedIn(lessons, courses.find((x) => x.slug === slug)!), []);
@@ -78,7 +88,7 @@ test("real lessons: the Variables lessons point to each other as the same concep
   assert.deepEqual(sameConceptElsewhere(lessons, find(lessons, "/courses/python/variables")).map((l) => l.href), ["/courses/c/variables"]);
   assert.deepEqual(sameConceptElsewhere(lessons, find(lessons, "/courses/c/variables")).map((l) => l.href), ["/courses/python/variables"]);
   // The other new concepts are used by one lesson each, and the published C lessons do not use them.
-  for (const slug of ["decisions", "dictionaries", "elif", "files", "first-program", "functions", "input-output", "lists", "loops", "strings"]) {
+  for (const slug of ["conditions", "decisions", "dictionaries", "elif", "files", "first-program", "functions", "input-output", "lists", "loops", "numbers", "strings"]) {
     assert.deepEqual(sameConceptElsewhere(lessons, find(lessons, `/courses/python/${slug}`)), [], slug);
   }
 });

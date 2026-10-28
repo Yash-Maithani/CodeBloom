@@ -63,6 +63,8 @@ for (const { path, id, file } of VISUALS) {
     const visual = await open(page, path, id);
     const states = [await snapshot(visual)];
     const total = traceOf(file).steps.length;
+    // The Start again loop clicks about total squared times, so a longer trace needs more time.
+    test.setTimeout(Math.max(30_000, total * total * 600));
     for (let i = 0; i < total; i++) {
       await visual.getByRole("button", { name: "Next step" }).click();
       states.push(await snapshot(visual));

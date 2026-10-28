@@ -16,7 +16,7 @@ Whatever the person types, `input` gives back a string. Even when the person typ
 
 ## Turning text into a number
 
-`int` converts text that represents a whole number, such as "17", into a number. Spaces around the number and a minus sign are accepted too. Use it on what `input` gives back.
+`int` converts text that represents a whole number, such as "17", into a number. Spaces around the number and a minus sign are accepted too. Use it on what `input` gives back. For a number with a decimal point, such as "2.5", use `float` instead of `int`, as in [Numbers and arithmetic](/courses/python/numbers).
 
 {{example age}}
 

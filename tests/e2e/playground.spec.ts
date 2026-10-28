@@ -214,6 +214,8 @@ test("each Python lesson example links to its playground page, which starts from
     "/courses/python/strings": /^Strings/,
     "/courses/python/dictionaries": /^Dictionaries/,
     "/courses/python/files": /^Reading and writing files/,
+    "/courses/python/numbers": /^Numbers and arithmetic/,
+    "/courses/python/conditions": /^Combining conditions/,
   };
   for (const [lesson, title] of Object.entries(titles)) {
     await page.goto(lesson);
@@ -231,6 +233,14 @@ test("each Python lesson example links to its playground page, which starts from
   // Examples that show a mistake get no link; the fix of a mistake does (elif_right_order, type_error_fixed).
   expect(opened.sort()).toEqual([
     "python/compare",
+    "python/cond_and",
+    "python/cond_and_or_fix",
+    "python/cond_not",
+    "python/cond_or",
+    "python/cond_or_text_fix",
+    "python/cond_precedence",
+    "python/cond_short",
+    "python/cond_values",
     "python/delivery_fee",
     "python/dict_basics",
     "python/dict_change",
@@ -272,6 +282,14 @@ test("each Python lesson example links to its playground page, which starts from
     "python/loop_range",
     "python/loop_sum",
     "python/loop_while_count",
+    "python/num_basics",
+    "python/num_convert",
+    "python/num_float",
+    "python/num_minutes",
+    "python/num_negative",
+    "python/num_order",
+    "python/num_slash_fix",
+    "python/num_update",
     "python/str_basics",
     "python/str_escape",
     "python/str_fstring",
