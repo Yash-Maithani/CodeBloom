@@ -156,6 +156,16 @@ LANG=C.UTF-8 python3 -I -B ../../../scripts/lib/python-input.py name.py name.inp
 
 The echo is simulated. Python does not echo piped input: when a program reads from a pipe, the typed text is never shown, because nobody typed it. A person at a terminal sees the typed line right after the prompt only because the terminal draws it, and the playground shows it the same way. `python-input.py` therefore writes each prompt, then the next line of the input file and a line break, so the saved output reads like a terminal session (`What is your name? Ada`). `check:examples` runs every example that has an input file this way, and a file with too few lines fails with Python's own `EOFError`. The hash of the input file is part of the verification record, so editing an input file stops the build until the example is verified again.
 
+**Examples that write files.** A Python example may write a file and read it back, as the Files lesson does. Make it self-contained: it writes every file it reads, so it runs on its own, and it uses plain relative names such as `notes.txt`. `check:examples` runs every example in a fresh temporary folder that is deleted afterwards, and the playground gives every run a fresh in-memory file area, so a file never lands in the repository and never survives to a later run. When you capture the result by hand, run from a temporary folder too, never from inside `content/examples/`, or the program leaves its file there:
+
+```
+D="$PWD/content/examples/python"
+(cd "$(mktemp -d)" && LANG=C.UTF-8 python3 -I -B "$D/name.py" > "$D/name.expected.txt")
+(cd "$(mktemp -d)" && LANG=C.UTF-8 python3 -I -B "$D/name.py" 2>&1 >/dev/null | sed "s#$D/##g" > "$D/name.run-error.txt")
+```
+
+Error codes from the operating system are not portable. A missing file is `[Errno 2]` under Python on Linux, where the examples are verified, and `[Errno 44]` in the playground. The saved file holds the Linux text, so a lesson about such an error must say that the number can differ.
+
 **Capturing a trace** (Python examples with an `.expected.txt` only), from the same folder:
 
 ```

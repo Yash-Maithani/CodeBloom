@@ -73,6 +73,13 @@ test("courses without lessons say so plainly; planned topics are plain text on e
     await page.goto(path);
     const hasLessons = path === "/courses/c" || path === "/courses/python";
     await expect(page.getByText("No lessons yet", { exact: true }), path).toHaveCount(hasLessons ? 0 : 1);
+    if (path === "/courses/python") {
+      // Every Python topic has a published lesson, so the whole Planned topics section is gone.
+      await expect(page.locator("[data-planned-topics]")).toHaveCount(0);
+      await expect(page.getByRole("heading", { name: "Planned topics" })).toHaveCount(0);
+      await expect(page.getByText(/^Planned and subject to change/)).toHaveCount(0);
+      continue;
+    }
     await expect(page.getByText(/^Planned and subject to change/)).toBeVisible();
     const topics = page.locator("[data-planned-topics]");
     expect(await topics.locator("li").count(), path).toBeGreaterThan(0);

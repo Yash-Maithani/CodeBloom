@@ -1,0 +1,283 @@
+{
+  "steps": [
+    {
+      "line": 1,
+      "variables": [
+        {
+          "name": "words",
+          "value": "['the', 'cat', 'and', 'the', 'hat']",
+          "type": "list"
+        }
+      ],
+      "output": ""
+    },
+    {
+      "line": 2,
+      "variables": [
+        {
+          "name": "words",
+          "value": "['the', 'cat', 'and', 'the', 'hat']",
+          "type": "list"
+        },
+        {
+          "name": "counts",
+          "value": "{}",
+          "type": "dict"
+        }
+      ],
+      "output": ""
+    },
+    {
+      "line": 3,
+      "variables": [
+        {
+          "name": "words",
+          "value": "['the', 'cat', 'and', 'the', 'hat']",
+          "type": "list"
+        },
+        {
+          "name": "counts",
+          "value": "{}",
+          "type": "dict"
+        },
+        {
+          "name": "word",
+          "value": "'the'",
+          "type": "str"
+        }
+      ],
+      "output": ""
+    },
+    {
+      "line": 4,
+      "variables": [
+        {
+          "name": "words",
+          "value": "['the', 'cat', 'and', 'the', 'hat']",
+          "type": "list"
+        },
+        {
+          "name": "counts",
+          "value": "{'the': 1}",
+          "type": "dict"
+        },
+        {
+          "name": "word",
+          "value": "'the'",
+          "type": "str"
+        }
+      ],
+      "output": ""
+    },
+    {
+      "line": 3,
+      "variables": [
+        {
+          "name": "words",
+          "value": "['the', 'cat', 'and', 'the', 'hat']",
+          "type": "list"
+        },
+        {
+          "name": "counts",
+          "value": "{'the': 1}",
+          "type": "dict"
+        },
+        {
+          "name": "word",
+          "value": "'cat'",
+          "type": "str"
+        }
+      ],
+      "output": ""
+    },
+    {
+      "line": 4,
+      "variables": [
+        {
+          "name": "words",
+          "value": "['the', 'cat', 'and', 'the', 'hat']",
+          "type": "list"
+        },
+        {
+          "name": "counts",
+          "value": "{'the': 1, 'cat': 1}",
+          "type": "dict"
+        },
+        {
+          "name": "word",
+          "value": "'cat'",
+          "type": "str"
+        }
+      ],
+      "output": ""
+    },
+    {
+      "line": 3,
+      "variables": [
+        {
+          "name": "words",
+          "value": "['the', 'cat', 'and', 'the', 'hat']",
+          "type": "list"
+        },
+        {
+          "name": "counts",
+          "value": "{'the': 1, 'cat': 1}",
+          "type": "dict"
+        },
+        {
+          "name": "word",
+          "value": "'and'",
+          "type": "str"
+        }
+      ],
+      "output": ""
+    },
+    {
+      "line": 4,
+      "variables": [
+        {
+          "name": "words",
+          "value": "['the', 'cat', 'and', 'the', 'hat']",
+          "type": "list"
+        },
+        {
+          "name": "counts",
+          "value": "{'the': 1, 'cat': 1, 'and': 1}",
+          "type": "dict"
+        },
+        {
+          "name": "word",
+          "value": "'and'",
+          "type": "str"
+        }
+      ],
+      "output": ""
+    },
+    {
+      "line": 3,
+      "variables": [
+        {
+          "name": "words",
+          "value": "['the', 'cat', 'and', 'the', 'hat']",
+          "type": "list"
+        },
+        {
+          "name": "counts",
+          "value": "{'the': 1, 'cat': 1, 'and': 1}",
+          "type": "dict"
+        },
+        {
+          "name": "word",
+          "value": "'the'",
+          "type": "str"
+        }
+      ],
+      "output": ""
+    },
+    {
+      "line": 4,
+      "variables": [
+        {
+          "name": "words",
+          "value": "['the', 'cat', 'and', 'the', 'hat']",
+          "type": "list"
+        },
+        {
+          "name": "counts",
+          "value": "{'the': 2, 'cat': 1, 'and': 1}",
+          "type": "dict"
+        },
+        {
+          "name": "word",
+          "value": "'the'",
+          "type": "str"
+        }
+      ],
+      "output": ""
+    },
+    {
+      "line": 3,
+      "variables": [
+        {
+          "name": "words",
+          "value": "['the', 'cat', 'and', 'the', 'hat']",
+          "type": "list"
+        },
+        {
+          "name": "counts",
+          "value": "{'the': 2, 'cat': 1, 'and': 1}",
+          "type": "dict"
+        },
+        {
+          "name": "word",
+          "value": "'hat'",
+          "type": "str"
+        }
+      ],
+      "output": ""
+    },
+    {
+      "line": 4,
+      "variables": [
+        {
+          "name": "words",
+          "value": "['the', 'cat', 'and', 'the', 'hat']",
+          "type": "list"
+        },
+        {
+          "name": "counts",
+          "value": "{'the': 2, 'cat': 1, 'and': 1, 'hat': 1}",
+          "type": "dict"
+        },
+        {
+          "name": "word",
+          "value": "'hat'",
+          "type": "str"
+        }
+      ],
+      "output": ""
+    },
+    {
+      "line": 3,
+      "variables": [
+        {
+          "name": "words",
+          "value": "['the', 'cat', 'and', 'the', 'hat']",
+          "type": "list"
+        },
+        {
+          "name": "counts",
+          "value": "{'the': 2, 'cat': 1, 'and': 1, 'hat': 1}",
+          "type": "dict"
+        },
+        {
+          "name": "word",
+          "value": "'hat'",
+          "type": "str"
+        }
+      ],
+      "output": ""
+    },
+    {
+      "line": 5,
+      "variables": [
+        {
+          "name": "words",
+          "value": "['the', 'cat', 'and', 'the', 'hat']",
+          "type": "list"
+        },
+        {
+          "name": "counts",
+          "value": "{'the': 2, 'cat': 1, 'and': 1, 'hat': 1}",
+          "type": "dict"
+        },
+        {
+          "name": "word",
+          "value": "'hat'",
+          "type": "str"
+        }
+      ],
+      "output": "{'the': 2, 'cat': 1, 'and': 1, 'hat': 1}\n"
+    }
+  ]
+}

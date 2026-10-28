@@ -91,6 +91,52 @@
       "source": "f5f7de82c910f74e9803e4b1e2b5c02a54539f3cc9230cf5e08795e0a7bd3266",
       "expected": "91d476fecfbb9621ef9cefe884f5df3bc92394c5dd1a001573db58d7f964c285"
     },
+    "python/dict_basics": {
+      "kind": "output",
+      "source": "31526287b47a1cffdac24c53598b9d83a87db5ea570f3af7e0093687fe7e5ec9",
+      "expected": "ee70a06389fe8a9ee9907c279764442b109dde5c7a90a530aa20ce1ac4531083"
+    },
+    "python/dict_change": {
+      "kind": "output",
+      "source": "4bb923526c8c6e0141016cc222c0f2f4427d301a54fc26fe55b07b6b8d1bb98c",
+      "expected": "ee8ba0edca6172f15718e9a1af99987d786693a1da4ca8514abc999d0d28ac28"
+    },
+    "python/dict_count": {
+      "kind": "output",
+      "source": "24cb498efe183a53c3db2f5a8c223383b85733e396c2e26f785d52e2e694be05",
+      "expected": "4f21ed63ac3c3a2e69f82d2f9c9021077a6cf2bbfc20279072158a6d58bcecb0",
+      "trace": "6b38e9f40663f7f97f198f27924f0ec9228eba2fa0a4fdcff682cdeb20d18fdf"
+    },
+    "python/dict_duplicate": {
+      "kind": "output",
+      "source": "d9f236fbade3601493d128f8bd1343447840ed99f2a6dcd05f69479acacd9821",
+      "expected": "338a814e0213989001b50629aea24d5b81ce9473a2380db74760c9bb56fe8736"
+    },
+    "python/dict_duplicate_fix": {
+      "kind": "output",
+      "source": "b8fbe0f8a545f3ae8942cacf881200923a81951b87006e86f7d9dc402a89d717",
+      "expected": "1d64b8f1f5dae2f7829730734f381f005353438348891254c666ceffa5a0f252"
+    },
+    "python/dict_in_get": {
+      "kind": "output",
+      "source": "e63ab9fb21aa829c35f495991e6e6f36294f4b2d3768856177ce2a65fe430800",
+      "expected": "ec0ff860c7d3bd656463220740e4966a497d2dc406d5f7e20d8b436904456200"
+    },
+    "python/dict_key_error": {
+      "kind": "run-error",
+      "source": "a1cffe13078114908cb48d6900e59ef28298b67d97c1c2a5388978f4e2053862",
+      "expected": "3941c8acc4ff82e24acf179581c93b557651887455a2cac9b928a57e6c57bec0"
+    },
+    "python/dict_key_error_fix": {
+      "kind": "output",
+      "source": "dd258f33fe83e92ffec87c65e5dd22b2d05b36539e02ee32bdda41206f154068",
+      "expected": "7f51b4fb44dbc72708fac0a474600c2e9d8af4ce3a8b8f1680330454f6a8d68f"
+    },
+    "python/dict_loop": {
+      "kind": "output",
+      "source": "6ade62515cc2f69a43f6d4dc273261276233fe053d588e670a812bde6e68bf55",
+      "expected": "d4f8aa849836a1aa7e3601ceef56f60cfbbd2d490cc26b90b67ab7c53789a183"
+    },
     "python/elif_grade": {
       "kind": "output",
       "source": "92fc986925e21d96cbf62057049872eb888dfe93c715f1731b3e225f68bc6c76",
@@ -121,6 +167,56 @@
       "kind": "output",
       "source": "0e82b25be14510e2218319a65d0108e54f0986512f462c5b92c5d7d1eb47226c",
       "expected": "be74f37819ffb11ffad06d49783004b660971ca7970cc3617eefcc96c1b083af"
+    },
+    "python/file_append": {
+      "kind": "output",
+      "source": "0d3254120b49729460ec078f2478f86191a30002f06c331917f1f1c970707975",
+      "expected": "c93ac6ed67738e8c6cefa08855e65a897b09741df0d7cd913171f4a2a706cdad"
+    },
+    "python/file_lines": {
+      "kind": "output",
+      "source": "8af426cfb4e870a5228fdbe134db79a44e716e8717396a9d3273fc70e927271d",
+      "expected": "842088974e95481adb96e39d57b0a9c1fcfe44ac4c140673ea0201a0500de94e"
+    },
+    "python/file_missing": {
+      "kind": "run-error",
+      "source": "051d0517b2c4b05ef73c9efc563158bb067901f2572e425a6bde12f8ada6a4ab",
+      "expected": "c2ec3f528e37cab795a2135b4b4af33787e52c422f04c0e41a8708772a96d9b2"
+    },
+    "python/file_missing_fix": {
+      "kind": "output",
+      "source": "889a9e6f5dc090f43c6f2359b1f256696f02a84ae5b0bf31f0df92cf5da76e56",
+      "expected": "07305a3200629a7b8a04f77008fa1b1f719fec3b60d4fdf2683ba60cf2956381"
+    },
+    "python/file_newline_fix": {
+      "kind": "output",
+      "source": "78ee2afe4c7cbaa1286c05ec0a63127742489fbbef025e1b2cd82bc49d9277fc",
+      "expected": "a6fb55c103b69eb0a92f8875bd9f448d7f52102939c44fe5c57d58122e64ce8d"
+    },
+    "python/file_no_newline": {
+      "kind": "output",
+      "source": "b61d0135adc145800329750313096745d78f610a93c248c11bb3f7a084c55211",
+      "expected": "699cdca618e0702caa3baf042bac28cda77044d8e410f4025487a4d1567e744c"
+    },
+    "python/file_numbers": {
+      "kind": "output",
+      "source": "81694bd4e365f067d50007eba65040e3d85f8f72785c0a15a918bff3651b7a0e",
+      "expected": "29acc1bed0e2430820fe6415d6639a0a0b6dbad6fdc4071c9caf60799175303a"
+    },
+    "python/file_overwrite": {
+      "kind": "output",
+      "source": "fb06b05b22c7a92ef3b59d13c430f6105176593adcf6f98575588bb6eb4501ee",
+      "expected": "480c2336b410f1ad5f8bf1b28944490255804b65350c527787e74ebdd511e3a4"
+    },
+    "python/file_overwrite_fix": {
+      "kind": "output",
+      "source": "bfd998237eea5d71d2fb22311893365940ad14636066563e31274cee157b9a44",
+      "expected": "dbea9325179efe46ea2add94f7b6b745ca983fabb208dc6d34aa064623d7ee23"
+    },
+    "python/file_write_read": {
+      "kind": "output",
+      "source": "6d9be69077ebed6aecef69c255bff5f3c662a1c3e8df7925afd9b025c6d5ba69",
+      "expected": "1fabadfd29fa555544ec5429085877088ad668df4c169eba5c2ea14fc9f3933e"
     },
     "python/first_hello": {
       "kind": "output",
@@ -314,6 +410,16 @@
       "source": "6136af513a32e0997e06a28afe5fbb1445b9e22e1e1b9fb4864f8f20fd1c5c2b",
       "expected": "7ae15ce3109ab5e210cd4686faef828330a0a1511e789b4ac7b806570071c791"
     },
+    "python/practice_dict_get": {
+      "kind": "output",
+      "source": "2bbc241e99ad1a22961e732840754417c7530fdd20f39530b90293506d083c36",
+      "expected": "8f7031a868458a6fb43e28b0a714633c77c16e06c53cc9027911102f69ffb947"
+    },
+    "python/practice_dict_update": {
+      "kind": "output",
+      "source": "b969ce19a91bedd1a10c9a2ba2765be484e70da712916dcd47c783eb61868f8f",
+      "expected": "3ef1b6be09ecb8bbaad2702387ce5c1ce9e2f23f09608e69970aa2c1d2ebdc9f"
+    },
     "python/practice_elif_boundary": {
       "kind": "output",
       "source": "d39702a8c8f75cd0c70b5c28022a5d22318b7bdd5d1c65d235e185e44da3ac76",
@@ -328,6 +434,16 @@
       "kind": "output",
       "source": "0fd7eadd6bfc7d0ffb36471a535063a5e5e7bdf3c09ffed67f137e0d74457c6e",
       "expected": "f6c2c78ae684a9ac5339908557df34b8ae39d0574c7de7b9f160a80bf327d848"
+    },
+    "python/practice_file_modes": {
+      "kind": "output",
+      "source": "d9db63079f6a3739a1610b7b302c8745a563588e8627c683259fd644862b953a",
+      "expected": "1121cfccd5913f0a63fec40a6ffd44ea64f9dc135c66634ba001d10bcf4302a2"
+    },
+    "python/practice_file_text": {
+      "kind": "output",
+      "source": "2ccc768a962ebb5581f0d0ff6395a77a49ac705f9467da8ce8073629ce46d86d",
+      "expected": "420002158111bff8adb3347d84029e480f45e60e1869b454b6adac3345f9f7d4"
     },
     "python/practice_first_comments": {
       "kind": "output",
@@ -390,6 +506,76 @@
       "kind": "output",
       "source": "e08f0130b510e8269d02b4552dbb99bd6c3c69febfe70b2e789b9662b7a39641",
       "expected": "238903180cc104ec2c5d8b3f20c5bc61b389ec0a967df8cc208cdc7cd454174f"
+    },
+    "python/practice_str_split": {
+      "kind": "output",
+      "source": "f0324c0bce0f49518f5cbff75ad4ba8fa445cb3e406e229d771e67acb120fa81",
+      "expected": "ae3b8db9853b52e40818b262a0084a6822087220f66ea6175f69518ac4f2204f"
+    },
+    "python/practice_str_upper": {
+      "kind": "output",
+      "source": "48736274c7068d4010eeab3830ff6f0c951fdd046a90fbcbb129bd0acd486fc2",
+      "expected": "e9a3f2b8b0bd64b57b5f72bafca4d20dc5993a232a6969b9ebfb1eed7b16ef18"
+    },
+    "python/str_basics": {
+      "kind": "output",
+      "source": "ebde6a130e6a6441eb504a8c151ac865358db480497785c851d8a83440ed1a17",
+      "expected": "b69422b991d5509f513d6515d5153072d39ece3b60031c76ad4017f9611b2c80"
+    },
+    "python/str_escape": {
+      "kind": "output",
+      "source": "a1903898d6ce48a9a252228b17f8653b8c45d64703fc42eb5a641db0815d8a31",
+      "expected": "f733b42da3098d5d0c8e28c50c2758d537e6d3bca8b89c8442cd251648b5ff27"
+    },
+    "python/str_fstring": {
+      "kind": "output",
+      "source": "77cda191208de338889afae947bee6e87199492b008135ffdaa24f9094a553bf",
+      "expected": "a6f5a00edd1f03ec96757b7e22d09cfb77609e0fb2ca41a178413305382d5203"
+    },
+    "python/str_immutable": {
+      "kind": "run-error",
+      "source": "42cec5eddbb1e6de201d28ca6e4c3695fe59b894e45c322ab3eeef93661d7da0",
+      "expected": "5979dd7734d078888bcfd34f45427ad2c3d61900fd9af35aa883ef8133b28815"
+    },
+    "python/str_immutable_fix": {
+      "kind": "output",
+      "source": "ced5e9b4b7ddb50e4cbd32422d39bd3f493f5cddd870ae61b9dfb9fdf0b68e1d",
+      "expected": "2b1af0fe3b9b32d6a425f0d4f9b06eade50cff70aaa41824da025576d00bbf47"
+    },
+    "python/str_in": {
+      "kind": "output",
+      "source": "0fc003e4ec685f3a890f584739c5a8c7e2552501f72125a75abd1a51b612cd66",
+      "expected": "d51b8aa5a46a9e241522059233cae960e8027b3c4bb5f0f4da0c6a8c55db61b0"
+    },
+    "python/str_join": {
+      "kind": "output",
+      "source": "06487fed165e23bd3e9eacb686e67b4dc1b096beacc022036e1947200117dbff",
+      "expected": "72d31198e3aa63556d053bcdc291670a387e7bc929c43701a988c1c06415a72d"
+    },
+    "python/str_methods": {
+      "kind": "output",
+      "source": "d54040ab15ad82e1bd887c579e35811ff3177f4cb2b4abe3f7ca1d02ad4f7167",
+      "expected": "0ee04fe7d700dc6a5488e1af7d76916c5d38c60cac22fb6ec75c82643713123d"
+    },
+    "python/str_no_store": {
+      "kind": "output",
+      "source": "dc1324d46eb49196ca66d81fb87b72625e66a71bcecff7ad2d9fdb5bd88668af",
+      "expected": "8691647640d53190e4668a2da4477c909b8c81f8bfca09826f395b46d01f46a0"
+    },
+    "python/str_no_store_fix": {
+      "kind": "output",
+      "source": "09b9d1830b054d20f9bd1fc5f3dda5e6f1cd38aeb937de627faaa57a88047fac",
+      "expected": "f3b2ce93cd3fcee67e44da21c5b63dcca07c99fbba234b4a737d7df98adbe386"
+    },
+    "python/str_split": {
+      "kind": "output",
+      "source": "44a10a35ef30fe4cb1b01bddccf6558f7065f64be7429413fa3f408b01cbb3e5",
+      "expected": "6cd79c47be267017df8cd7cb851a307789bfbc2a1e702810535cab193f5adf84"
+    },
+    "python/str_strip": {
+      "kind": "output",
+      "source": "ccf215b7215dca150c0cf9a75499a2ba62fbbf40dfbc296b4423094c64b56dec",
+      "expected": "ea48cf55a3f1c18b826ca449038222cebaf1df0c1a22f07e66150e265597c39d"
     },
     "python/type_error": {
       "kind": "run-error",

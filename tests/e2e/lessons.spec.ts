@@ -17,6 +17,9 @@ const COURSES = {
       ["/courses/python/loops", "Loops: while and for"],
       ["/courses/python/functions", "Functions"],
       ["/courses/python/lists", "Lists"],
+      ["/courses/python/strings", "Strings"],
+      ["/courses/python/dictionaries", "Dictionaries"],
+      ["/courses/python/files", "Reading and writing files"],
     ],
   },
 } as const;
@@ -56,7 +59,8 @@ for (const [slug, course] of Object.entries(COURSES)) {
     }
     // Planned topics are plain text, and a published topic is not listed again.
     await expect(page.locator("[data-planned-topics] a")).toHaveCount(0);
-    for (const [, title] of course.lessons) await expect(page.locator("[data-planned-topics]")).not.toContainText(title);
+    if (slug === "python") await expect(page.locator("[data-planned-topics]")).toHaveCount(0);
+    else for (const [, title] of course.lessons) await expect(page.locator("[data-planned-topics]")).not.toContainText(title);
     await expect(page.getByText("No lessons yet")).toHaveCount(0);
 
     await page.getByRole("link", { name: "Start the first lesson" }).click();
@@ -64,13 +68,15 @@ for (const [slug, course] of Object.entries(COURSES)) {
   });
 }
 
-test("Python's planned topics start with Strings now that loops, functions and lists are published, and the replaced topic is gone", async ({ page }) => {
+test("Python has no planned topics left: the Planned topics section is gone, and a course with planned topics still shows it", async ({ page }) => {
   await page.goto("/courses/python");
-  const planned = page.locator("[data-planned-topics] li");
-  await expect(planned.first()).toContainText("Strings");
-  await expect(planned.filter({ hasText: "Loops: while and for" })).toHaveCount(0);
-  await expect(planned.filter({ hasText: "More decisions with elif" })).toHaveCount(0);
-  await expect(planned.filter({ hasText: "Decisions with if, elif and else" })).toHaveCount(0);
+  await expect(page.locator("[data-planned-topics]")).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "Planned topics" })).toHaveCount(0);
+  await expect(page.getByText("Planned and subject to change")).toHaveCount(0);
+  await expect(page.locator("[data-lessons] > li")).toHaveCount(11);
+  await page.goto("/courses/c");
+  await expect(page.getByRole("heading", { name: "Planned topics" })).toBeVisible();
+  await expect(page.locator("[data-planned-topics] li").first()).toBeVisible();
 });
 
 for (const slug of ["cpp", "java"]) {
@@ -87,7 +93,7 @@ test("course cards show the real number of published lessons", async ({ page }) 
   await page.goto("/courses");
   const status = (name: string) => page.locator("article").filter({ has: page.getByRole("link", { name, exact: true }) }).locator("p").last();
   await expect(status("C")).toHaveText("2 lessons published");
-  await expect(status("Python")).toHaveText("8 lessons published");
+  await expect(status("Python")).toHaveText("11 lessons published");
   await expect(status("C++")).toHaveText("No lessons published yet");
   await expect(status("Java")).toHaveText("No lessons published yet");
 });
@@ -130,7 +136,7 @@ for (const [slug, course] of Object.entries(COURSES)) {
 }
 
 test("unknown lesson addresses return the 404 page", async ({ page }) => {
-  for (const path of ["/courses/c/no-such-lesson", "/courses/cpp/variables", "/courses/python/strings"]) {
+  for (const path of ["/courses/c/no-such-lesson", "/courses/cpp/variables", "/courses/python/classes"]) {
     const response = await page.goto(path);
     expect(response?.status(), path).toBe(404);
   }

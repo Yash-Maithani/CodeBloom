@@ -99,9 +99,9 @@ export const courses: Course[] = [
       { title: "Loops: while and for", lesson: "loops" },
       { title: "Functions", lesson: "functions" },
       { title: "Lists", lesson: "lists" },
-      { title: "Strings" },
-      { title: "Dictionaries" },
-      { title: "Reading and writing files" },
+      { title: "Strings", lesson: "strings" },
+      { title: "Dictionaries", lesson: "dictionaries" },
+      { title: "Reading and writing files", lesson: "files" },
     ],
   },
 ];
