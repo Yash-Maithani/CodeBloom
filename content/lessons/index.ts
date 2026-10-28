@@ -8,11 +8,14 @@ import { cFirstProgram } from "./c/first-program.ts";
 import { cVariables } from "./c/variables.ts";
 import { pythonDecisions } from "./python/decisions.ts";
 import { pythonElif } from "./python/elif.ts";
+import { pythonDictionaries } from "./python/dictionaries.ts";
+import { pythonFiles } from "./python/files.ts";
 import { pythonFirstProgram } from "./python/first-program.ts";
 import { pythonFunctions } from "./python/functions.ts";
 import { pythonInputOutput } from "./python/input-output.ts";
 import { pythonLists } from "./python/lists.ts";
 import { pythonLoops } from "./python/loops.ts";
+import { pythonStrings } from "./python/strings.ts";
 import { pythonVariables } from "./python/variables.ts";
 
 export const lessonSources: LessonSource[] = [
@@ -26,4 +29,7 @@ export const lessonSources: LessonSource[] = [
   pythonLoops,
   pythonFunctions,
   pythonLists,
+  pythonStrings,
+  pythonDictionaries,
+  pythonFiles,
 ];

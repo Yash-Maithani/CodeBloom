@@ -1,7 +1,7 @@
 // Tests for the example runner itself, using throwaway fixtures in a temporary
 // folder. Run with `npm run test:runner`. These prove the runner fails when it should.
 import assert from "node:assert/strict";
-import { mkdtemp, mkdir, readFile, rm, symlink, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readdir, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { after, test } from "node:test";
@@ -443,4 +443,26 @@ test("input: an error example that never reads input still must print nothing be
   const result = await checkExamples({ root, languages });
   assert.equal(result.ok, false);
   assert.match(result.results[0].message, /must print nothing to standard output before failing/);
+});
+
+test("files: an example that writes a file leaves nothing behind in the examples folder or in the temporary folder", async () => {
+  const program = 'with open("out.txt", "w") as file:\n    file.write("hi\\n")\nwith open("out.txt", "r") as file:\n    print(file.read().strip())\n';
+  const { root, languages } = await fixture({ "python/w.py": program, "python/w.expected.txt": "hi\n" });
+  const workFolders = async () => (await readdir(tmpdir())).filter((name) => name.startsWith("codebloom-example-")).sort();
+  const before = await workFolders();
+  const result = await checkExamples({ root, languages });
+  assert.equal(result.ok, true);
+  assert.deepEqual(await readdir(join(root, "python")), ["w.expected.txt", "w.py"], "no file is written next to the example");
+  assert.deepEqual(await readdir(root), ["python"], "no file is written in the examples root");
+  assert.deepEqual(await workFolders(), before, "the temporary working folder is deleted");
+});
+
+test("files: reading a file that was never written fails with FileNotFoundError, and the message names the file only", async () => {
+  const { root, languages } = await fixture({
+    "python/m.py": 'with open("greeting.txt", "r") as file:\n    print(file.read())\n',
+    "python/m.run-error.txt": "x\n",
+  });
+  const result = await checkExamples({ root, languages });
+  assert.equal(result.ok, false);
+  assert.match(result.results[0].message, /FileNotFoundError: \[Errno 2\] No such file or directory: 'greeting.txt'/);
 });

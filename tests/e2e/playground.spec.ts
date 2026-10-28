@@ -211,6 +211,9 @@ test("each Python lesson example links to its playground page, which starts from
     "/courses/python/loops": /^Loops: while and for/,
     "/courses/python/functions": /^Functions/,
     "/courses/python/lists": /^Lists/,
+    "/courses/python/strings": /^Strings/,
+    "/courses/python/dictionaries": /^Dictionaries/,
+    "/courses/python/files": /^Reading and writing files/,
   };
   for (const [lesson, title] of Object.entries(titles)) {
     await page.goto(lesson);
@@ -229,10 +232,24 @@ test("each Python lesson example links to its playground page, which starts from
   expect(opened.sort()).toEqual([
     "python/compare",
     "python/delivery_fee",
+    "python/dict_basics",
+    "python/dict_change",
+    "python/dict_count",
+    "python/dict_duplicate_fix",
+    "python/dict_in_get",
+    "python/dict_key_error_fix",
+    "python/dict_loop",
     "python/elif_grade",
     "python/elif_right_order",
     "python/elif_separate",
     "python/elif_ticket",
+    "python/file_append",
+    "python/file_lines",
+    "python/file_missing_fix",
+    "python/file_newline_fix",
+    "python/file_numbers",
+    "python/file_overwrite_fix",
+    "python/file_write_read",
     "python/first_hello",
     "python/first_order",
     "python/func_greet",
@@ -255,6 +272,16 @@ test("each Python lesson example links to its playground page, which starts from
     "python/loop_range",
     "python/loop_sum",
     "python/loop_while_count",
+    "python/str_basics",
+    "python/str_escape",
+    "python/str_fstring",
+    "python/str_immutable_fix",
+    "python/str_in",
+    "python/str_join",
+    "python/str_methods",
+    "python/str_no_store_fix",
+    "python/str_split",
+    "python/str_strip",
     "python/type_error_fixed",
     "python/variables_change",
     "python/variables_types",
@@ -320,4 +347,38 @@ test("an example without input starts with an empty Input box, and Reset empties
   await page.getByRole("button", { name: "Reset code" }).click();
   await expect(page.locator("[data-input]")).toHaveValue("");
   await expect(page.getByText("The code is back to the example. The Input box is empty.")).toHaveCount(1);
+});
+
+// Examples that write and read files. Every example writes the file it reads, so
+// the verified output (made by the runner in a temporary folder) must equal what
+// the real playground prints, and the files must not outlive the run.
+
+const FILE_EXAMPLES = ["file_write_read", "file_lines", "file_numbers", "file_append", "file_overwrite", "file_overwrite_fix", "file_missing_fix", "file_no_newline", "file_newline_fix", "practice_file_modes", "practice_file_text"];
+
+test("file examples print in the real playground exactly what the runner verified", async ({ page }) => {
+  test.setTimeout(180_000); // every run starts a fresh Python, 11 runs in one test
+  await open(page);
+  for (const name of FILE_EXAMPLES) {
+    const run = await runCode(page, readText(`content/examples/python/${name}.py`).replace(/\n$/, ""));
+    expect(run.state, name).toBe("finished");
+    expect(run.output, `${name}: playground output`).toBe(readText(`content/examples/python/${name}.expected.txt`));
+  }
+});
+
+test("a file written in one run is gone in the next run", async ({ page }) => {
+  await open(page);
+  const writer = await runCode(page, 'with open("notes.txt", "w") as file:\n    file.write("kept?\\n")\nprint("written")');
+  expect(writer.output).toBe("written\n");
+  const reader = await runCode(page, 'with open("notes.txt", "r") as file:\n    print(file.read())');
+  expect(reader.state).toBe("error");
+  expect(reader.error).toContain("No such file or directory");
+});
+
+test("the missing-file mistake shows Errno 44 in the playground, as the lesson says", async ({ page }) => {
+  await open(page);
+  const run = await runCode(page, readText("content/examples/python/file_missing.py").replace(/\n$/, ""));
+  expect(run.state).toBe("error");
+  expect(run.error).toContain("FileNotFoundError");
+  expect(run.error).toContain("[Errno 44] No such file or directory: 'greeting.txt'");
+  expect(readText("content/examples/python/file_missing.run-error.txt")).toContain("[Errno 2]");
 });

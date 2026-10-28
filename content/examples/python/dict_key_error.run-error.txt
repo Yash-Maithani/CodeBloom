@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "dict_key_error.py", line 2, in <module>
+    print(ages["Alan"])
+          ~~~~^^^^^^^^
+KeyError: 'Alan'
