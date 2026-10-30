@@ -86,6 +86,56 @@
       "source": "974d3b144b2b483be4d184e4f8bb3dfe43e6c8c54bfc54feaf73753c10a87bb5",
       "expected": "1a836a01f068a76e9cc78d552aed35c95dd5fdcf2769f7a7a50ddf3698f56d33"
     },
+    "python/cond_and": {
+      "kind": "output",
+      "source": "5f438a85553d43bd520249f7a0c44efb03fe872387e49a76aace8bf463b78261",
+      "expected": "e75f0a3c4ecfab9b35e7efff124f1f571eae7bae1590e3095131f0ca1b78757c"
+    },
+    "python/cond_and_or": {
+      "kind": "output",
+      "source": "8e3da2825947c3fa4e78c1638c533788495bef4eb0588bd5ec2f50d223857794",
+      "expected": "7544d9876f017c4cca5fc5dfbcdaf8a7f791b89f33817c93d3860f10417b0a81"
+    },
+    "python/cond_and_or_fix": {
+      "kind": "output",
+      "source": "5a5bd8b89ee53d972cf1c7031238da5326cb863eadaaea679eb9e0d90eef2c2b",
+      "expected": "2a09ae35c3da127901b590bd98fbe1167145508874fa0cc5d4ffe36947ad3f44"
+    },
+    "python/cond_not": {
+      "kind": "output",
+      "source": "1c32644e3d478b93c373d4dec2598f78da1825e3dbf07bf64c109961cfb30066",
+      "expected": "af7e5c78e39230051a126990496c357a31002f69560a44d3f665ab963b32795a"
+    },
+    "python/cond_or": {
+      "kind": "output",
+      "source": "115ff7e97956f555976b0764fc98f44c6e2beac3c4c2f1900e7fec1016a8d73e",
+      "expected": "fe3e8e3e9dfddc75d079a2368d3884963d7d50f8d474feff0010eb242fdd65d6"
+    },
+    "python/cond_or_text": {
+      "kind": "output",
+      "source": "86e8ebadfee3351bd272aac7e35c40b7e6e56e265ff1ee858bb9f45e5bec693a",
+      "expected": "fe3e8e3e9dfddc75d079a2368d3884963d7d50f8d474feff0010eb242fdd65d6"
+    },
+    "python/cond_or_text_fix": {
+      "kind": "output",
+      "source": "06cec94b64f86a298acc11eb07c595a4a09b5d007584f34f63bc6bdfae7b347b",
+      "expected": "97188679950986393537f76e86906804715b897306abbec09f7b270f19e216a9"
+    },
+    "python/cond_precedence": {
+      "kind": "output",
+      "source": "ef17af028607c2dc6f5ba53e06ec9cbe2965ace266d02bd6d42eaad80e6cf64b",
+      "expected": "7ae15ce3109ab5e210cd4686faef828330a0a1511e789b4ac7b806570071c791"
+    },
+    "python/cond_short": {
+      "kind": "output",
+      "source": "36c064a65f8d1da74f0aa29537990fb67b7776e4f56534fc45e96bbf81f283bf",
+      "expected": "03066e27e6eb098dae834b3ef495c49fe1419c2d318b4389577aca6ffd0e4334"
+    },
+    "python/cond_values": {
+      "kind": "output",
+      "source": "b1ace042c16b96ef4dec277bfdb4237764138009d42b301683db04c98bf9494c",
+      "expected": "91ef627e942efa8d1de799d995728701f447d0cc4b9d02a22c805c65679a89a5"
+    },
     "python/delivery_fee": {
       "kind": "output",
       "source": "f5f7de82c910f74e9803e4b1e2b5c02a54539f3cc9230cf5e08795e0a7bd3266",
@@ -405,10 +455,70 @@
       "source": "1d2d7bcb2d91ab2f983068c3ef97e2cf6edf93910d26e9291e82654662c98932",
       "expected": "0cf316581833d9d33d5da0a2ad3a857f4db8a05330163e8ee8f5bf4bddd1b92e"
     },
+    "python/num_basics": {
+      "kind": "output",
+      "source": "89048f577dfcf7773ce63ee844887f1e66038fb84fe5d6e341926a16a9c79ed9",
+      "expected": "5519bcb0e32baa5f65d379dc0622af94e363eefe9e06eabfcf84020db8f9f4c6"
+    },
+    "python/num_convert": {
+      "kind": "output",
+      "source": "f2bfc81ac75ec9399976cc60f342c8f54010d483db2c8077ec14ff726545f5a0",
+      "expected": "43e5ac8b5dec11f79cd88f72ab9a2ec613ec2abdddc63d52e67a0ad130c726f7"
+    },
+    "python/num_float": {
+      "kind": "output",
+      "source": "ae3c2fd061275d4adc12068f3f8f2cb8757dd2c75fb399b52905e5df35cd9a65",
+      "expected": "0e5963be9916172528f5bf056419f58d8cd0997ee8466329b79e16b77bc522ac"
+    },
+    "python/num_minutes": {
+      "kind": "output",
+      "source": "576f3391e7d335c5b202dfea7eed3fbdc0eea512a0469980158c98d85ef3a547",
+      "expected": "bd3d9693057737d4300f367c5a0f5058085cbb6beb56f8e2860cb42e495cd19a"
+    },
+    "python/num_negative": {
+      "kind": "output",
+      "source": "45c46e72f6d7c035ddf2aac7d770e13de2b839f6d671074d8798fe9097cd91f3",
+      "expected": "dcbdd641ea4e74e4bb8b834124954f0643f6dc4a6b7558542c183f38767d6158"
+    },
+    "python/num_order": {
+      "kind": "output",
+      "source": "2b35e7e86b2e8fa0c25b43a3d79c729afad3420c864ed723ff411e79c7548f5b",
+      "expected": "d93aa6b4ff65740c4960d6e24d2c6e0e97e6c7898866046991f78dcfb2dbbab3"
+    },
+    "python/num_slash": {
+      "kind": "output",
+      "source": "5865f9a2c4cdd6c321f799ee837754ac938524226bdf44b4762ce7bc663e82ba",
+      "expected": "d526eb4e878a23ef26ae190031b4efd2d58ed66789ac049ea3dbaf74c9df7402"
+    },
+    "python/num_slash_fix": {
+      "kind": "output",
+      "source": "46a3261ea640cef9b021ec70f699e54a86279455efa35e6a30ed36408348d63e",
+      "expected": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3"
+    },
+    "python/num_update": {
+      "kind": "output",
+      "source": "e742903820c0406c9e68bf71210eb0619ca53cbba5a5482b9a7f92ee5e6abd26",
+      "expected": "1f628c564ac8a4f1a87ed869e2315541ef151a447232dc5d850d16e2d46647e7"
+    },
+    "python/num_zero": {
+      "kind": "run-error",
+      "source": "9d63765321510a0952772837919f6b5cfa0cfc81284c06c019e2058d406dc5e7",
+      "expected": "17aeb3395ba3113cc36ab087a2e1f58df9b2811a4c0d0c0e1ebc00770af7ef72"
+    },
     "python/practice_compare": {
       "kind": "output",
       "source": "6136af513a32e0997e06a28afe5fbb1445b9e22e1e1b9fb4864f8f20fd1c5c2b",
       "expected": "7ae15ce3109ab5e210cd4686faef828330a0a1511e789b4ac7b806570071c791"
+    },
+    "python/practice_cond_not": {
+      "kind": "output",
+      "source": "8557ba01f7b28cebcf2ccd64cd0213a69194b573462030fe352f8014335526ad",
+      "expected": "7ae15ce3109ab5e210cd4686faef828330a0a1511e789b4ac7b806570071c791"
+    },
+    "python/practice_cond_ticket": {
+      "kind": "output",
+      "source": "16b4c9f857c003440a155a2e4b8c7db8449e47b225f9fa1f5feb4bbdb5864877",
+      "expected": "ec5ca63d8a50389024df8e566993e91b7b60f220df3c621e1e8f54f2ef6b7866"
     },
     "python/practice_dict_get": {
       "kind": "output",
@@ -496,6 +606,21 @@
       "kind": "output",
       "source": "60186c49b0d6ea0768346bcd8171b0cd271987207b2a47fc54f2cc45c9f4f484",
       "expected": "35348fff5097ce610aefa8452eee25e4181b8c71adf56714004b75e9cbf3d3bd"
+    },
+    "python/practice_num_division": {
+      "kind": "output",
+      "source": "3bf1bdb820781b6dffa5e7708288ccdb5d89af670c3ccfc86196cee5e4be9840",
+      "expected": "d9de72b11ccda77b138500940807af54073524f663d8b3b0b3d86feec6d95f06"
+    },
+    "python/practice_num_order": {
+      "kind": "output",
+      "source": "2b35e7e86b2e8fa0c25b43a3d79c729afad3420c864ed723ff411e79c7548f5b",
+      "expected": "d93aa6b4ff65740c4960d6e24d2c6e0e97e6c7898866046991f78dcfb2dbbab3"
+    },
+    "python/practice_num_update": {
+      "kind": "output",
+      "source": "e7435446d96c0b80ccff01c28c05c89394a08c0cbf3666fb0a50c5a67950e451",
+      "expected": "20d2add851bf39edcc6b5e830930f962db7e19dffa2cab8610eed551eda6c302"
     },
     "python/practice_quotes": {
       "kind": "output",

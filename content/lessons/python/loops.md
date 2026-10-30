@@ -6,7 +6,7 @@ In [Making decisions with if and else](/courses/python/decisions), an `if` ran i
 
 {{example count}}
 
-`count` is the loop's counter. A loop like this needs three parts that work together: a starting value (line 1), a condition (line 2) and a change to the variable inside the group (line 4). If one is missing, the loop usually does the wrong thing.
+`count` is the loop's counter. A loop like this needs three parts that work together: a starting value (line 1), a condition (line 2) and a change to the variable inside the group (line 4). If one is missing, the loop usually does the wrong thing. Line 4 can also be written `count += 1`, the shorthand from [Numbers and arithmetic](/courses/python/numbers).
 
 {{visual count}}
 

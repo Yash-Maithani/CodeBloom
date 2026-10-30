@@ -8,7 +8,7 @@ To create a variable, write a name, `=` and a value. You do not write a type: Py
 
 {{example change}}
 
-Line 4 is the same instruction as line 2, but `apples` now has a different value, so the output changes.
+Line 4 is the same instruction as line 2, but `apples` now has a different value, so the output changes. The `+` adds two numbers. [Numbers and arithmetic](/courses/python/numbers), the next lesson, covers `+` and the other arithmetic operators.
 
 {{visual change}}
 

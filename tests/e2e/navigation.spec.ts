@@ -36,6 +36,22 @@ const EXPECTED_PAGES = [
   "/playground/python/list_loop",
   "/playground/python/list_index_error_fix",
   "/playground/python/list_alias_fix",
+  "/playground/python/num_basics",
+  "/playground/python/num_minutes",
+  "/playground/python/num_negative",
+  "/playground/python/num_order",
+  "/playground/python/num_float",
+  "/playground/python/num_convert",
+  "/playground/python/num_update",
+  "/playground/python/num_slash_fix",
+  "/playground/python/cond_and",
+  "/playground/python/cond_or",
+  "/playground/python/cond_not",
+  "/playground/python/cond_values",
+  "/playground/python/cond_precedence",
+  "/playground/python/cond_short",
+  "/playground/python/cond_or_text_fix",
+  "/playground/python/cond_and_or_fix",
   "/playground/python/str_basics",
   "/playground/python/str_join",
   "/playground/python/str_fstring",
@@ -78,6 +94,8 @@ const EXPECTED_PAGES = [
   "/courses/python/strings",
   "/courses/python/dictionaries",
   "/courses/python/files",
+  "/courses/python/numbers",
+  "/courses/python/conditions",
 ];
 
 async function internalLinks(page: Page): Promise<string[]> {
@@ -92,6 +110,7 @@ async function internalLinks(page: Page): Promise<string[]> {
 }
 
 test("crawling every link from the homepage finds only working pages", async ({ page }) => {
+  test.setTimeout(180_000); // opens every page of the site one after another; the site grows with every lesson
   const toVisit = ["/"];
   const visited = new Set<string>();
 

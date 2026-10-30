@@ -93,9 +93,11 @@ export const courses: Course[] = [
     topics: [
       { title: "Your first Python program", lesson: "first-program" },
       { title: "Variables and data types", lesson: "variables" },
+      { title: "Numbers and arithmetic", lesson: "numbers" },
       { title: "Input and output", lesson: "input-output" },
       { title: "Making decisions with if and else", lesson: "decisions" },
       { title: "More decisions with elif", lesson: "elif" },
+      { title: "Combining conditions with and, or and not", lesson: "conditions" },
       { title: "Loops: while and for", lesson: "loops" },
       { title: "Functions", lesson: "functions" },
       { title: "Lists", lesson: "lists" },

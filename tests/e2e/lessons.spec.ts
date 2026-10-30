@@ -11,9 +11,11 @@ const COURSES = {
     lessons: [
       ["/courses/python/first-program", "Your first Python program"],
       ["/courses/python/variables", "Variables and data types"],
+      ["/courses/python/numbers", "Numbers and arithmetic"],
       ["/courses/python/input-output", "Input and output"],
       ["/courses/python/decisions", "Making decisions with if and else"],
       ["/courses/python/elif", "More decisions with elif"],
+      ["/courses/python/conditions", "Combining conditions with and, or and not"],
       ["/courses/python/loops", "Loops: while and for"],
       ["/courses/python/functions", "Functions"],
       ["/courses/python/lists", "Lists"],
@@ -73,7 +75,7 @@ test("Python has no planned topics left: the Planned topics section is gone, and
   await expect(page.locator("[data-planned-topics]")).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "Planned topics" })).toHaveCount(0);
   await expect(page.getByText("Planned and subject to change")).toHaveCount(0);
-  await expect(page.locator("[data-lessons] > li")).toHaveCount(11);
+  await expect(page.locator("[data-lessons] > li")).toHaveCount(13);
   await page.goto("/courses/c");
   await expect(page.getByRole("heading", { name: "Planned topics" })).toBeVisible();
   await expect(page.locator("[data-planned-topics] li").first()).toBeVisible();
@@ -93,7 +95,7 @@ test("course cards show the real number of published lessons", async ({ page }) 
   await page.goto("/courses");
   const status = (name: string) => page.locator("article").filter({ has: page.getByRole("link", { name, exact: true }) }).locator("p").last();
   await expect(status("C")).toHaveText("2 lessons published");
-  await expect(status("Python")).toHaveText("11 lessons published");
+  await expect(status("Python")).toHaveText("13 lessons published");
   await expect(status("C++")).toHaveText("No lessons published yet");
   await expect(status("Java")).toHaveText("No lessons published yet");
 });
