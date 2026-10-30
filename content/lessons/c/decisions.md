@@ -18,6 +18,8 @@ An `if` does not need an `else`. When the condition is false, the program just c
 
 {{example fee}}
 
+To choose between more than two outcomes, see [More decisions with else if and switch](/courses/c/else-if), the next lesson.
+
 ## Braces and a single instruction
 
 If you leave out the braces, an `if` controls only the very next instruction. Many programmers always write braces, because adding a second instruction to an `if` is then safe.
