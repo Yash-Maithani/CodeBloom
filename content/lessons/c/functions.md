@@ -36,7 +36,7 @@ C reads the file from the top, so it must know a function before the line that c
 
 ## A function works on copies
 
-C copies each argument into its parameter. The function can change its own parameter, but the caller's variable stays as it was. Pointers, a later lesson, show how a function can change the caller's variable. Arrays, the next lesson, behave differently from single numbers, and that lesson explains how.
+C copies each argument into its parameter. The function can change its own parameter, but the caller's variable stays as it was. [Pointers](/courses/c/pointers), a later lesson, show how a function can change the caller's variable. Arrays, the next lesson, behave differently from single numbers, and that lesson explains how.
 
 {{example byvalue}}
 

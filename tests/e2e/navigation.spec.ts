@@ -92,6 +92,8 @@ const EXPECTED_PAGES = [
   "/courses/c/functions",
   "/courses/c/arrays",
   "/courses/c/strings",
+  "/courses/c/pointers",
+  "/courses/c/structures",
   "/courses/python/first-program",
   "/courses/python/variables",
   "/courses/python/input-output",

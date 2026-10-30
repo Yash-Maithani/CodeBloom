@@ -32,7 +32,7 @@ for (const path of PAGES) {
 }
 
 // Lesson pages at the other widths in SPEC.md AR-6 and AR-8.
-for (const path of ["/courses/c/first-program", "/courses/c/variables", "/courses/c/numbers", "/courses/c/printf-scanf", "/courses/c/decisions", "/courses/c/else-if", "/courses/c/conditions", "/courses/c/loops", "/courses/c/functions", "/courses/c/arrays", "/courses/c/strings", "/courses/python/first-program", "/courses/python/variables", "/courses/python/input-output", "/courses/python/decisions", "/courses/python/elif", "/courses/python/loops", "/courses/python/functions", "/courses/python/lists", "/courses/python/strings", "/courses/python/dictionaries", "/courses/python/files", "/courses/python/numbers", "/courses/python/conditions"]) {
+for (const path of ["/courses/c/first-program", "/courses/c/variables", "/courses/c/numbers", "/courses/c/printf-scanf", "/courses/c/decisions", "/courses/c/else-if", "/courses/c/conditions", "/courses/c/loops", "/courses/c/functions", "/courses/c/arrays", "/courses/c/strings", "/courses/c/pointers", "/courses/c/structures", "/courses/python/first-program", "/courses/python/variables", "/courses/python/input-output", "/courses/python/decisions", "/courses/python/elif", "/courses/python/loops", "/courses/python/functions", "/courses/python/lists", "/courses/python/strings", "/courses/python/dictionaries", "/courses/python/files", "/courses/python/numbers", "/courses/python/conditions"]) {
   for (const width of [320, 768, 1024]) {
     test(`${path} at ${width}px: no horizontal scroll, solutions open`, async ({ page }) => {
       await page.setViewportSize({ width, height: 900 });

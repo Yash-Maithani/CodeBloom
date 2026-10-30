@@ -44,8 +44,8 @@ export const courses: Course[] = [
       { title: "Functions", lesson: "functions" },
       { title: "Arrays", lesson: "arrays" },
       { title: "Strings", lesson: "strings" },
-      { title: "Pointers" },
-      { title: "Structures" },
+      { title: "Pointers", lesson: "pointers" },
+      { title: "Structures", lesson: "structures" },
     ],
   },
   {

@@ -67,7 +67,7 @@ export const cPrintfScanf: LessonSource = {
       whatHappens:
         "gcc stops with an error, so no program is made. gcc reports this problem when you compile with `-Wall`, and CodeBloom compiles with `-Wall -Wextra -Werror`: `-Werror` turns every warning into an error. Without `-Werror` the report is only a warning, and the program is still made. On some systems, such as Ubuntu, gcc prints the warning even without `-Wall`, but not on every system. Running a program like this is undefined behavior: C does not say what happens, and it may crash.",
       howToRead:
-        "the message says `%d` expects an argument of type `int *`, an address of an `int`. The `*` stands for \"address of\", which the Pointers lesson explains later. It then says that argument 2 has type `int`: the second item in the call is the `int` itself, so the `&` is missing.",
+        "the message says `%d` expects an argument of type `int *`, an address of an `int`. `int *` is the type \"pointer to `int`\": an address of an `int`, which the Pointers lesson explains later. It then says that argument 2 has type `int`: the second item in the call is the `int` itself, so the `&` is missing.",
       fix: "write `&age`.",
       fixExample: {
         file: "c/io_no_amp_fix",

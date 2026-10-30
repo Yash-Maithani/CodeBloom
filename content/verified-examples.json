@@ -522,6 +522,16 @@
       "source": "b70eaf9057359ece69420be2d79232c4c800966a8cabe7c9489432a9a8fc900e",
       "expected": "8f50e0c1ec65603f2235e131555c6d7fc922e94675d4a9df317b3de0dc3db762"
     },
+    "c/practice_ptr_copy": {
+      "kind": "output",
+      "source": "58803590e416de861b1597ea63b595f0adf3b15e5261b4bb40772a096f9b911f",
+      "expected": "dfac347cb71ae693ba8a54687f7112aff24ec67f88a3c66f69a7bf968fa2ac16"
+    },
+    "c/practice_ptr_star": {
+      "kind": "output",
+      "source": "1d6aaf3a82677626c5c46dd5b5714dd430f2aa6ab27001140ada7de01ac06477",
+      "expected": "b5f2e66ce001a17823c9587c5e0c207e8bc868994ebb08ec2443ce5106ffff77"
+    },
     "c/practice_score": {
       "kind": "output",
       "source": "9e01e066577cc05c6befc2242afdbe24fd0beeedf1b7554a4993575efae40023",
@@ -536,6 +546,16 @@
       "kind": "output",
       "source": "fd0b58c1ad30fe0e0cd0cae83e999881d6967b14363e5ab2635b64c7a8014654",
       "expected": "074c887225f50c152b289e95c69d8f28e40da1f95741a55cfe1a70bb632cf769"
+    },
+    "c/practice_struct_copy": {
+      "kind": "output",
+      "source": "26c6ebfb513f2832e50cecc2e4e40b822f491735603f060e5d1500ea5ee9e437",
+      "expected": "a93f1571782f8417b59d54581630ad251043e1750a52bd5250ab5175fad576b4"
+    },
+    "c/practice_struct_fn": {
+      "kind": "output",
+      "source": "e2050b563fa9eb177ee5b3e97fec7025dc62bfd7d7023c9aff241168579f8642",
+      "expected": "0210d51797921a617229eea6331ca1ee037b676ebc25e1a146e54c5c6dbf4881"
     },
     "c/practice_sw_boundary": {
       "kind": "output",
@@ -561,6 +581,88 @@
       "kind": "output",
       "source": "e1f0feb9eaeb90a985e3d91bc8e2e5f78b143146f2b9ac186dc3eee1bb28bf0e",
       "expected": "58b37696c3b405a5df73f9d115374cf9ecfedefb828dea9b398543183e8e4955"
+    },
+    "c/ptr_add_one": {
+      "kind": "output",
+      "source": "1816abc0936387d94e04d33c6441aad3b5f47cceacfa1120d9eb4c5642565da2",
+      "expected": "ddda6a8968e2ec0a37a540ae6c5f1382e9f475cad466698b5153b2572b5fca4e"
+    },
+    "c/ptr_array": {
+      "kind": "output",
+      "source": "6ae8e125ed84b0d8636c3a17005746cda1575bcc8e2fa48e9bba52371283390b",
+      "expected": "1cd4ba73350bf945527518adb72f177ac80f6fc65b9cf2cb2e61175204e0f580"
+    },
+    "c/ptr_basic": {
+      "kind": "output",
+      "source": "9f031ccaaa8ac4eee3586045a25105022860b6586b124b876232a75b8bc53c5c",
+      "expected": "d4627f247442a50afbc674d2a07ba7dccb4c53d50ca5ec09a8f5f13bcb5fe154"
+    },
+    "c/ptr_find": {
+      "kind": "output",
+      "source": "b776a5a343a0267ece77e0b2793e44808a59023c031371e2c14687ff9d3edf87",
+      "expected": "2130ee695b611049be1eccbb1f849f57379d7b30e8f5c40a8bd2a65d1e1836a7"
+    },
+    "c/ptr_no_amp": {
+      "kind": "compile-error",
+      "source": "f06bba51b4891658d90cc636d63e714196fa6b2bbaf9e59c3792a32f49f5c5f4",
+      "expected": "de3e033871e6427685f7c95322b33ece620096c66384a13df1bfd75656ba229c"
+    },
+    "c/ptr_no_amp_fix": {
+      "kind": "output",
+      "source": "b70f9d73c50354f9f9dfef0529c59200f7abb40e3818cffb8bebd20461d4c3ef",
+      "expected": "25d4f2a86deb5e2574bb3210b67bb24fcc4afb19f93a7b65a057daa874a9d18e"
+    },
+    "c/ptr_param_size": {
+      "kind": "output",
+      "source": "c0619fd128ac34f2b98306b4e90f2e5f021da8502124baed6981deb46f29b799",
+      "expected": "ad0fadf63cc7cd779ce475e345bf4063565b63a3c2efef1eebc89790aaa6acba"
+    },
+    "c/ptr_return_local": {
+      "kind": "compile-error",
+      "source": "ea0efbfa6b138ecf2420cbbef6f69167823f52f1247144234534c3792dba4327",
+      "expected": "0732cad41afa20bd4c84c341c23929241200e1cd0ad742edcbfeeef12b52afa9"
+    },
+    "c/ptr_return_local_fix": {
+      "kind": "output",
+      "source": "d0a663739fe8f7cc3ffaff1126a73302281636e074f68008b4eacd6a1f0850e1",
+      "expected": "084c799cd551dd1d8d5c5f9a5d593b2e931f5e36122ee5c793c1d08a19839cc0"
+    },
+    "c/ptr_same_type": {
+      "kind": "output",
+      "source": "cd684c795d1b8eb21ffc6e78f797f2b02b0baba95aaa646e1a14ab867826294e",
+      "expected": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3"
+    },
+    "c/ptr_scanf": {
+      "kind": "output",
+      "source": "bbc7b8849854d8ede1eb692abc90403482b83f3f74a1cc546af27e60bf0174b2",
+      "expected": "28dc0fb933f68295a4a40f704f9fac031e3bef631b05f344c8fce568ce892981",
+      "input": "54183f4323f377b737433a1e98229ead0fdc686f93bab057ecb612daa94002b5"
+    },
+    "c/ptr_scanf_string": {
+      "kind": "output",
+      "source": "705cf117fdb25c7f48724746899edb4ed434a16dd8550fd50549c5b7b11ca6d6",
+      "expected": "0d6918f28033e4b400540083ac1cdc1ca07f85e95fbd374615409eed054fb04f",
+      "input": "c4b7d45359e10813d1787293eb7ffa9a074e837fcf99c0281610eab5fe907e79"
+    },
+    "c/ptr_swap": {
+      "kind": "output",
+      "source": "e6730dae7719d03dfd9c7c7c6fee37df77e4d05fe703631b61662f659cf88ad9",
+      "expected": "a96b63af333446540818c0eacd2c408b6d6403d649c9c697e8c66ff162a4422b"
+    },
+    "c/ptr_walk": {
+      "kind": "output",
+      "source": "20af03bfcc153ea66253e532a181782a08292bb395184c13bd20af09e5a3315c",
+      "expected": "917df3320d778ddbaa5c5c7742bc4046bf803c36ed2b050f30844ed206783469"
+    },
+    "c/ptr_wrong_target": {
+      "kind": "output",
+      "source": "0ecdccd1ff3b81a25dd2b245e50b452deb2498e192e2c2a5693969b2ce20b55a",
+      "expected": "2d0ac73da6295d3b7de9d0fa2d1df9190842f2d81ec37214ff6312c367e3e78f"
+    },
+    "c/ptr_wrong_target_fix": {
+      "kind": "output",
+      "source": "9c9d9b2c3da4cf5e77f591301a9dcc2664678d3cb24dd4b9175b11fdfbd02d4a",
+      "expected": "b3894cb19488848a440c582ec4196160482aff870b46923ff37dc2562749e1f8"
     },
     "c/str_assign": {
       "kind": "compile-error",
@@ -627,6 +729,72 @@
       "source": "d4a106e3d807f78f5e1b1e75b61f607feb07245784cbe1053d48c0a74c07198f",
       "expected": "b175056f1201e07a80c2f0a19d33887f69805455548320865085e263208de6c2",
       "input": "c4b7d45359e10813d1787293eb7ffa9a074e837fcf99c0281610eab5fe907e79"
+    },
+    "c/struct_array": {
+      "kind": "output",
+      "source": "119bee0b317c99a582a1fca106597c7f3d46e7767eadfee294ba26e3b66fa2ef",
+      "expected": "97e04869e115d4a537257c77aba4aaa44b740ce6e0313d18e03049b87cbae899"
+    },
+    "c/struct_basic": {
+      "kind": "output",
+      "source": "93a0b69c27bf75a28650ecf90cc5fe569110bbafdf6be1c0fe730825afadb94f",
+      "expected": "94678be6f3c45d34c9f25254c98bb184fd358c0ea6803e553fd97d94499d9e5d"
+    },
+    "c/struct_by_value": {
+      "kind": "output",
+      "source": "d311f4b4dc67441002bad0deafea51ed8587d430fd782d4ce0ac43cdb3d5be65",
+      "expected": "8c426520d768976283d05d74cbfa1d84286a9734925aeb1e9d95ce6853a99dd9"
+    },
+    "c/struct_copy": {
+      "kind": "output",
+      "source": "f8d221bc0c72f8cb7dbb6a8b8cf3f5acc79fa1db81696516a62e7c0d86f86ddb",
+      "expected": "b91d2c4c6e93a14d0c536b8d2c029615f4ac7b550b1d1edf00d5c254251b9e66"
+    },
+    "c/struct_dot_pointer": {
+      "kind": "compile-error",
+      "source": "701d65ea7e900b69973536214479a0724f6a0e1a7b35242cddf13a2f6cd42a55",
+      "expected": "d2c5068634c4d40cc2cfa60d078f0e84b77c19a375ef9b093496614ab16f1c88"
+    },
+    "c/struct_dot_pointer_fix": {
+      "kind": "output",
+      "source": "4af91c7051f12fa96fe63a58b4413823a49be067e24dbd60ca26d5e986b7fd28",
+      "expected": "ce434a743148081fcb8cbbaf67ac1f09cbe2dcf9515fadb668d7a6e555825600"
+    },
+    "c/struct_equal": {
+      "kind": "compile-error",
+      "source": "b8dce9daed69799ca410ff1150dc9a3327a1c05334ac5503eac5ff30ed86cdfe",
+      "expected": "efbf4284b775f02e7c0e3a9eb43761f4a48dd777b43b732b3bce65687021ad66"
+    },
+    "c/struct_equal_fix": {
+      "kind": "output",
+      "source": "95cba95c930818519e44b96d411a404155597f3229aa6e2721e45a814fbd6757",
+      "expected": "d711bbbc9e918b08b6c4e0d2dc3ac54b6b6274e7abc10ab77b09e62377541056"
+    },
+    "c/struct_input": {
+      "kind": "output",
+      "source": "226d8edd33767424d716cca29773a8cb2ad3270d61fa5ea9e7d9696ac70d3307",
+      "expected": "b69bc1558f11b73f5825f41865bed10b2a070b346790d63c52f7b27c2e005aab",
+      "input": "300b3f308eec5be5f9dde153b952f1a361c7660034aaa736e75e7e7dd6ff923f"
+    },
+    "c/struct_name_assign": {
+      "kind": "compile-error",
+      "source": "51d92e54db0e505ef99c2f9dc1bf3e67ade23afcfe0f9738182c4c9b82937bbb",
+      "expected": "67ebf72e37927880f394bf1b7cf1d068b2c82103198c160e6aaa52046c3aa325"
+    },
+    "c/struct_name_assign_fix": {
+      "kind": "output",
+      "source": "bfa42ec0b4159eed0ffdf7bf1f282ea29545398e347a68f729cc4dca13250b71",
+      "expected": "c4b7d45359e10813d1787293eb7ffa9a074e837fcf99c0281610eab5fe907e79"
+    },
+    "c/struct_pointer": {
+      "kind": "output",
+      "source": "627747eef9bb75b39584bf28315e998822006243520b74099df4de9bcb060629",
+      "expected": "987eaa422c6c15643d6c3f50e76e8564c1966b3908fc92d6f10ffa31f396ab7a"
+    },
+    "c/struct_return": {
+      "kind": "output",
+      "source": "1ab59534137bda454702497d97315cda1d0bd61120f7572da1e68ae402d9ba39",
+      "expected": "ce434a743148081fcb8cbbaf67ac1f09cbe2dcf9515fadb668d7a6e555825600"
     },
     "c/sw_day": {
       "kind": "output",

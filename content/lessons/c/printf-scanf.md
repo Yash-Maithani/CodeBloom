@@ -8,7 +8,7 @@ You have used `printf` with one placeholder. A format string can hold several: `
 
 ## Reading a number with scanf
 
-**Input** is what a person types while the program runs. `scanf` reads the typed characters and converts them into a number. The first argument says what to read: `%d` means a whole number. The second says where to store it: `&age`. The `&` is required. It tells `scanf` where in memory `age` lives, so it can store the number there. A later lesson, Pointers, explains why it works this way. For now, write `&` before every variable you give to `scanf`.
+**Input** is what a person types while the program runs. `scanf` reads the typed characters and converts them into a number. The first argument says what to read: `%d` means a whole number. The second says where to store it: `&age`. The `&` is required. It tells `scanf` where in memory `age` lives, so it can store the number there. A later lesson, [Pointers](/courses/c/pointers), explains why it works this way. For now, write `&` before every variable you give to `scanf`.
 
 Give the variable a starting value first. If `scanf` cannot read a number it stores nothing, and reading a variable that never got a value is undefined behavior.
 

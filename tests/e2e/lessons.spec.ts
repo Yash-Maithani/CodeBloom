@@ -19,6 +19,8 @@ const COURSES = {
       ["/courses/c/functions", "Functions"],
       ["/courses/c/arrays", "Arrays"],
       ["/courses/c/strings", "Strings"],
+      ["/courses/c/pointers", "Pointers"],
+      ["/courses/c/structures", "Structures"],
     ],
   },
   python: {
@@ -76,7 +78,7 @@ for (const [slug, course] of Object.entries(COURSES)) {
     }
     // Planned topics are plain text, and a published topic is not listed again.
     await expect(page.locator("[data-planned-topics] a")).toHaveCount(0);
-    if (slug === "python") await expect(page.locator("[data-planned-topics]")).toHaveCount(0);
+    if (slug === "python" || slug === "c") await expect(page.locator("[data-planned-topics]")).toHaveCount(0);
     else for (const [, title] of course.lessons) await expect(page.locator("[data-planned-topics]")).not.toContainText(title);
     await expect(page.getByText("No lessons yet")).toHaveCount(0);
 
@@ -85,13 +87,17 @@ for (const [slug, course] of Object.entries(COURSES)) {
   });
 }
 
-test("Python has no planned topics left: the Planned topics section is gone, and a course with planned topics still shows it", async ({ page }) => {
+test("Python and C have no planned topics left: the Planned topics section is gone, and a course with planned topics still shows it", async ({ page }) => {
   await page.goto("/courses/python");
   await expect(page.locator("[data-planned-topics]")).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "Planned topics" })).toHaveCount(0);
   await expect(page.getByText("Planned and subject to change")).toHaveCount(0);
   await expect(page.locator("[data-lessons] > li")).toHaveCount(13);
   await page.goto("/courses/c");
+  await expect(page.locator("[data-planned-topics]")).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "Planned topics" })).toHaveCount(0);
+  await expect(page.locator("[data-lessons] > li")).toHaveCount(13);
+  await page.goto("/courses/cpp");
   await expect(page.getByRole("heading", { name: "Planned topics" })).toBeVisible();
   await expect(page.locator("[data-planned-topics] li").first()).toBeVisible();
 });
@@ -109,7 +115,7 @@ for (const slug of ["cpp", "java"]) {
 test("course cards show the real number of published lessons", async ({ page }) => {
   await page.goto("/courses");
   const status = (name: string) => page.locator("article").filter({ has: page.getByRole("link", { name, exact: true }) }).locator("p").last();
-  await expect(status("C")).toHaveText("11 lessons published");
+  await expect(status("C")).toHaveText("13 lessons published");
   await expect(status("Python")).toHaveText("13 lessons published");
   await expect(status("C++")).toHaveText("No lessons published yet");
   await expect(status("Java")).toHaveText("No lessons published yet");

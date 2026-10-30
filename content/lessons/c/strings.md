@@ -24,7 +24,7 @@ C has no string type. A **string** is an array of `char` that ends with the char
 
 ## Reading a word with scanf
 
-`scanf` with `%s` reads one word, up to the next space or line break. Give it an array that is big enough. `char name[20]` holds up to 19 letters, because the terminator needs one item. Write a width in the placeholder: `%19s` stops after 19 characters. There is no `&` here: the name of an array already stands for the place where it is, and Pointers, a later lesson, explains that. The typed line is in the Typed input panel.
+`scanf` with `%s` reads one word, up to the next space or line break. Give it an array that is big enough. `char name[20]` holds up to 19 letters, because the terminator needs one item. Write a width in the placeholder: `%19s` stops after 19 characters. There is no `&` here: the name of an array already stands for the place where it is, and [Pointers](/courses/c/pointers), the next lesson, explains that. The typed line is in the Typed input panel.
 
 {{example scanf}}
 
