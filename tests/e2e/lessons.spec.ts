@@ -5,7 +5,16 @@ import { normalizeLineEndings } from "../../src/lib/line-endings.ts";
 // Lesson pages and course navigation (SPEC.md FR-C1, FR-C2, FR-L4, FR-L5).
 
 const COURSES = {
-  c: { name: "C", lessons: [["/courses/c/first-program", "Your first C program"], ["/courses/c/variables", "Variables and data types"]] },
+  c: {
+    name: "C",
+    lessons: [
+      ["/courses/c/first-program", "Your first C program"],
+      ["/courses/c/variables", "Variables and data types"],
+      ["/courses/c/numbers", "Numbers and arithmetic"],
+      ["/courses/c/printf-scanf", "Printing and reading values with printf and scanf"],
+      ["/courses/c/decisions", "Making decisions with if and else"],
+    ],
+  },
   python: {
     name: "Python",
     lessons: [
@@ -94,7 +103,7 @@ for (const slug of ["cpp", "java"]) {
 test("course cards show the real number of published lessons", async ({ page }) => {
   await page.goto("/courses");
   const status = (name: string) => page.locator("article").filter({ has: page.getByRole("link", { name, exact: true }) }).locator("p").last();
-  await expect(status("C")).toHaveText("2 lessons published");
+  await expect(status("C")).toHaveText("5 lessons published");
   await expect(status("Python")).toHaveText("13 lessons published");
   await expect(status("C++")).toHaveText("No lessons published yet");
   await expect(status("Java")).toHaveText("No lessons published yet");
@@ -218,7 +227,8 @@ test("the shared idea links the same lesson in the other language, both ways", a
   await expect(page).toHaveURL(/\/courses\/c\/variables$/);
   await page.getByText("This part is the same in the").getByRole("link", { name: "Python lesson" }).click();
   await expect(page).toHaveURL(/\/courses\/python\/variables$/);
-  await page.goto("/courses/python/decisions");
+  // A concept used by one lesson only has no link. Elif has no C lesson yet.
+  await page.goto("/courses/python/elif");
   await expect(page.getByText("This part is the same in the")).toHaveCount(0);
 });
 
@@ -242,4 +252,31 @@ test("the homepage example links to the lesson it comes from", async ({ page }) 
   await page.goto("/");
   await page.getByText("This example comes from the lesson").getByRole("link", { name: "Making decisions with if and else" }).click();
   await expect(page).toHaveURL(/\/courses\/python\/decisions$/);
+});
+
+test("the new C lessons share their idea with the matching Python lessons, and link to each other", async ({ page }) => {
+  const pairs = [
+    ["/courses/c/first-program", "/courses/python/first-program"],
+    ["/courses/c/numbers", "/courses/python/numbers"],
+    ["/courses/c/printf-scanf", "/courses/python/input-output"],
+    ["/courses/c/decisions", "/courses/python/decisions"],
+  ] as const;
+  for (const [c, python] of pairs) {
+    await page.goto(c);
+    await expect(page.getByRole("heading", { name: "The idea" })).toBeVisible();
+    await page.getByText("This part is the same in the").getByRole("link", { name: "Python lesson" }).click();
+    await expect(page).toHaveURL(new RegExp(`${python}$`));
+    await page.getByText("This part is the same in the").getByRole("link", { name: "C lesson" }).click();
+    await expect(page).toHaveURL(new RegExp(`${c}$`));
+  }
+});
+
+test("the first C lesson no longer repeats the shared idea", async ({ page }) => {
+  await page.goto("/courses/c/first-program");
+  const body = await page.locator("main").innerText();
+  // Each sentence of the shared idea appears once on the page, in The idea.
+  for (const sentence of ["You write the instructions as text in a file.", "The text a program shows when it runs is called its output."]) {
+    expect(body.split(sentence).length - 1, sentence).toBe(1);
+  }
+  expect(await page.locator("section[aria-labelledby=the-idea]").innerText()).toContain("You write the instructions as text in a file.");
 });

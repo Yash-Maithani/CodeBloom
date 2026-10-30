@@ -1,0 +1,4 @@
+num_mod_double.c: In function ‘main’:
+num_mod_double.c:5:29: error: invalid operands to binary % (have ‘double’ and ‘int’)
+    5 |     printf("%d\n", distance % 2);
+      |                             ^

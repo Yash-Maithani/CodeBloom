@@ -1,0 +1,8 @@
+dec_missing_paren.c: In function ‘main’:
+dec_missing_paren.c:5:18: error: expected ‘)’ before ‘{’ token
+    5 |     if (age >= 18 {
+      |        ~         ^~
+      |                  )
+dec_missing_paren.c:9:1: error: expected expression before ‘}’ token
+    9 | }
+      | ^

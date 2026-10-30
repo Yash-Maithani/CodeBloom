@@ -5,6 +5,9 @@
 
 import type { LessonSource } from "@/lib/lesson-types";
 import { cFirstProgram } from "./c/first-program.ts";
+import { cDecisions } from "./c/decisions.ts";
+import { cNumbers } from "./c/numbers.ts";
+import { cPrintfScanf } from "./c/printf-scanf.ts";
 import { cVariables } from "./c/variables.ts";
 import { pythonDecisions } from "./python/decisions.ts";
 import { pythonElif } from "./python/elif.ts";
@@ -23,6 +26,9 @@ import { pythonVariables } from "./python/variables.ts";
 export const lessonSources: LessonSource[] = [
   cFirstProgram,
   cVariables,
+  cNumbers,
+  cPrintfScanf,
+  cDecisions,
   pythonFirstProgram,
   pythonVariables,
   pythonInputOutput,

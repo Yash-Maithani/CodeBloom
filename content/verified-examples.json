@@ -1,6 +1,57 @@
 {
   "about": "Written by npm run check:examples when every example passes. Do not edit by hand. The site build refuses to show an example whose files no longer match these hashes.",
   "examples": {
+    "c/dec_assign": {
+      "kind": "compile-error",
+      "source": "f557661413b2e016f4822d8ed6fe78acdb22b127fcbcae4f0a1d4e685c0ea898",
+      "expected": "a2ceecc88589eabe8095cb069c88799e70984b8c7f198f9424d04a05757c7d37"
+    },
+    "c/dec_assign_fix": {
+      "kind": "output",
+      "source": "9c869b3dbc9b87a0b0e60e39f96f0da8575121ffd264637cd2510e34d60877a1",
+      "expected": "85546d7fd978889fd55d196e3af0cb58b3686cf1c9e9b3184132f05657141f8e"
+    },
+    "c/dec_compare": {
+      "kind": "output",
+      "source": "ad3c81a256bed3d37ef9cf5829101b557f22d5b1f0120c9588f862b83398f733",
+      "expected": "82705308134bbe1154849ebc6ec13ce36c1a232c76415f79c0de21c4d631001f"
+    },
+    "c/dec_fee": {
+      "kind": "output",
+      "source": "1c0833ae20681e8aa9355540cc750ccfba0c33b8b6bce12fa3257c8a638f0083",
+      "expected": "f6c2c78ae684a9ac5339908557df34b8ae39d0574c7de7b9f160a80bf327d848"
+    },
+    "c/dec_missing_paren": {
+      "kind": "compile-error",
+      "source": "5a448cf62a1eb1813b15225319f5be76208ced2575a8eae7d1258b7a8baa51cf",
+      "expected": "51cf09f1a044969825739df4a42e03e7f7958ffab23f38581f82a6496ea111f8"
+    },
+    "c/dec_missing_paren_fix": {
+      "kind": "output",
+      "source": "b1035331ad16cefffd37c54d4db31d604e8aaedecf89446ab79612e242daea5c",
+      "expected": "08408c62a767e6191c638a3fe27f39882dfdc7e8a6e5b8b5286af743f0919b3b"
+    },
+    "c/dec_no_braces": {
+      "kind": "output",
+      "source": "7b10e0c2c427267961b4363c5422eaeb6d4635e63ffbc5ae780931e8f3a11807",
+      "expected": "eff2906dc8f6d10da753f78c53bbb4c2fc0a1b4bc925c1ec535b5f42902a240a"
+    },
+    "c/dec_scanf_check": {
+      "kind": "output",
+      "source": "512401a69308e7b0d3dcaec7d158efbd88f3df2320b1fe796dc9291455284a2b",
+      "expected": "d3a4090f4a0d7f3612efcaa75dbf44384737921f3982c35e6dfc6f68ca1c337d",
+      "input": "edeaaff3f1774ad2888673770c6d64097e391bc362d7d6fb34982ddf0efd18cb"
+    },
+    "c/dec_truthy": {
+      "kind": "output",
+      "source": "cb4795e6c45d3c81b118500f730b3b390add03a7439b7c637c90430d7bfe23d6",
+      "expected": "715fca56c7b1af20cb4e1cb4caee35fb3e370abbd0340c102a5dfa87f349ffc3"
+    },
+    "c/dec_vote": {
+      "kind": "output",
+      "source": "f011422f2dfde18b96bc9ff3b8d1aac9378b8bc8c66caa6e9ef010ed63a021af",
+      "expected": "39a0523c1e707bdbb8f23c4dda7eb1ca8302a31e1fc1fbaf4df7cb77917beafa"
+    },
     "c/first_program": {
       "kind": "output",
       "source": "e5c34e065a561403177e9e4384a273cfadd4af016f7778f18ca40cfd3bcf70ac",
@@ -16,6 +67,63 @@
       "source": "80ea16b6ef1bbce9a29fa5760375706c05762c6a0fb3b2e4fea43894c3bc43cd",
       "expected": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3"
     },
+    "c/io_age": {
+      "kind": "output",
+      "source": "987dc9a62471b7757ff15616ee77697feb0a1d6b8a696c034465152468edfd67",
+      "expected": "213362d1949db05ee79ccfccbc8ed75112271f06ac6fcb211d15460943567e45",
+      "input": "54183f4323f377b737433a1e98229ead0fdc686f93bab057ecb612daa94002b5"
+    },
+    "c/io_bad_input": {
+      "kind": "output",
+      "source": "6da79aa671fc18a6eb3a1efb31f33ff907935b6ef7a1a2e2d2f4707587607cf7",
+      "expected": "0e6743a12e27d6f8cc359267fbaaffbac695563b42d13018c90cbca4e8c8e538",
+      "input": "edeaaff3f1774ad2888673770c6d64097e391bc362d7d6fb34982ddf0efd18cb"
+    },
+    "c/io_count": {
+      "kind": "output",
+      "source": "17c2daa8d803698deadaeb629d20981e2bed3352ecce7c5e64f14b4f7c08e8a2",
+      "expected": "f6a78406800e18f0dd532856728b12fe3200cad334d8c83bc3f5d7c998de3b22",
+      "input": "084c799cd551dd1d8d5c5f9a5d593b2e931f5e36122ee5c793c1d08a19839cc0"
+    },
+    "c/io_double": {
+      "kind": "output",
+      "source": "2d8a39eefea3e2127ed43e2a2f6312d2792b773033866ab52db37c0769ad3a22",
+      "expected": "0b2821e77419b08333b652da33172e95c4a7d4a78966ce6101ccdb4554f04781",
+      "input": "686513ed91231892fbf0c4e72acee20264caa8538e8389157a942a808dba6531"
+    },
+    "c/io_no_amp": {
+      "kind": "compile-error",
+      "source": "f49805c4d02b4de6b3d8bcae3a4dc40099060ccdf4f381289a2fe6fed34d7216",
+      "expected": "aa9bf918e2eed741a790fe49a9c76be1714f3afa6d92202a077e3e89b416c206"
+    },
+    "c/io_no_amp_fix": {
+      "kind": "output",
+      "source": "5316501698eea5b06de4ee44710876b9705e2fc71472ac9c6e81d9c985c3bbfe",
+      "expected": "54183f4323f377b737433a1e98229ead0fdc686f93bab057ecb612daa94002b5",
+      "input": "54183f4323f377b737433a1e98229ead0fdc686f93bab057ecb612daa94002b5"
+    },
+    "c/io_printf": {
+      "kind": "output",
+      "source": "cc6fbdcefae2932f4ecf5399cc4853ab48292651d61489c228517a95bf94369e",
+      "expected": "72029d543fe19b16ac0f914f9c2e4e043a910c83d85f6a643b6ca6d9b1ff8e06"
+    },
+    "c/io_sum": {
+      "kind": "output",
+      "source": "b4067079f2154dd1f8727e58c9191e3de344b81147160d04c57a3d11234c19df",
+      "expected": "a909139bda9d5a50e0c088b737f48654f6d0763c53c9587237f6531a1d73a892",
+      "input": "0d0830f739a0a589f6478ff3d62d471dfb0974db59484dbebbfb39a770e5412f"
+    },
+    "c/io_wrong_format": {
+      "kind": "compile-error",
+      "source": "b67a59e6d5c37e76cdbde7ce7b1fe11e6e32b755e28a75c72f2b19d61e5c4e79",
+      "expected": "4bcb52e93157d6c3bf6f1659df149ee53cbdc7e04a319964331c9ede7181522e"
+    },
+    "c/io_wrong_format_fix": {
+      "kind": "output",
+      "source": "b0f4c29bbaeb0baa8086cbf52be55770de62e0a452ed530b19e4fc25d7691f49",
+      "expected": "bdc8e36eacc9b8f335b6d93061082ceba7dcd7bbbf40d0f739ee59f224cb8825",
+      "input": "686513ed91231892fbf0c4e72acee20264caa8538e8389157a942a808dba6531"
+    },
     "c/missing_brace": {
       "kind": "compile-error",
       "source": "742dcc0d7e0b73d67a90f991971390296c4ca9b13bc90574b4d9db5fc6758311",
@@ -26,10 +134,90 @@
       "source": "406c11c87d92f8c3d0130533f698652c55f053b8a97583df9a07c11263ee15e1",
       "expected": "fb4c3d2ba33273267303d211a338a769d8f0700bac92cc2721011b8dd9d031c8"
     },
+    "c/num_basics": {
+      "kind": "output",
+      "source": "f70847f2d24b0d87e7a9f62d29fc94e97979c739702e8c7be0e14afde9fd6c51",
+      "expected": "9b75e4067dbcf7900fa16efdb693adc166b8ed7808f7211157431ebba5d92da0"
+    },
+    "c/num_float": {
+      "kind": "output",
+      "source": "4802a92590c2d4730c092a8db8e334c8856cd341a5f5ceaf08824ccdf3e8a4dc",
+      "expected": "2a19421a991af73aebf9bc3e9beb3d3ada73a419375b209ddd3fe6edf3272154"
+    },
+    "c/num_int_division": {
+      "kind": "output",
+      "source": "34b4eec6e0baa2baeb4902e8706398244e14989659bde2fe2e774b35cccb92e5",
+      "expected": "ecce418e0390701cc37a54951d32832ee51c34ebc9db979d36225aa0234d8dd0"
+    },
+    "c/num_int_division_fix": {
+      "kind": "output",
+      "source": "877927f823b5af3955f8d4b65dfb207d2916729e3b354b5a20aeeed45aec45ec",
+      "expected": "1d845fde7e7a72fe87460468b003d0c9e8934a12e9cd03c6b561e07628d3fce1"
+    },
+    "c/num_minutes": {
+      "kind": "output",
+      "source": "0b499bb6746f721e3ef35a72a2c878101b7381ddd3bcbbe5b62b9cb0984c6d5d",
+      "expected": "bd3d9693057737d4300f367c5a0f5058085cbb6beb56f8e2860cb42e495cd19a"
+    },
+    "c/num_mixed": {
+      "kind": "output",
+      "source": "1fe2fff103e945b2761e02f24f361ac630bd2e6b863f3927ca7b3914bb0c51c9",
+      "expected": "41df1ed953fa0743324c5de992d1d271c3cd941888ff5637a94bc37e6f2e5325"
+    },
+    "c/num_mod_double": {
+      "kind": "compile-error",
+      "source": "a072dd1f57499488f22f21b9b64b3435ebfa8508b2599f63680d62c1fa10b4e8",
+      "expected": "613ff9bf889ca29f4a0000de9457e6a8394b0c0cbfa8451c275d49c0e136d75e"
+    },
+    "c/num_negative": {
+      "kind": "output",
+      "source": "971645f771a770ff914ec5bf3566c6cb26c65b2d0a1232c0e77a9a1b98102a3b",
+      "expected": "2ec57d80d449eb82bfc39682668e6cd7a98dbf523171093265df4621157efc34"
+    },
+    "c/num_order": {
+      "kind": "output",
+      "source": "c479a6670c4b1225fc8d9df0428e045203cb76108e4e8dc9b9ed426f573e5aea",
+      "expected": "d93aa6b4ff65740c4960d6e24d2c6e0e97e6c7898866046991f78dcfb2dbbab3"
+    },
+    "c/num_update": {
+      "kind": "output",
+      "source": "8fdf7078f229457a7255aae2b88cb73273ed3484a5cd6ab6939fb068e0349f45",
+      "expected": "37cba066b0fa7d10b40a1f3a9f3c0b0f2794a0b0a2bf862c124dfd8671b1acae"
+    },
+    "c/practice_dec_scope": {
+      "kind": "output",
+      "source": "ea09505ca5cc1789d31749f2d950b55c230887a7cb544c5a340cf051e68c7c23",
+      "expected": "c0325b9c5101922e265cb3a70c0a1696fda77d582163e851b4dae7247c2915bc"
+    },
+    "c/practice_dec_values": {
+      "kind": "output",
+      "source": "5ac19ed0107a99cfe3196e99b5bee62d331f28d4e3b0d35627ca09898ba0da17",
+      "expected": "f4a8ae8e74ddfb896a256de4e3099911dcaa6a9302591713898069b0bcd6e3d7"
+    },
+    "c/practice_io_printf": {
+      "kind": "output",
+      "source": "25ca2cd89643a61b17571d1fdfdccd4796d770925e0d6e472e585ca4efb3ab28",
+      "expected": "a4046449471d120a9173ad26421fbc663d239a9a7ee8a35f329fdf05c45e5ee4"
+    },
     "c/practice_newline": {
       "kind": "output",
       "source": "a897bd62f3d1e5ad59c1b1e1b2deda558eea5da6a3dc893821bc1e7fe0bcab97",
       "expected": "daee1cd25194ae952d046ad9b9c81d3c07dc5332440b58d6d7461b248be56712"
+    },
+    "c/practice_num_average": {
+      "kind": "output",
+      "source": "2d848902654fa2d77facce590a67a8f61b97d3afa14bb26568f267d5c9651f22",
+      "expected": "139fd1901b5a2bbfc9274e0c91630d6e62bf74e70330fdc23a060b02261bdc13"
+    },
+    "c/practice_num_division": {
+      "kind": "output",
+      "source": "5954b83447cad2717cca8a593eb21196d9288ff2f62e5b38698d7605c31564cd",
+      "expected": "d9de72b11ccda77b138500940807af54073524f663d8b3b0b3d86feec6d95f06"
+    },
+    "c/practice_num_update": {
+      "kind": "output",
+      "source": "22b21188ddde7a48816d3b824e1c9630989cd9d14eb7f69978af0f4ad3c2a37c",
+      "expected": "932ab0a0e4191d32c0af7b3f565b7b180dbe9869378abc5816f9add54b806e7f"
     },
     "c/practice_print": {
       "kind": "output",

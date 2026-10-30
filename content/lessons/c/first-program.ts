@@ -1,12 +1,13 @@
 import type { LessonSource } from "@/lib/lesson-types";
 
-// Prose in reading order: first-program.md. No shared concept file yet: Python's
-// first lesson will share one when it is written.
+// Prose in reading order: first-program.md. Shared idea: content/concepts/first-program.md,
+// which the Python lesson uses too. The lesson text does not repeat it.
 export const cFirstProgram: LessonSource = {
   course: "c",
   slug: "first-program",
   title: "Your first C program",
   status: "published",
+  concept: "first-program",
   objective: "Explain what compiling means, and write a C program that prints text with `printf`.",
   analogy: {
     title: "Translating a recipe",

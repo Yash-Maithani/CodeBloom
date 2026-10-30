@@ -1,8 +1,6 @@
-## What a program is
+## From source code to a running program
 
-A **program** is a list of instructions for a computer. You write the instructions as text in a file. That text is called **source code**, and a file of C source code has a name ending in `.c`.
-
-The part of a computer that carries out instructions, the **processor**, cannot read C. It only runs **machine code**: instructions stored as numbers, in a form that depends on the kind of processor. So before a C program can run, a tool called a **compiler** translates the source code into machine code and saves the result as a new file that you can run. This translation is called **compiling**.
+A file of C source code has a name ending in `.c`. The part of a computer that carries out instructions, the **processor**, cannot read C. It only runs **machine code**: instructions stored as numbers, in a form that depends on the kind of processor. So before a C program can run, a tool called a **compiler** translates the source code into machine code and saves the result as a new file that you can run. This translation is called **compiling**.
 
 Compiling happens once, before the program runs. If the compiler finds something it cannot understand, it stops with an error message: compilation fails, so there is no program to run.
 
@@ -10,7 +8,7 @@ Compiling happens once, before the program runs. If the compiler finds something
 
 ## Your first program
 
-Here is a complete C program. CodeBloom compiled and ran it. The text a program shows when it runs is called its **output**, and the output below is what this one printed.
+Here is a complete C program. CodeBloom compiled and ran it, and the output below is what it printed.
 
 {{example hello}}
 

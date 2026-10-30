@@ -308,7 +308,7 @@ test("each Python lesson example links to its playground page, which starts from
 });
 
 test("C lessons have no playground link, and an unknown example is a 404", async ({ page }) => {
-  for (const lesson of ["/courses/c/first-program", "/courses/c/variables"]) {
+  for (const lesson of ["/courses/c/first-program", "/courses/c/variables", "/courses/c/numbers", "/courses/c/printf-scanf", "/courses/c/decisions"]) {
     await page.goto(lesson);
     await expect(page.locator("[data-playground-link]")).toHaveCount(0);
   }

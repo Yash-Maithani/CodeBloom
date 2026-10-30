@@ -1,0 +1,5 @@
+dec_assign.c: In function ‘main’:
+dec_assign.c:5:9: error: suggest parentheses around assignment used as truth value [-Werror=parentheses]
+    5 |     if (age = 18) {
+      |         ^~~
+cc1: all warnings being treated as errors

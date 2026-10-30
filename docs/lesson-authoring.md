@@ -25,7 +25,7 @@ content/
   examples/<course>/<name>.<ext>        a program shown in a lesson
   examples/<course>/<name>.<kind>.txt   what it really printed (section 5)
   examples/python/<name>.trace.json     the line-by-line trace behind a step-through visual (section 3b)
-  examples/python/<name>.input.txt      the lines a person types, for an example that calls input() (section 5)
+  examples/<course>/<name>.input.txt    the lines a person types, for a Python example that calls input() or a C example that calls scanf (section 5)
   verified-examples.json        written by npm run check:examples; never edit it
 ```
 
@@ -131,7 +131,7 @@ Each example program has exactly one expectation file:
 | `name.compile-error.txt` | The compiler fails (C, C++ and Java only); this is its exact error message |
 | `name.run-error.txt` | The program starts and exits with an error, printing nothing to standard output first; this is the exact error message. A Python `SyntaxError` is a run error, because Python has no separate compile step here |
 
-A Python example that calls `input()` also has `name.input.txt`: the lines a person types, one line per `input()` call. Only an example that succeeds (`.expected.txt`) may have one, and it cannot have a trace. An error example must print nothing before it fails, and a prompt would be printed first, so error examples do not call `input()`.
+A Python example that calls `input()` also has `name.input.txt`: the lines a person types, one line per `input()` call. A C example that reads with `scanf` can have one too: it becomes the program's standard input. Only an example that succeeds (`.expected.txt`) may have one, and it cannot have a trace. An error example must print nothing before it fails, and a prompt would be printed first, so error examples do not call `input()` or `scanf`. C++ and Java examples cannot have one yet.
 
 File names start with a letter and use letters, digits and underscores. Java file names match the class name.
 
@@ -165,6 +165,17 @@ D="$PWD/content/examples/python"
 ```
 
 Error codes from the operating system are not portable. A missing file is `[Errno 2]` under Python on Linux, where the examples are verified, and `[Errno 44]` in the playground. The saved file holds the Linux text, so a lesson about such an error must say that the number can differ.
+
+**Capturing a C example that reads input.** Compile with the runner's flags and run the program with the input file as standard input, from inside the example's folder:
+
+```
+cd content/examples/c
+LANG=C.UTF-8 gcc -std=c17 -Wall -Wextra -Werror name.c -o /tmp/name && /tmp/name < name.input.txt > name.expected.txt
+```
+
+Nothing is echoed. A program reading a pipe prints only what it prints itself, so `name.expected.txt` holds exactly that. For `printf("How old are you? "); scanf(...); printf("Next year you will be %d.\n", age + 1);` with the input `17`, the output is `How old are you? Next year you will be 18.`, with no 17 in it. A terminal draws the typed characters on screen, but the program does not print them. That is why a lesson page shows the lines of a C input file in a separate **Typed input** panel above the Expected output panel, and why Python, whose playground really echoes them, keeps them inside the output (decision D65). In the prose, say that the typed lines are in their own panel and are not part of the output. If the input file has fewer lines than the program reads, `scanf` returns the end-of-file value and the program carries on, so keep the file exactly as long as the program needs.
+
+**Warnings that CodeBloom turns into errors.** C examples are compiled with `-Wall -Wextra -Werror`, so a warning stops the build. When a mistake example's message is a warning without `-Werror`, check what a learner would see: compile it with plain `gcc` and with `gcc -Wall`, and say in the lesson what each shows, because they differ between systems (on Ubuntu, plain gcc 13.3 warns about a wrong `scanf` placeholder but says nothing about `if (x = 5)`; both are warnings with `-Wall`). Never show the program that results from undefined behavior, such as a wrong `scanf` placeholder, a missing `&`, or a division by zero, as if its behavior were defined. Test it to see the outcome (it may crash, print nonsense or seem to work), record that in `PROGRESS.md`, and say only that C does not define it.
 
 **Capturing a trace** (Python examples with an `.expected.txt` only), from the same folder:
 
@@ -229,9 +240,10 @@ Set `status: "published"`, then run every check in `CLAUDE.md` (Quality gates), 
 | `exactly one option must be correct` / `needs one to three hints` / `two or three wrong outputs` | A practice question is outside its limits (section 3a) |
 | `error message differs` (from `check:examples`) | The compiler or interpreter printed something else; see section 5, Toolchain |
 | `trace differs from` (from `check:examples`) | The program or the tracer changed. Recapture the trace (section 5), read the new steps, and check the notes still fit |
-| `input files are only supported for Python examples` / `can have an input file` / `cannot have a trace` (from `check:examples`) | An `.input.txt` sits next to a C, C++ or Java example, an error example, or an example with a trace |
+| `input files are only supported for Python and C examples` / `can have an input file` / `cannot have a trace` (from `check:examples`) | An `.input.txt` sits next to a C++ or Java example, an error example, or an example with a trace |
 | `The input of example ... has changed` | An input file was edited, added or removed after verification. Run `npm run check:examples` and commit the updated record |
 | `EOFError: EOF when reading a line` (from `check:examples`) | The program calls `input()` more times than its input file has lines, or the example has no input file |
+| `output differs` on a C example with an input file | The program reads more or fewer values than the input file holds, or the expected file still has the old output. Capture it again with the command above and read the result |
 | `traces are only supported for Python examples` / `only an example with ... can have a trace` / `no example file named` (from `check:examples`) | A `.trace.json` sits next to the wrong kind of example, or its program is missing |
 | `The trace of ... has never been verified` / `has changed since it was last verified` | Run `npm run check:examples` and commit the updated record |
 | `has no trace file` / `a visual needs an output example` / `must be "python/<name>"` | The visual's `example` is not a traced Python output example |
