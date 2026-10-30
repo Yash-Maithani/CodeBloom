@@ -1,0 +1,5 @@
+fn_before_declared.c: In function ‘main’:
+fn_before_declared.c:4:20: error: implicit declaration of function ‘add’ [-Werror=implicit-function-declaration]
+    4 |     printf("%d\n", add(2, 3));
+      |                    ^~~
+cc1: all warnings being treated as errors

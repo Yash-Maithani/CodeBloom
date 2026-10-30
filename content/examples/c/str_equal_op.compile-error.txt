@@ -1,0 +1,6 @@
+str_equal_op.c: In function ‘main’:
+str_equal_op.c:6:15: error: comparison between two arrays [-Werror=array-compare]
+    6 |     if (first == second) {
+      |               ^~
+str_equal_op.c:6:15: note: use ‘&first[0] == &second[0]’ to compare the addresses
+cc1: all warnings being treated as errors

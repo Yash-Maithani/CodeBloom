@@ -5,12 +5,15 @@
 
 import type { LessonSource } from "@/lib/lesson-types";
 import { cFirstProgram } from "./c/first-program.ts";
+import { cFunctions } from "./c/functions.ts";
+import { cArrays } from "./c/arrays.ts";
 import { cConditions } from "./c/conditions.ts";
 import { cDecisions } from "./c/decisions.ts";
 import { cElseIf } from "./c/else-if.ts";
 import { cLoops } from "./c/loops.ts";
 import { cNumbers } from "./c/numbers.ts";
 import { cPrintfScanf } from "./c/printf-scanf.ts";
+import { cStrings } from "./c/strings.ts";
 import { cVariables } from "./c/variables.ts";
 import { pythonDecisions } from "./python/decisions.ts";
 import { pythonElif } from "./python/elif.ts";
@@ -35,6 +38,9 @@ export const lessonSources: LessonSource[] = [
   cElseIf,
   cConditions,
   cLoops,
+  cFunctions,
+  cArrays,
+  cStrings,
   pythonFirstProgram,
   pythonVariables,
   pythonInputOutput,

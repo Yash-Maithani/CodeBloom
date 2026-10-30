@@ -1,0 +1,6 @@
+arr_excess.c: In function ‘main’:
+arr_excess.c:4:34: error: excess elements in array initializer [-Werror]
+    4 |     int scores[3] = {70, 85, 90, 60};
+      |                                  ^~
+arr_excess.c:4:34: note: (near initialization for ‘scores’)
+cc1: all warnings being treated as errors
