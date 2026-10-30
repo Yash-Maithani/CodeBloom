@@ -1,0 +1,2 @@
+scanf returned 1
+number is 42

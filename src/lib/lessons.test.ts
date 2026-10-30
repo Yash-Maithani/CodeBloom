@@ -31,7 +31,10 @@ const find = (lessons: LoadedLesson[], href: string) => lessons.find((l) => l.hr
 test("every real lesson loads, passes its checks and the publish gate", async () => {
   const lessons = await site();
   assert.deepEqual(lessons.map((l) => `${l.href} ${l.source.status}`).sort(), [
+    "/courses/c/decisions published",
     "/courses/c/first-program published",
+    "/courses/c/numbers published",
+    "/courses/c/printf-scanf published",
     "/courses/c/variables published",
     "/courses/python/conditions published",
     "/courses/python/decisions published",
@@ -52,11 +55,20 @@ test("every real lesson loads, passes its checks and the publish gate", async ()
 test("real courses: previous and next follow published lessons in topic order", async () => {
   const lessons = await site();
   const c = courses.find((course) => course.slug === "c")!;
-  assert.deepEqual(publishedIn(lessons, c).map((l) => l.source.slug), ["first-program", "variables"]);
+  assert.deepEqual(publishedIn(lessons, c).map((l) => l.source.slug), ["first-program", "variables", "numbers", "printf-scanf", "decisions"]);
   const first = neighbours(lessons, find(lessons, "/courses/c/first-program"));
   assert.equal(first.number, 1);
   assert.equal(first.previous, undefined, "the first lesson has no previous lesson");
   assert.equal(first.next?.href, "/courses/c/variables");
+  // C topic order: first program, variables, numbers, printf and scanf, decisions.
+  const cNumbers = neighbours(lessons, find(lessons, "/courses/c/numbers"));
+  assert.equal(cNumbers.number, 3);
+  assert.equal(cNumbers.previous?.href, "/courses/c/variables");
+  assert.equal(cNumbers.next?.href, "/courses/c/printf-scanf");
+  const cLast = neighbours(lessons, find(lessons, "/courses/c/decisions"));
+  assert.equal(cLast.number, 5);
+  assert.equal(cLast.previous?.href, "/courses/c/printf-scanf");
+  assert.equal(cLast.next, undefined, "the last published C lesson has no next lesson");
   // Python topic order: first program, variables, numbers, input and output, decisions, elif, conditions, loops, functions, lists, strings, dictionaries, files.
   const python = courses.find((course) => course.slug === "python")!;
   assert.deepEqual(publishedIn(lessons, python).map((l) => l.source.slug), ["first-program", "variables", "numbers", "input-output", "decisions", "elif", "conditions", "loops", "functions", "lists", "strings", "dictionaries", "files"]);
@@ -87,9 +99,19 @@ test("real lessons: the Variables lessons point to each other as the same concep
   const lessons = await site();
   assert.deepEqual(sameConceptElsewhere(lessons, find(lessons, "/courses/python/variables")).map((l) => l.href), ["/courses/c/variables"]);
   assert.deepEqual(sameConceptElsewhere(lessons, find(lessons, "/courses/c/variables")).map((l) => l.href), ["/courses/python/variables"]);
-  // The other new concepts are used by one lesson each, and the published C lessons do not use them.
+  // These Python lessons share a concept with a C lesson; the others are used by one lesson each.
+  const withC: Record<string, string> = {
+    "first-program": "/courses/c/first-program",
+    numbers: "/courses/c/numbers",
+    "input-output": "/courses/c/printf-scanf",
+    decisions: "/courses/c/decisions",
+  };
   for (const slug of ["conditions", "decisions", "dictionaries", "elif", "files", "first-program", "functions", "input-output", "lists", "loops", "numbers", "strings"]) {
-    assert.deepEqual(sameConceptElsewhere(lessons, find(lessons, `/courses/python/${slug}`)), [], slug);
+    const expected = withC[slug] ? [withC[slug]] : [];
+    assert.deepEqual(sameConceptElsewhere(lessons, find(lessons, `/courses/python/${slug}`)).map((l) => l.href), expected, slug);
+  }
+  for (const [python, c] of Object.entries(withC)) {
+    assert.deepEqual(sameConceptElsewhere(lessons, find(lessons, c)).map((l) => l.href), [`/courses/python/${python}`], c);
   }
 });
 

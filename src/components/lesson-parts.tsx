@@ -41,6 +41,7 @@ export function LessonCodeBlock({
       mistake={mistake}
       showOutput={showOutput}
       exampleId={example.id}
+      typedInput={example.typedInput}
     />
     {playground && opensInPlayground(example) && (
       <p className="mt-2">

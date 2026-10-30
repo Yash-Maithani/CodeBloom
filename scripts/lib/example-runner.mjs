@@ -26,6 +26,10 @@
 // the echo is simulated). Only an example that succeeds (name.expected.txt) may
 // have one: an error example must print nothing before it fails, and a prompt
 // and echoed input would be printed first. No example with input has a trace.
+// A C example may have name.input.txt too: the program's standard input is that
+// file, so scanf and getchar read it. Nothing is echoed: a program reading a pipe
+// prints only what it prints itself, so the expected output holds exactly that,
+// and the lesson page shows the typed lines in a separate "Typed input" panel.
 // Error output is compared after two changes only: line endings become \n, and
 // the folders of the source file and the work folder are removed from paths,
 // so "/home/.../c/undeclared.c:6:20" is compared as "undeclared.c:6:20".
@@ -58,6 +62,8 @@ export const LANGUAGES = {
       { command: "gcc", args: ["-std=c17", "-Wall", "-Wextra", "-Werror", source, "-o", join(workDir, name)] },
       { command: join(workDir, name), args: [] },
     ],
+    // The input file becomes the standard input of the last step (the program).
+    stdinInput: true,
   },
   cpp: {
     label: "C++",
@@ -116,13 +122,14 @@ const INPUT_RUNNER = fileURLToPath(new URL("./python-input.py", import.meta.url)
 // plain Node and does not read TypeScript, so it keeps its own one-line copy.
 const normalizeLineEndings = (text) => text.replace(/\r\n?/g, "\n");
 
-function runProcess(command, args, { cwd, env, timeoutMs }) {
+function runProcess(command, args, { cwd, env, timeoutMs, stdin }) {
   return new Promise((resolve) => {
     const child = spawn(command, args, {
       cwd,
       env,
       shell: false,
-      stdio: ["ignore", "pipe", "pipe"],
+      // Without input the program's standard input is empty, so a read gets end-of-file.
+      stdio: [stdin === undefined ? "ignore" : "pipe", "pipe", "pipe"],
       // Own process group, so a timeout can stop the program and anything it started.
       detached: true,
     });
@@ -166,6 +173,11 @@ function runProcess(command, args, { cwd, env, timeoutMs }) {
       timedOut = true;
       killAll();
     }, timeoutMs);
+    if (stdin !== undefined) {
+      // A program that stops reading early closes the pipe; that is not a failure of the check.
+      child.stdin.on("error", () => {});
+      child.stdin.end(stdin);
+    }
     child.stdout.on("data", collect(out));
     child.stderr.on("data", collect(err));
     child.on("error", (error) => finish({ code: null, signal: null, startError: error }));
@@ -238,8 +250,8 @@ async function discover(root, languages) {
       traces.delete(example.name);
       const inputFile = inputs.get(example.name);
       inputs.delete(example.name);
-      if (inputFile && !language.inputSteps) {
-        problems.push(`${key}/${inputFile}: input files are only supported for Python examples`);
+      if (inputFile && !language.inputSteps && !language.stdinInput) {
+        problems.push(`${key}/${inputFile}: input files are only supported for Python and C examples`);
         continue;
       }
       if (inputFile && found.length === 1 && found[0][0] !== "output") {
@@ -299,15 +311,18 @@ async function checkOne(example, timeoutMs) {
   const describe = (step) => `${step.command} ${step.args[0] ?? ""}`.trim();
   try {
     const env = { PATH: process.env.PATH ?? "", LANG: "C.UTF-8", HOME: workDir, TMPDIR: workDir };
-    const steps = example.input
+    // Python feeds input through python-input.py. C feeds the file as standard input of the last step.
+    const useWrapper = example.input && example.language.inputSteps;
+    const steps = useWrapper
       ? example.language.inputSteps({ source: example.source, input: example.input })
       : example.language.steps({ source: example.source, name: example.name, workDir });
+    const stdin = example.input && !useWrapper ? normalizeLineEndings(await readFile(example.input, "utf8")) : undefined;
     // The step that is meant to fail, if any: the compiler, or the program itself.
     const failingStep =
       example.kind === "compile-error" ? 0 : example.kind === "run-error" ? steps.length - 1 : -1;
     let last;
     for (const [index, step] of steps.entries()) {
-      last = await runProcess(step.command, step.args, { cwd: workDir, env, timeoutMs });
+      last = await runProcess(step.command, step.args, { cwd: workDir, env, timeoutMs, stdin: index === steps.length - 1 ? stdin : undefined });
       if (last.startError) {
         return finishedWith(false, `could not start "${step.command}" (${last.startError.code ?? last.startError.message}). Is it installed and on PATH?`);
       }

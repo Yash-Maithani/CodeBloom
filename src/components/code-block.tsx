@@ -17,6 +17,7 @@
 
 import { Fragment, useEffect, useId, useState } from "react";
 import { CircleAlert } from "lucide-react";
+import { InputPanel } from "@/components/input-panel";
 import { OutputPanel } from "@/components/output-panel";
 import { InlineText } from "@/components/prose";
 import { buttonStyles } from "@/components/styles";
@@ -45,6 +46,8 @@ type CodeBlockProps = {
   showOutput?: boolean;
   /** "<language>/<file>", so tests can compare the page with the example's files */
   exampleId?: string;
+  /** The lines typed while a C program ran. Shown above the output, because the output does not contain them. */
+  typedInput?: string;
 };
 
 export const tokenStyles: Record<TokenKind, string> = {
@@ -83,6 +86,7 @@ export function CodeBlock({
   mistake = false,
   showOutput = true,
   exampleId,
+  typedInput,
 }: CodeBlockProps) {
   const [notesHidden, setNotesHidden] = useState(false);
   const [activeNote, setActiveNote] = useState<number | null>(null);
@@ -260,6 +264,11 @@ export function CodeBlock({
         </div>
       </div>
 
+      {showOutput && typedInput !== undefined && (
+        <div className="mt-4">
+          <InputPanel text={typedInput} of={regionLabel} />
+        </div>
+      )}
       {showOutput && (
         <div className="mt-4">
           <OutputPanel kind={kind} text={expectedOutput} of={regionLabel} />

@@ -1,0 +1,8 @@
+io_no_amp.c: In function ‘main’:
+io_no_amp.c:5:13: error: format ‘%d’ expects argument of type ‘int *’, but argument 2 has type ‘int’ [-Werror=format=]
+    5 |     scanf("%d", age);
+      |            ~^   ~~~
+      |             |   |
+      |             |   int
+      |             int *
+cc1: all warnings being treated as errors

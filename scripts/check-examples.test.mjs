@@ -424,15 +424,16 @@ test("input: an example that reads input but has no input file does not hang and
   assert.match(result.results[0].message, /EOFError/);
 });
 
-test("input: refused next to an error example, with a trace, with no example, or for C", async () => {
+test("input: refused next to an error example, with a trace, with no example, or for C++", async () => {
   const errorExample = await fixture({ "python/e.py": 'print(1 / 0)\n', "python/e.run-error.txt": "x\n", "python/e.input.txt": "1\n" });
   assert.ok((await checkExamples(errorExample)).problems.some((p) => p.includes("python/e.input.txt") && p.includes("error example must print nothing")));
   const traced = await fixture({ "python/t.py": 'print(input())\n', "python/t.expected.txt": "1\n1\n", "python/t.input.txt": "1\n", "python/t.trace.json": "{}\n" });
   assert.ok((await checkExamples(traced)).problems.some((p) => p.includes("cannot have a trace")));
   const orphan = await fixture({ "python/ok.py": 'print("x")\n', "python/ok.expected.txt": "x\n", "python/lonely.input.txt": "1\n" });
   assert.ok((await checkExamples(orphan)).problems.some((p) => p.includes("lonely.input.txt") && p.includes("no example file named")));
-  const c = await fixture({ "c/a.c": "int main(void) { return 0; }\n", "c/a.expected.txt": "", "c/a.input.txt": "1\n" }, { c: LANGUAGES.c });
-  assert.ok((await checkExamples(c)).problems.some((p) => p.includes("only supported for Python")));
+  // C is supported now (see the "c input" tests below); C++ and Java still are not.
+  const cpp = await fixture({ "cpp/a.cpp": "int main() { return 0; }\n", "cpp/a.expected.txt": "", "cpp/a.input.txt": "1\n" }, { cpp: LANGUAGES.cpp });
+  assert.ok((await checkExamples(cpp)).problems.some((p) => p.includes("only supported for Python and C")));
 });
 
 test("input: an error example that never reads input still must print nothing before failing", async () => {
@@ -465,4 +466,66 @@ test("files: reading a file that was never written fails with FileNotFoundError,
   const result = await checkExamples({ root, languages });
   assert.equal(result.ok, false);
   assert.match(result.results[0].message, /FileNotFoundError: \[Errno 2\] No such file or directory: 'greeting.txt'/);
+});
+
+// ---------- c input: the input file becomes the program's standard input ----------
+
+const C_SUM =
+  '#include <stdio.h>\n\nint main(void) {\n    int first = 0;\n    int second = 0;\n    scanf("%d", &first);\n    scanf("%d", &second);\n    printf("Sum: %d\\n", first + second);\n    return 0;\n}\n';
+
+test("c input: the input file is fed to scanf, and the output holds only what the program printed", async () => {
+  const { root, languages } = await fixture({
+    "c/sum.c": C_SUM,
+    "c/sum.input.txt": "12\n30\n",
+    "c/sum.expected.txt": "Sum: 42\n",
+  }, { c: LANGUAGES.c });
+  const result = await checkExamples({ root, languages });
+  assert.equal(result.ok, true, JSON.stringify(result.results));
+  assert.match(result.record.examples["c/sum"].input, /^[0-9a-f]{64}$/);
+});
+
+test("c input: an example with no input file gets an empty standard input, so a read returns end-of-file instead of hanging", async () => {
+  const program =
+    '#include <stdio.h>\n\nint main(void) {\n    int number = 7;\n    int count = scanf("%d", &number);\n    printf("%d %d\\n", count < 0, number);\n    return 0;\n}\n';
+  const { root, languages } = await fixture({ "c/none.c": program, "c/none.expected.txt": "1 7\n" }, { c: LANGUAGES.c });
+  const result = await checkExamples({ root, languages, timeoutMs: 5000 });
+  assert.equal(result.ok, true, JSON.stringify(result.results));
+});
+
+test("c input: an edited input file fails the check, and the recorded input hash changes", async () => {
+  const files = { "c/sum.c": C_SUM, "c/sum.input.txt": "12\n30\n", "c/sum.expected.txt": "Sum: 42\n" };
+  const first = await fixture(files, { c: LANGUAGES.c });
+  const passed = await checkExamples(first);
+  assert.equal(passed.ok, true);
+  await writeFile(join(first.root, "c/sum.input.txt"), "1\n2\n");
+  const edited = await checkExamples(first);
+  assert.equal(edited.ok, false);
+  assert.match(edited.results[0].message, /output differs/);
+  await writeFile(join(first.root, "c/sum.expected.txt"), "Sum: 3\n");
+  const second = await checkExamples(first);
+  assert.equal(second.ok, true);
+  assert.notEqual(second.record.examples["c/sum"].input, passed.record.examples["c/sum"].input);
+});
+
+test("c input: refused next to a compile-error example, and for an input file with no example", async () => {
+  const broken = await fixture({ "c/bad.c": "int main(void) { return 0 }\n", "c/bad.compile-error.txt": "x\n", "c/bad.input.txt": "1\n" }, { c: LANGUAGES.c });
+  assert.ok((await checkExamples(broken)).problems.some((p) => p.includes("c/bad.input.txt") && p.includes("can have an input file")));
+  const orphan = await fixture({ "c/ok.c": "#include <stdio.h>\nint main(void) { printf(\"x\\n\"); return 0; }\n", "c/ok.expected.txt": "x\n", "c/lonely.input.txt": "1\n" }, { c: LANGUAGES.c });
+  assert.ok((await checkExamples(orphan)).problems.some((p) => p.includes("lonely.input.txt") && p.includes("no example file named")));
+});
+
+test("c input: Windows line endings in the input file reach the program as \\n", async () => {
+  const program =
+    '#include <stdio.h>\n\nint main(void) {\n    int carriage_returns = 0;\n    int c;\n    while ((c = getchar()) != EOF) {\n        if (c == \'\\r\') {\n            carriage_returns++;\n        }\n    }\n    printf("%d\\n", carriage_returns);\n    return 0;\n}\n';
+  const { root, languages } = await fixture({ "c/crlf.c": program, "c/crlf.input.txt": "12\r\n30\r\n", "c/crlf.expected.txt": "0\n" }, { c: LANGUAGES.c });
+  const result = await checkExamples({ root, languages });
+  assert.equal(result.ok, true, JSON.stringify(result.results));
+});
+
+test("c input: a program that stops reading early does not make the check fail", async () => {
+  const program = '#include <stdio.h>\n\nint main(void) {\n    int first = 0;\n    scanf("%d", &first);\n    printf("%d\\n", first);\n    return 0;\n}\n';
+  const lots = Array.from({ length: 20000 }, (_, i) => String(i)).join("\n") + "\n";
+  const { root, languages } = await fixture({ "c/early.c": program, "c/early.input.txt": lots, "c/early.expected.txt": "0\n" }, { c: LANGUAGES.c });
+  const result = await checkExamples({ root, languages });
+  assert.equal(result.ok, true, JSON.stringify(result.results));
 });

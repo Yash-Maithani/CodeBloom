@@ -1,0 +1,9 @@
+io_wrong_format.c: In function ‘main’:
+io_wrong_format.c:5:13: error: format ‘%f’ expects argument of type ‘float *’, but argument 2 has type ‘double *’ [-Werror=format=]
+    5 |     scanf("%f", &price);
+      |            ~^   ~~~~~~
+      |             |   |
+      |             |   double *
+      |             float *
+      |            %lf
+cc1: all warnings being treated as errors

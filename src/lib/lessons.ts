@@ -28,7 +28,14 @@ export type RenderedExample = {
   kind: ExpectationKind;
   /** The recorded output or error message, never typed by hand */
   result: string;
+  /** The lines typed while the program ran, for an example whose output does not contain them (C) */
+  typedInput?: string;
 };
+
+// Python's recorded output contains the typed lines (the playground echoes them, and
+// scripts/lib/python-input.py does the same). A compiled C program prints only what
+// it prints itself, so the lines typed for it are shown in their own panel.
+const SHOWS_TYPED_INPUT: readonly string[] = ["c"];
 
 /** An answer option ready for the page. `output` options are shown as program output. */
 export type RenderedOption = { text: string; why: string; correct: boolean; output: boolean };
@@ -160,6 +167,7 @@ export async function buildLessons({ courses, sources, contentRoot, recordPath }
         notes: example.notes,
         kind: loaded.kind,
         result: loaded.expectedOutput,
+        ...(loaded.input !== undefined && SHOWS_TYPED_INPUT.includes(loaded.language) ? { typedInput: loaded.input } : {}),
       };
     };
 
