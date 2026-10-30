@@ -30,6 +30,9 @@ test("every C example with an input file gets a panel, with its own lines, and n
   const expected: Record<string, string[]> = {
     "/courses/c/printf-scanf": ["io_age", "io_sum", "io_double", "io_count", "io_no_amp_fix", "io_wrong_format_fix", "io_bad_input"],
     "/courses/c/decisions": ["dec_scanf_check"],
+    "/courses/c/else-if": ["sw_menu"],
+    "/courses/c/loops": ["loop_ask"],
+    "/courses/c/conditions": [],
     "/courses/c/numbers": [],
   };
   for (const [path, examples] of Object.entries(expected)) {

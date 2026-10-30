@@ -1,0 +1,8 @@
+sw_no_break.c: In function ‘main’:
+sw_no_break.c:7:13: error: this statement may fall through [-Werror=implicit-fallthrough=]
+    7 |             printf("Monday\n");
+      |             ^~~~~~~~~~~~~~~~~~
+sw_no_break.c:8:9: note: here
+    8 |         case 2:
+      |         ^~~~
+cc1: all warnings being treated as errors

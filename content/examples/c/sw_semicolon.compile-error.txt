@@ -1,0 +1,11 @@
+sw_semicolon.c: In function ‘main’:
+sw_semicolon.c:5:19: error: suggest braces around empty body in an ‘if’ statement [-Werror=empty-body]
+    5 |     if (age >= 18);
+      |                   ^
+sw_semicolon.c:5:5: error: this ‘if’ clause does not guard... [-Werror=misleading-indentation]
+    5 |     if (age >= 18);
+      |     ^~
+sw_semicolon.c:6:5: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+    6 |     {
+      |     ^
+cc1: all warnings being treated as errors

@@ -1,0 +1,5 @@
+cond_mixed.c: In function ‘main’:
+cond_mixed.c:7:27: error: suggest parentheses around ‘&&’ within ‘||’ [-Werror=parentheses]
+    7 |     printf("%d\n", a || b && c);
+      |                         ~~^~~~
+cc1: all warnings being treated as errors

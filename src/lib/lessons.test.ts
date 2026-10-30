@@ -31,8 +31,11 @@ const find = (lessons: LoadedLesson[], href: string) => lessons.find((l) => l.hr
 test("every real lesson loads, passes its checks and the publish gate", async () => {
   const lessons = await site();
   assert.deepEqual(lessons.map((l) => `${l.href} ${l.source.status}`).sort(), [
+    "/courses/c/conditions published",
     "/courses/c/decisions published",
+    "/courses/c/else-if published",
     "/courses/c/first-program published",
+    "/courses/c/loops published",
     "/courses/c/numbers published",
     "/courses/c/printf-scanf published",
     "/courses/c/variables published",
@@ -55,19 +58,27 @@ test("every real lesson loads, passes its checks and the publish gate", async ()
 test("real courses: previous and next follow published lessons in topic order", async () => {
   const lessons = await site();
   const c = courses.find((course) => course.slug === "c")!;
-  assert.deepEqual(publishedIn(lessons, c).map((l) => l.source.slug), ["first-program", "variables", "numbers", "printf-scanf", "decisions"]);
+  assert.deepEqual(publishedIn(lessons, c).map((l) => l.source.slug), ["first-program", "variables", "numbers", "printf-scanf", "decisions", "else-if", "conditions", "loops"]);
   const first = neighbours(lessons, find(lessons, "/courses/c/first-program"));
   assert.equal(first.number, 1);
   assert.equal(first.previous, undefined, "the first lesson has no previous lesson");
   assert.equal(first.next?.href, "/courses/c/variables");
-  // C topic order: first program, variables, numbers, printf and scanf, decisions.
+  // C topic order: first program, variables, numbers, printf and scanf, decisions, else if, conditions, loops.
   const cNumbers = neighbours(lessons, find(lessons, "/courses/c/numbers"));
   assert.equal(cNumbers.number, 3);
   assert.equal(cNumbers.previous?.href, "/courses/c/variables");
   assert.equal(cNumbers.next?.href, "/courses/c/printf-scanf");
-  const cLast = neighbours(lessons, find(lessons, "/courses/c/decisions"));
-  assert.equal(cLast.number, 5);
-  assert.equal(cLast.previous?.href, "/courses/c/printf-scanf");
+  const cDecisions = neighbours(lessons, find(lessons, "/courses/c/decisions"));
+  assert.equal(cDecisions.number, 5);
+  assert.equal(cDecisions.previous?.href, "/courses/c/printf-scanf");
+  assert.equal(cDecisions.next?.href, "/courses/c/else-if");
+  const cConditions = neighbours(lessons, find(lessons, "/courses/c/conditions"));
+  assert.equal(cConditions.number, 7);
+  assert.equal(cConditions.previous?.href, "/courses/c/else-if");
+  assert.equal(cConditions.next?.href, "/courses/c/loops");
+  const cLast = neighbours(lessons, find(lessons, "/courses/c/loops"));
+  assert.equal(cLast.number, 8);
+  assert.equal(cLast.previous?.href, "/courses/c/conditions");
   assert.equal(cLast.next, undefined, "the last published C lesson has no next lesson");
   // Python topic order: first program, variables, numbers, input and output, decisions, elif, conditions, loops, functions, lists, strings, dictionaries, files.
   const python = courses.find((course) => course.slug === "python")!;
@@ -105,6 +116,9 @@ test("real lessons: the Variables lessons point to each other as the same concep
     numbers: "/courses/c/numbers",
     "input-output": "/courses/c/printf-scanf",
     decisions: "/courses/c/decisions",
+    elif: "/courses/c/else-if",
+    conditions: "/courses/c/conditions",
+    loops: "/courses/c/loops",
   };
   for (const slug of ["conditions", "decisions", "dictionaries", "elif", "files", "first-program", "functions", "input-output", "lists", "loops", "numbers", "strings"]) {
     const expected = withC[slug] ? [withC[slug]] : [];

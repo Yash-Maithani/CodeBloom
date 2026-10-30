@@ -50,6 +50,6 @@ Programs often change a variable using its own value, like `score = score + 5`. 
 
 ## Limits that C does not check
 
-Dividing a whole number by zero is **undefined behavior**: the rules of C do not say what happens, so the program may crash, print nonsense, or even seem to work. Python stops with a clear error instead. Check the divisor first. A later lesson, Making decisions with if and else, shows how.
+Dividing a whole number by zero is **undefined behavior**: the rules of C do not say what happens, so the program may crash, print nonsense, or even seem to work. Python stops with a clear error instead. Check the divisor first. A later lesson, Making decisions with if and else, shows how to check a value, and [Combining conditions with &&, || and !](/courses/c/conditions) shows a safe way to divide.
 
 An `int` also has a limit. On most computers the largest is 2147483647, and a calculation that goes beyond it is undefined behavior as well. Keep the numbers small for now.

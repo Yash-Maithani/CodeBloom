@@ -1,0 +1,8 @@
+loop_semicolon.c: In function ‘main’:
+loop_semicolon.c:4:5: error: this ‘for’ clause does not guard... [-Werror=misleading-indentation]
+    4 |     for (int number = 1; number <= 3; number++);
+      |     ^~~
+loop_semicolon.c:5:5: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+    5 |     {
+      |     ^
+cc1: all warnings being treated as errors

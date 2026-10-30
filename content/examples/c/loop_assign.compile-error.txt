@@ -1,0 +1,5 @@
+loop_assign.c: In function ‘main’:
+loop_assign.c:5:12: error: suggest parentheses around assignment used as truth value [-Werror=parentheses]
+    5 |     while (count = 3) {
+      |            ^~~~~
+cc1: all warnings being treated as errors

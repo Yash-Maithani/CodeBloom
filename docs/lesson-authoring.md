@@ -177,6 +177,19 @@ Nothing is echoed. A program reading a pipe prints only what it prints itself, s
 
 **Warnings that CodeBloom turns into errors.** C examples are compiled with `-Wall -Wextra -Werror`, so a warning stops the build. When a mistake example's message is a warning without `-Werror`, check what a learner would see: compile it with plain `gcc` and with `gcc -Wall`, and say in the lesson what each shows, because they differ between systems (on Ubuntu, plain gcc 13.3 warns about a wrong `scanf` placeholder but says nothing about `if (x = 5)`; both are warnings with `-Wall`). Never show the program that results from undefined behavior, such as a wrong `scanf` placeholder, a missing `&`, or a division by zero, as if its behavior were defined. Test it to see the outcome (it may crash, print nonsense or seem to work), record that in `PROGRESS.md`, and say only that C does not define it.
 
+Which flag turns on which gcc 13.3 report, measured for the C mistakes in the lessons (plain `gcc` reports none of these except the `scanf` format ones on Ubuntu):
+
+| Report | Turned on by |
+|---|---|
+| `[-Wformat=]`, a wrong `scanf` placeholder or a missing `&` | `-Wall`, and by default on Ubuntu |
+| `[-Wparentheses]`: `=` in a condition, `&&` within `\|\|`, a comparison in an operand of `&` | `-Wall` |
+| `[-Wmisleading-indentation]`: a semicolon after `if (...)` or `for (...)` | `-Wall` |
+| `[-Wempty-body]`: a semicolon after `if (...)` | `-Wextra` |
+| `[-Wimplicit-fallthrough=]`: a `case` that runs into the next one | `-Wextra` |
+| Nothing reports it: `else if` in the wrong order, `<` instead of `<=`, `\|\|` with a bare number, `&` between two plain numbers, a loop that never changes its variable | no flag |
+
+A program that never ends cannot be an example, because the runner would stop it at the timeout: teach the infinite loop in prose, say that gcc cannot warn about it, and use a choice question that claims no output.
+
 **Capturing a trace** (Python examples with an `.expected.txt` only), from the same folder:
 
 ```
