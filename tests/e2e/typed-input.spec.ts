@@ -32,6 +32,9 @@ test("every C example with an input file gets a panel, with its own lines, and n
     "/courses/c/decisions": ["dec_scanf_check"],
     "/courses/c/else-if": ["sw_menu"],
     "/courses/c/loops": ["loop_ask"],
+    "/courses/c/functions": ["fn_larger"],
+    "/courses/c/arrays": ["arr_input"],
+    "/courses/c/strings": ["str_scanf"],
     "/courses/c/conditions": [],
     "/courses/c/numbers": [],
   };

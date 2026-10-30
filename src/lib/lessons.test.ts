@@ -31,13 +31,16 @@ const find = (lessons: LoadedLesson[], href: string) => lessons.find((l) => l.hr
 test("every real lesson loads, passes its checks and the publish gate", async () => {
   const lessons = await site();
   assert.deepEqual(lessons.map((l) => `${l.href} ${l.source.status}`).sort(), [
+    "/courses/c/arrays published",
     "/courses/c/conditions published",
     "/courses/c/decisions published",
     "/courses/c/else-if published",
     "/courses/c/first-program published",
+    "/courses/c/functions published",
     "/courses/c/loops published",
     "/courses/c/numbers published",
     "/courses/c/printf-scanf published",
+    "/courses/c/strings published",
     "/courses/c/variables published",
     "/courses/python/conditions published",
     "/courses/python/decisions published",
@@ -58,12 +61,12 @@ test("every real lesson loads, passes its checks and the publish gate", async ()
 test("real courses: previous and next follow published lessons in topic order", async () => {
   const lessons = await site();
   const c = courses.find((course) => course.slug === "c")!;
-  assert.deepEqual(publishedIn(lessons, c).map((l) => l.source.slug), ["first-program", "variables", "numbers", "printf-scanf", "decisions", "else-if", "conditions", "loops"]);
+  assert.deepEqual(publishedIn(lessons, c).map((l) => l.source.slug), ["first-program", "variables", "numbers", "printf-scanf", "decisions", "else-if", "conditions", "loops", "functions", "arrays", "strings"]);
   const first = neighbours(lessons, find(lessons, "/courses/c/first-program"));
   assert.equal(first.number, 1);
   assert.equal(first.previous, undefined, "the first lesson has no previous lesson");
   assert.equal(first.next?.href, "/courses/c/variables");
-  // C topic order: first program, variables, numbers, printf and scanf, decisions, else if, conditions, loops.
+  // C topic order: first program, variables, numbers, printf and scanf, decisions, else if, conditions, loops, functions, arrays, strings.
   const cNumbers = neighbours(lessons, find(lessons, "/courses/c/numbers"));
   assert.equal(cNumbers.number, 3);
   assert.equal(cNumbers.previous?.href, "/courses/c/variables");
@@ -76,9 +79,17 @@ test("real courses: previous and next follow published lessons in topic order", 
   assert.equal(cConditions.number, 7);
   assert.equal(cConditions.previous?.href, "/courses/c/else-if");
   assert.equal(cConditions.next?.href, "/courses/c/loops");
-  const cLast = neighbours(lessons, find(lessons, "/courses/c/loops"));
-  assert.equal(cLast.number, 8);
-  assert.equal(cLast.previous?.href, "/courses/c/conditions");
+  const cLoops = neighbours(lessons, find(lessons, "/courses/c/loops"));
+  assert.equal(cLoops.number, 8);
+  assert.equal(cLoops.previous?.href, "/courses/c/conditions");
+  assert.equal(cLoops.next?.href, "/courses/c/functions");
+  const cArrays = neighbours(lessons, find(lessons, "/courses/c/arrays"));
+  assert.equal(cArrays.number, 10);
+  assert.equal(cArrays.previous?.href, "/courses/c/functions");
+  assert.equal(cArrays.next?.href, "/courses/c/strings");
+  const cLast = neighbours(lessons, find(lessons, "/courses/c/strings"));
+  assert.equal(cLast.number, 11);
+  assert.equal(cLast.previous?.href, "/courses/c/arrays");
   assert.equal(cLast.next, undefined, "the last published C lesson has no next lesson");
   // Python topic order: first program, variables, numbers, input and output, decisions, elif, conditions, loops, functions, lists, strings, dictionaries, files.
   const python = courses.find((course) => course.slug === "python")!;
@@ -119,6 +130,9 @@ test("real lessons: the Variables lessons point to each other as the same concep
     elif: "/courses/c/else-if",
     conditions: "/courses/c/conditions",
     loops: "/courses/c/loops",
+    functions: "/courses/c/functions",
+    lists: "/courses/c/arrays",
+    strings: "/courses/c/strings",
   };
   for (const slug of ["conditions", "decisions", "dictionaries", "elif", "files", "first-program", "functions", "input-output", "lists", "loops", "numbers", "strings"]) {
     const expected = withC[slug] ? [withC[slug]] : [];

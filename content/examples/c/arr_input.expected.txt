@@ -1,0 +1,3 @@
+Type 3 numbers: 2
+9
+4

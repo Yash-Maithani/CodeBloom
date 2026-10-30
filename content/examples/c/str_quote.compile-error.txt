@@ -1,0 +1,5 @@
+str_quote.c: In function ‘main’:
+str_quote.c:4:19: error: initialization of ‘char’ from ‘char *’ makes integer from pointer without a cast [-Werror=int-conversion]
+    4 |     char letter = "A";
+      |                   ^~~
+cc1: all warnings being treated as errors

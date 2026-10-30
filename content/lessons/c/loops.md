@@ -42,4 +42,4 @@ A `do while` loop checks its condition after the group, not before. So its group
 
 ## while, for or do while?
 
-Use `for` when you know how many passes you need, `while` when you repeat until something happens, and `do while` when the group must run once before the first check. Python has no `do while` loop, and its `for` loop goes through a sequence instead of counting with three parts.
+Use `for` when you know how many passes you need, `while` when you repeat until something happens, and `do while` when the group must run once before the first check. Python has no `do while` loop, and its `for` loop goes through a sequence instead of counting with three parts. A `for` loop is also the usual way to go through an array: see [Arrays](/courses/c/arrays), a later lesson.

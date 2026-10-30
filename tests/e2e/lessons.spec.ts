@@ -16,6 +16,9 @@ const COURSES = {
       ["/courses/c/else-if", "More decisions with else if and switch"],
       ["/courses/c/conditions", "Combining conditions with &&, || and !"],
       ["/courses/c/loops", "Loops: while, for and do while"],
+      ["/courses/c/functions", "Functions"],
+      ["/courses/c/arrays", "Arrays"],
+      ["/courses/c/strings", "Strings"],
     ],
   },
   python: {
@@ -106,7 +109,7 @@ for (const slug of ["cpp", "java"]) {
 test("course cards show the real number of published lessons", async ({ page }) => {
   await page.goto("/courses");
   const status = (name: string) => page.locator("article").filter({ has: page.getByRole("link", { name, exact: true }) }).locator("p").last();
-  await expect(status("C")).toHaveText("8 lessons published");
+  await expect(status("C")).toHaveText("11 lessons published");
   await expect(status("Python")).toHaveText("13 lessons published");
   await expect(status("C++")).toHaveText("No lessons published yet");
   await expect(status("Java")).toHaveText("No lessons published yet");
@@ -230,8 +233,8 @@ test("the shared idea links the same lesson in the other language, both ways", a
   await expect(page).toHaveURL(/\/courses\/c\/variables$/);
   await page.getByText("This part is the same in the").getByRole("link", { name: "Python lesson" }).click();
   await expect(page).toHaveURL(/\/courses\/python\/variables$/);
-  // A concept used by one lesson only has no link. Functions has no C lesson yet.
-  await page.goto("/courses/python/functions");
+  // A concept used by one lesson only has no link. Dictionaries has no C lesson.
+  await page.goto("/courses/python/dictionaries");
   await expect(page.getByText("This part is the same in the")).toHaveCount(0);
 });
 
@@ -266,6 +269,9 @@ test("the new C lessons share their idea with the matching Python lessons, and l
     ["/courses/c/else-if", "/courses/python/elif"],
     ["/courses/c/conditions", "/courses/python/conditions"],
     ["/courses/c/loops", "/courses/python/loops"],
+    ["/courses/c/functions", "/courses/python/functions"],
+    ["/courses/c/arrays", "/courses/python/lists"],
+    ["/courses/c/strings", "/courses/python/strings"],
   ] as const;
   for (const [c, python] of pairs) {
     await page.goto(c);

@@ -1,0 +1,2 @@
+3 squared is 9
+5 squared is 25

@@ -1,0 +1,5 @@
+fn_local.c: In function ‘main’:
+fn_local.c:10:20: error: ‘result’ undeclared (first use in this function)
+   10 |     printf("%d\n", result);
+      |                    ^~~~~~
+fn_local.c:10:20: note: each undeclared identifier is reported only once for each function it appears in

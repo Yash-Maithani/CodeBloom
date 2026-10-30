@@ -1,0 +1,4 @@
+arr_assign.c: In function ‘main’:
+arr_assign.c:6:12: error: assignment to expression with array type
+    6 |     second = first;
+      |            ^

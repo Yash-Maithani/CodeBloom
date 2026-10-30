@@ -186,7 +186,15 @@ Which flag turns on which gcc 13.3 report, measured for the C mistakes in the le
 | `[-Wmisleading-indentation]`: a semicolon after `if (...)` or `for (...)` | `-Wall` |
 | `[-Wempty-body]`: a semicolon after `if (...)` | `-Wextra` |
 | `[-Wimplicit-fallthrough=]`: a `case` that runs into the next one | `-Wextra` |
-| Nothing reports it: `else if` in the wrong order, `<` instead of `<=`, `\|\|` with a bare number, `&` between two plain numbers, a loop that never changes its variable | no flag |
+| `[-Wreturn-type]`: a function with a return type that reaches its closing brace without `return` | `-Wall` |
+| `[-Warray-compare]`: `==` between two arrays, such as two strings | `-Wall` |
+| `[-Wimplicit-function-declaration]`: a call before the function is declared | by default in gcc 13, and `-Wall` |
+| `[-Wsizeof-array-argument]`: `sizeof` on an array parameter | by default in gcc 13, and `-Wall` |
+| `[-Wint-conversion]`: `"A"` stored in a `char`; `excess elements in array initializer` | by default in gcc 13, and `-Wall` |
+| An assignment to an array (`second = first`) or an undeclared local variable | an error with every flag |
+| Nothing reports it: `char word[3] = "cat"` with no room for the terminator, `scanf("%s", name)` with no width, `else if` in the wrong order, `<` instead of `<=`, `\|\|` with a bare number, `&` between two plain numbers, a loop that never changes its variable | no flag |
+
+An index past the end of an array is undefined behavior and cannot be an example either: with `-O0` no flag warned in the tests with gcc 13.3, `-O2 -Wall` warned for a constant index (`-Warray-bounds`), and `-fsanitize=address` or `-fsanitize=undefined` reported it when the program ran. The value read differed between `-O0` and `-O2`. Teach it in prose and a choice question, and claim only what was tested.
 
 A program that never ends cannot be an example, because the runner would stop it at the timeout: teach the infinite loop in prose, say that gcc cannot warn about it, and use a choice question that claims no output.
 
