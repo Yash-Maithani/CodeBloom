@@ -7,6 +7,7 @@
 // right pane moves under the code.
 
 import { tokenStyles } from "@/components/code-block";
+import { PredictReveal } from "@/components/predict-reveal";
 import { InlineText } from "@/components/prose";
 import { ValueChip } from "@/components/value-chip";
 import type { CodeToken } from "@/lib/highlight";
@@ -40,6 +41,7 @@ export function Figure({
   path,
   output,
   note,
+  predict,
   children,
 }: {
   title: string;
@@ -50,9 +52,16 @@ export function Figure({
   /** The output of the verified run */
   output: string;
   note?: { line: number; text: string };
+  /** Hide the output until the learner presses Show; `line` names the line that prints, when the trace shows it */
+  predict?: { line?: number };
   /** A control above the code, for an explorer */
   children?: React.ReactNode;
 }) {
+  const outputPanel = (
+    <pre tabIndex={0} role="region" aria-label={`Output of the real run for ${regionLabel}`} className="overflow-x-auto rounded-control bg-sunken px-3 py-2 font-mono text-code">
+      <code>{output}</code>
+    </pre>
+  );
   return (
     <figure data-figure className="rounded-panel border border-rule bg-surface">
       <figcaption className="rounded-t-panel border-b border-rule bg-sunken px-4 py-3 font-heading text-h3">{title}</figcaption>
@@ -99,9 +108,9 @@ export function Figure({
           )}
           <div>
             <p className="text-small font-bold text-ink-muted">Output of the real run</p>
-            <pre tabIndex={0} role="region" aria-label={`Output of the real run for ${regionLabel}`} className="mt-2 overflow-x-auto rounded-control bg-sunken px-3 py-2 font-mono text-code">
-              <code>{output}</code>
-            </pre>
+            <div className="mt-2">
+              {predict ? <PredictReveal line={predict.line}>{outputPanel}</PredictReveal> : outputPanel}
+            </div>
           </div>
           {note && (
             <div data-figure-note>
