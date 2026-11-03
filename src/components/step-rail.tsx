@@ -41,7 +41,19 @@ function Steps({ steps, current }: { steps: RailStep[]; current: string | null }
   );
 }
 
-export function StepRail({ steps, title, current: forced }: { steps: RailStep[]; title: string; /** gallery only */ current?: string }) {
+export function StepRail({
+  steps,
+  title,
+  label = "Steps in this lesson",
+  current: forced,
+}: {
+  steps: RailStep[];
+  title: string;
+  /** The navigation's name; a page with two rails needs two names */
+  label?: string;
+  /** gallery only */
+  current?: string;
+}) {
   const [current, setCurrent] = useState<string | null>(forced ?? steps[0]?.id ?? null);
 
   useEffect(() => {
@@ -60,7 +72,7 @@ export function StepRail({ steps, title, current: forced }: { steps: RailStep[];
   }, [steps, forced]);
 
   return (
-    <nav aria-label="Steps in this lesson" data-step-rail>
+    <nav aria-label={label} data-step-rail>
       <div className="hidden lg:sticky lg:top-6 lg:block">
         <p className="mb-2 px-3 text-small text-ink-muted">{title}</p>
         <Steps steps={steps} current={current} />

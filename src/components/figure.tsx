@@ -6,7 +6,7 @@
 // Chips appear only on lines given a chip, never on every line. Below 1024px the
 // right pane moves under the code.
 
-import { tokenStyles } from "@/components/code-block";
+import { tokenStyles } from "@/components/token-styles";
 import { PredictReveal } from "@/components/predict-reveal";
 import { InlineText } from "@/components/prose";
 import { ValueChip } from "@/components/value-chip";

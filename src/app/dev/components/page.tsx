@@ -31,8 +31,10 @@ function Both({ children, stack = false }: { children: React.ReactNode; stack?: 
   return (
     <div className={`grid gap-4 ${stack ? "" : "xl:grid-cols-2"}`}>
       {(["light", "dark"] as const).map((theme) => (
-        <div key={theme} data-theme={theme} className="min-w-0 rounded-card border border-rule p-4 md:p-6">
-          <p className="mb-4 text-small text-ink-muted">{theme === "light" ? "Light" : "Dark"}</p>
+        // The dark copy repeats the light one, so it is inert: screen readers and
+        // the keyboard use the light copy, and region names stay unique.
+        <div key={theme} data-theme={theme} inert={theme === "dark"} className="min-w-0 rounded-card border border-rule p-4 md:p-6">
+          <p className="mb-4 text-small text-ink-muted">{theme === "light" ? "Light (interactive)" : "Dark, for viewing"}</p>
           {children}
         </div>
       ))}
@@ -262,7 +264,7 @@ export default async function ComponentGallery() {
           <div>
             <p className="mb-2 font-bold">With the new components</p>
             <div className="rounded-card border border-rule bg-canvas p-4 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,3fr)] lg:gap-10 lg:p-10">
-              <StepRail title="Python, lesson 5 of 13" steps={steps.map((label, i) => ({ id: `preview-step-${i}`, label }))} current="preview-step-0" />
+              <StepRail title="Python, lesson 5 of 13" label="Steps in the preview lesson" steps={steps.map((label, i) => ({ id: `preview-step-${i}`, label }))} current="preview-step-0" />
               <div className="mt-6 min-w-0 lg:mt-0">
                 <h3 className="font-heading text-h1">{decisions.source.title}</h3>
                 <p className="mt-4 max-w-measure text-lead">

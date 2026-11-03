@@ -39,6 +39,8 @@ test("the figure's path and chip come from the vote trace, and predict then run 
   const figure = page.locator('section:has(h2#figure) [data-theme="light"] [data-figure]');
   await expect(figure.locator("[data-path-step]")).toHaveText(["Line 1 ran", "Line 2 ran", "Line 3 skipped", "Line 5 ran"]);
   await expect(figure.locator('[data-line="2"]')).toContainText("False");
+  // Syntax colours work in the server-rendered figure too: 17 is a literal (#8A4B00).
+  expect(await figure.locator('[data-line="1"] [data-code-text] span').filter({ hasText: "17" }).evaluate((el) => getComputedStyle(el).color)).toBe("rgb(138, 75, 0)");
   // Only the condition line has a chip.
   expect(await figure.locator("[data-line] .rounded-chip").count()).toBe(1);
   await expect(figure.getByText("Think about what line 5 prints, then press Show.")).toBeVisible();

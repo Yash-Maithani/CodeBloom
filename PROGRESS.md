@@ -6,6 +6,8 @@ Last updated: 2026-11-03
 
 ## Current milestone
 
+**UI redesign (Trailhead), round 1 of 3: foundations, components and gallery** (branch `claude/ui-polish`, started from `main` at `3cc2219`, which includes C batch 5 merged as pull request 16). The owner chose direction C, Trailhead, with B Bench's figure system inside lessons, and approved the new `DESIGN.md` and a three-round plan (D97). Round 1 is Implemented and Tested (Chromium only; light and dark; 360 and 1440px; keyboard; reduced motion): new tokens and fonts, the components with their states, and the gallery at `/dev/components`. The page templates are still the old layouts with the new tokens; round 2 rebuilds them and round 3 adds explorers from verified variants. Awaiting the owner's review of the gallery before round 2. Nothing is Deployed.
+
 **Milestone 5: Python playground.** Implemented and Tested (Chromium only; light and dark; 320 to 1440px; keyboard only). Python runs in the browser with Pyodide 314.0.7, self-hosted, in a Web Worker: `/playground` and one page per runnable Python lesson example. Not yet Verified in browser with a real screen reader or on a real phone. Awaiting owner review and a pull request opened by the owner. Nothing is Deployed.
 
 **C batch 5** (branch `claude/c-batch-5`, started from `main` at `503cf6a`, which includes C batch 4 merged as pull request 15): the 14th and last C lesson, "Reading and writing files with fopen", after Structures (D93). It reuses the shared `files` concept and links to the Python Files lesson, so the Python page now also points to it. Text approved by the owner, with three fixes, before any file was written. Implemented, Tested and Verified in browser (Chromium only). Awaiting owner review and a pull request opened by the owner. Nothing is Deployed.
@@ -131,7 +133,7 @@ Windows, Narrator (Windows key + Ctrl + Enter) or NVDA, in Edge or Chrome, on `/
 
 ## In progress
 
-Nothing beyond owner review of Milestone 5 and the owner's Milestone 3 screen reader walkthrough.
+UI redesign rounds 2 (templates and every page) and 3 (explorers from verified variants and the remaining motion), after the owner reviews the round 1 gallery. Also open: owner review of Milestone 5 and the Milestone 3 screen reader walkthrough.
 
 ## Outstanding tasks
 
@@ -140,7 +142,7 @@ Nothing beyond owner review of Milestone 5 and the owner's Milestone 3 screen re
 2. Measure the first Python start on a real mid-range phone (Chromium's CPU throttling does not reach workers, so the emulated numbers understate CPU time).
 3. Owner runs the screen reader checklist above and reports the results; then Milestone 3 can be marked Verified in browser. Deferred by the owner; kept open.
 4. A screen reader pass over one visual and one playground run (Next step, the ends, the table) when the owner does the Milestone 3 walkthrough; not done.
-5. Launch items still open (brief Section 16): the final favicon, social sharing metadata, removing `/dev/tokens`, and a privacy policy that says the playground runs on the learner's device and sends nothing (owner requirement). The host must serve `.wasm` as `application/wasm`, apply the worker's Content Security Policy and the immutable cache header, and ideally compress the files.
+5. Launch items still open (brief Section 16): the final favicon, social sharing metadata, removing `/dev/tokens`, `/dev/components` and `public/dev/`, and a privacy policy that says the playground runs on the learner's device and sends nothing (owner requirement). The host must serve `.wasm` as `application/wasm`, apply the worker's Content Security Policy and the immutable cache header, and ideally compress the files.
 6. Owner answers the open decisions in `SPEC.md` Section 10 as each milestone needs them. Decision 3 (remembering completed lessons) stays open.
 
 ## Stack and versions (checked 2026-10-26)
@@ -168,7 +170,7 @@ Official sources read: Next.js installation and ESLint pages (Node 20.9 minimum,
 
 | Asset | License | Source |
 |---|---|---|
-| Literata | SIL Open Font License 1.1 | github.com/google/fonts, `ofl/literata/OFL.txt` |
+| Bricolage Grotesque (replaced Literata on 2026-11-03, D98) | SIL Open Font License 1.1 | github.com/google/fonts, `ofl/bricolagegrotesque/OFL.txt` |
 | Atkinson Hyperlegible Next | SIL Open Font License 1.1 | `ofl/atkinsonhyperlegiblenext/OFL.txt` |
 | Atkinson Hyperlegible Mono | SIL Open Font License 1.1 | `ofl/atkinsonhyperlegiblemono/OFL.txt` |
 | Lucide icons | ISC | github.com/lucide-icons/lucide, `LICENSE` |
@@ -401,6 +403,16 @@ The OFL allows free use, self-hosting and embedding in a website; the font files
 | 2026-10-31 | Final gates for C batch 2 | `lint` 0, `typecheck` 0, `test:e2e` 268 of 268 on the first full run (builds first; 250 before, 18 new), `check:examples` 223 of 223, `test:runner` 45 of 45, `test:unit` 102 of 102, `verify:browser` 114 of 114, `npm audit` 0 vulnerabilities. Tests now pin 8 C lessons and their order, previous and next around the new lessons, "8 lessons published", the three new shared-concept pairs with Python, and the Typed input panel on two more lessons. |
 | 2026-10-31 | Accessibility scan after C batch 2 (axe-core 4.14.0, outside the repo, reduced motion) | 12 scans (`/courses/c/else-if`, `/courses/c/conditions`, `/courses/c/loops`; light and dark; 360 and 1440px): 0 violations, 8 needing review: 6 are `color-contrast` on long literal strings in code at 360px, and 2 are `color-contrast` on the compile-error output of `loop_semicolon` at 1440px ("partially obscured by another element", the existing scrollable output panel). The same kinds as earlier scans. Not investigated further. |
 | 2026-10-31 | Not done for C batch 2 | `design:design-critique`, `design:ux-copy` and `design:accessibility-review` were not run on these lessons: the owner approved the text first and no new interface text was added. Chromium only; no real screen reader. |
+| 2026-11-03 | UI redesign start | `main` at `3cc2219152f9dbf4b8070c5098a5f8a238616336` (C batch 5 merged). New branch `claude/ui-polish`. `website-design:web-review` of the homepage, courses page, a lesson and the playground at 360 and 1440px found a false claim on the homepage ("Hints and instant feedback are planned"; they shipped in Milestone 3) and that "How each lesson works" does not mention the step-through visuals or the playground; both are for round 2. Three directions were mocked up in the scratchpad with real content; the owner chose C, Trailhead, with B's figure system (D97). |
+| 2026-11-03 | Trailhead palette contrast (script, then `verify:browser`) | Every text pair 4.5:1 or more in both themes, lowest 5.52 (`success` on `success-tint`, light). Control edges 3.51 to 5.86. The light marigold fill is 1.45 against `canvas`, so primary buttons carry a 2px ink border (12.55). `verify:browser` reads the new tables and passes 114 of 114 with 31 contrast pairs, 9 type sizes at both breakpoints, 11 spacing steps, 4 radii and the three fonts. |
+| 2026-11-03 | Round 1 tests | `test:e2e` 314 of 314. Changed tests, each because what it checks really changed: the layout test's page background (`paper` to `canvas` values), the smoke test's font family (Literata to Bricolage Grotesque), and the keyboard test now waits until the page is interactive, because from 1024px each notes list becomes a tab stop when its script runs (it had built its list before that and missed the new stop). New: `notes-link.spec.ts` (3: one tab stop per notes list, arrow keys, Home and End, highlight and connector, none at 360px, no animation with reduced motion), `motion.spec.ts` (2: the bloom once per correct check, hidden from screen readers; no animation with reduced motion), `gallery.spec.ts` (5: every section in both themes, forced states with their token colours, path and chip from the vote trace, syntax colours in the server-rendered figure, predict then run, the unavailable explorer, nothing links to `/dev`). `test:unit` 102 of 102, `test:runner` 45 of 45, `check:examples` 316 of 316, lint and typecheck exit 0, build all static with the two known font warnings. |
+| 2026-11-03 | Bug found in review and fixed | The two-pane figure lost its syntax colours when rendered on the server, because it imported the token class map from a client component, where a server component only gets a reference. The map moved to `src/components/token-styles.ts`; a gallery test checks the literal colour. |
+| 2026-11-03 | `design:accessibility-review` approach, axe-core 4.14.0 (outside the repo) | 24 scans: `/`, `/courses`, `/courses/python`, `/courses/python/decisions`, `/playground`, `/dev/components`, light and dark, 360 and 1440px. First run: the real pages had 0 violations; the gallery had `landmark-unique` because each component appears twice. Fixed by making the dark copy `inert` (it is for viewing; the light copy is interactive) and naming the preview's step rail separately. Second run: 0 violations; the only items left are the known "partially obscured" contrast items on scrolling code lines. No real screen reader. |
+| 2026-11-03 | Lighthouse 13.5.0 mobile, one run each | `/`: performance 96, accessibility, best practices and SEO 100, CLS 0. `/courses/python/decisions`: 94, 100, 100, 100, CLS 0. |
+| 2026-11-03 | Bundle and fonts, `main` (built in a scratchpad worktree) against round 1 | All static JavaScript: 15 files, 618.3 KB raw, 194.4 KB gzip before; 17 files, 666.1 KB raw, 210.6 KB gzip after (most of the growth is the gallery page's own code). Downloaded by a browser: homepage JavaScript 146.8 to 148.0 KB gzip, lesson 155.3 to 157.6 KB; fonts 4 files on each page, 90.6 KB before and 109.4 KB after (+18.8 KB, Bricolage Grotesque 700 and 800 instead of Literata 600). |
+| 2026-11-03 | `design:design-system` audit (script over `src/`) | No raw colour values outside `globals.css`; no spacing, size or radius class without a token. Arbitrary class syntax remains only for state selectors (`data-[state=hover]`, `has-[:checked]`), one transition property list and two grid column ratios. Fixed: the notes grid used a hard-coded 1.5rem row height (the old code line height); it now uses the code size and line-height tokens. |
+| 2026-11-03 | `website-design:web-review` of the gallery and the current pages | Fixed: the figure's missing syntax colours (above), and a value chip that disappeared on a highlighted line (it now has an `edge` border). For round 2: the pages still use the old layouts with the new tokens, the homepage copy fixes, and the predict-then-run output area keeps its full height while waiting, which leaves a gap (intended, for CLS 0, but the waiting text could fill it). |
+| 2026-11-03 | `npm audit` | Production dependencies: 0 vulnerabilities. All dependencies: 16 moderate, in ESLint's `minimatch`, the advisory already in Known limitations; `package.json` and `package-lock.json` are identical to `main`. |
 
 ### What `verify:browser` covers
 
@@ -409,7 +421,7 @@ Scenarios: light and dark forced with `data-theme` while the browser preference 
 - 18 color tokens computed by the browser match `DESIGN.md`, and every swatch renders its token.
 - 32 contrast pairs: ratio calculated in the browser matches the documented value to two decimals and meets AA (4.5:1 text, 3:1 non-text). The 8 text samples on the page also match.
 - 9 type sizes with line heights, 9 spacing steps, 3 radii and the motion duration match `DESIGN.md`.
-- Literata 600, Atkinson Next 400 and 700, Atkinson Mono 400, 700 and 400 italic are loaded and used; font files come from our own origin and none from Google.
+- The fonts and weights named in `DESIGN.md` section 3 (Bricolage Grotesque 700 and 800, Atkinson Next 400 and 700, Atkinson Mono 400, 700 and 400 italic) are loaded and used; font files come from our own origin and none from Google.
 - No horizontal overflow, focus ring is 2px solid `ink` with 2px offset, no console errors, warnings, failed requests or HTTP errors.
 
 Screenshots are saved to `screenshots/` (`light-360.png`, `light-1440.png`, `dark-360.png`, `dark-1440.png`). The folder is ignored by Git and not committed.
@@ -511,6 +523,11 @@ Screenshots are saved to `screenshots/` (`light-360.png`, `light-1440.png`, `dar
 | D91 | 2026-10-31 | The Pointers lesson pays off these promises: `&` in `scanf`; what `int *` means; a function changing the caller's variable (`add_one`, `swap`); `&numbers[i]` in `scanf`; arrays passed to functions; `scanf("%s", name)` without `&`; why `sizeof` on an array parameter gives a pointer size; what `char *` is | Owner approved the list. |
 | D92 | 2026-10-31 | Dereferencing NULL or a pointer with no value, using a returned address of a local, and moving a pointer outside its array are undefined behavior, taught in prose and a choice question and never as examples that run. Run-time claims are limited to gcc 13.3 on Linux. Addresses are never printed (they changed on every run). `malloc`, pointers to pointers, function pointers, `void *`, `const`, string-literal pointers, struct padding and partial struct initialization are left out on purpose | Owner approved. |
 | D93 | 2026-10-31 | A C lesson "Reading and writing files with fopen" is approved as a separate C batch 5 after Structures, pairing with the existing `files` concept. It is not drafted. `fopen`, `fprintf`, `fgets`, `fclose` and a NULL check for a missing file were tested in a normal folder; the example runner uses a fresh temporary folder per example | Owner approved the plan only. |
+| D97 | 2026-11-03 | UI redesign: direction C, Trailhead (guided path, predict then run, step rail, marigold for the learner's own action, teal for structure), with B Bench's two-pane figure inside lessons. `DESIGN.md` rewritten; built in three rounds: foundations, components and gallery; templates and every page; explorers from verified variants and the remaining motion | Owner choice and approval. Approved features carried over: linked notes with ink connectors, notebook course cards, explorers from verified variants only, smooth state changes, the bloom, the step rail as the outline, highlighter marks, diagrams. |
+| D98 | 2026-11-03 | Fonts: Bricolage Grotesque (700, 800) for headings, Atkinson Hyperlegible Next and Mono kept; code never uses ligatures | Owner approved. All SIL Open Font License 1.1, self-hosted with `next/font`. |
+| D99 | 2026-11-03 | Two small token refinements during round 1: the primary button's pressed edge is 4px (it moves down one 4px spacing step), and the card tilt is a token (`tilt-card`, -0.5deg); with reduced motion a lifted card only shows its shadow. Added hover tokens `primary-hover` and `action-hover` (contrast checked) | Lets components use tokens instead of one-off values. Recorded in `DESIGN.md`. |
+| D100 | 2026-11-03 | Any element can force a theme (`data-theme`), so the gallery shows light and dark side by side; the dark copy is `inert` | The gallery would otherwise repeat every region name (axe `landmark-unique`) and every tab stop. |
+| D101 | 2026-11-03 | Figure values come only from verified data: the path taken and a condition's True or False chip are read from the trace with the same rule the build uses for branch declarations; predict then run names a line only when the trace shows which line printed | Honesty rule: nothing shown is computed by hand. |
 | D82 | 2026-10-31 | C batch 2 on a new branch `claude/c-batch-2` from `main` at `2285be6` (C batch 1 had been merged as pull request 12). Three lessons in the approved C order, each linked to its shared concept (and so to its Python lesson). Pointer sentences added to two published C lessons: Numbers (safe division is shown in the conditions lesson) and Decisions (the next lesson is else if and switch). No visuals: the tracer supports Python only | Owner approved the text, with three fixes, and the pointer changes W1 and W2. |
 | D83 | 2026-10-31 | `switch` works on whole numbers only in these lessons, because `char` and text come later. The fall-through and semicolon mistakes are gcc reports (`-Wextra`, and `-Wall` for the misleading indentation) that CodeBloom's `-Werror` makes errors, shown with the flags that produce each message; their consequence is described in words, not printed, because the runner cannot verify it | Owner approved. Fall-through is defined behavior in C, hand-tested with plain gcc: it runs through every instruction below the matching label until a `break`. |
 | D84 | 2026-10-31 | The infinite loop in C is taught in prose and in no example: gcc says nothing about it with any flags, nothing in C stops it, and Ctrl+C ends it in a terminal. The `scanf` guess loop is shown with enough typed input, and the text says it would repeat for ever on text or at the end of the input (both measured) | Owner approved, including the Ctrl+C advice. |
@@ -522,13 +539,13 @@ Node 22.22.0, npm 10.9.4, Python 3.13, gcc and g++ 13.3, OpenJDK and javac 21. P
 
 ## Git
 
-- Working branch: `claude/c-batch-5` (C batch 5), created from `main` at `503cf6a` (D94).
-- `main` at `503cf6a` (C batch 4 merged by the owner in pull request 15); unchanged by Claude.
-- For the latest commit on this branch, run `git log -1 origin/claude/c-batch-5`.
+- Working branch: `claude/ui-polish` (UI redesign), created from `main` at `3cc2219` (C batch 5 merged by the owner in pull request 16).
+- `main` at `3cc2219`; unchanged by Claude.
+- For the latest commit on this branch, run `git log -1 origin/claude/ui-polish`.
 
 ## Next recommended task
 
-Owner reviews C batch 5 and opens the pull request, then decides what to do with the `npm audit` finding, then decides what to do with the remaining teaching review findings (verification log, 2026-10-28): writing exercises, a mini project, and splitting Strings. Before launch, measure the first Python start on a real phone and confirm the host serves the Pyodide files and headers correctly. Milestone 6 gets acceptance criteria when it is planned.
+Owner reviews the round 1 gallery (`/dev/components`, screenshots in the session) and approves round 2: the homepage, courses, course page trail, lesson, playground and 404 templates with the new components, and the homepage copy fixes.
 
 ## Resuming work
 

@@ -25,8 +25,9 @@ import { InputPanel } from "@/components/input-panel";
 import { OutputPanel } from "@/components/output-panel";
 import { InlineText } from "@/components/prose";
 import { buttonStyles } from "@/components/styles";
+import { tokenStyles } from "@/components/token-styles";
 import type { CodeNote } from "@/lib/code-notes";
-import type { CodeToken, TokenKind } from "@/lib/highlight";
+import type { CodeToken } from "@/lib/highlight";
 import type { ExpectationKind } from "@/lib/verified";
 
 type CodeBlockProps = {
@@ -54,12 +55,6 @@ type CodeBlockProps = {
   typedInput?: string;
 };
 
-export const tokenStyles: Record<TokenKind, string> = {
-  plain: "",
-  keyword: "font-bold",
-  literal: "text-literal",
-  comment: "italic text-ink-muted",
-};
 
 function NoteMarker({ number }: { number: number }) {
   return (
@@ -263,9 +258,9 @@ export function CodeBlock({
                 data-notes-list
                 onKeyDown={wide ? onNotesKey : undefined}
                 className="lg:grid"
-                // One grid row per code line. 1.5rem is the code line height
-                // (text-code: 0.9375rem size times 1.6 line height).
-                style={{ gridTemplateRows: `repeat(${lines.length}, minmax(1.5rem, auto))` }}
+                // One grid row per code line, as tall as a code line (the text-code
+                // size times its line height, both tokens).
+                style={{ gridTemplateRows: `repeat(${lines.length}, minmax(calc(var(--text-code) * var(--text-code--line-height)), auto))` }}
               >
                 {notes.map((note, index) => {
                   const nextStart = notes[index + 1]?.startLine ?? lines.length + 1;

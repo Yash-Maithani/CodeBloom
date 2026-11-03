@@ -11,7 +11,7 @@
 
 import { Fragment, useState, useSyncExternalStore } from "react";
 import { ArrowRight } from "lucide-react";
-import { tokenStyles } from "@/components/code-block";
+import { tokenStyles } from "@/components/token-styles";
 import { OutputLines } from "@/components/output-lines";
 import { InlineText } from "@/components/prose";
 import { buttonStyles } from "@/components/styles";
