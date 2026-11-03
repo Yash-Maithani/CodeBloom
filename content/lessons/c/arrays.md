@@ -24,13 +24,13 @@ If you give fewer values than the size, the rest are 0. If you give none at all,
 
 ## Reading numbers into an array
 
-`scanf` can store a number in one item. Write `&` in front of the item, as in `&numbers[i]`. Pointers, a later lesson, explains the `&`. The typed lines are in the Typed input panel.
+`scanf` can store a number in one item. Write `&` in front of the item, as in `&numbers[i]`. [Pointers](/courses/c/pointers), a later lesson, explains the `&`. The typed lines are in the Typed input panel.
 
 {{example input}}
 
 ## Arrays and functions
 
-When you give a function an array, it does not receive a copy of the items, and it does not receive the length. It receives the place where the array is. So the function can change the caller's array, which is different from the single numbers in [Functions](/courses/c/functions), and it needs the length as a separate argument. Pointers, a later lesson, explains why.
+When you give a function an array, it does not receive a copy of the items, and it does not receive the length. It receives the place where the array is. So the function can change the caller's array, which is different from the single numbers in [Functions](/courses/c/functions), and it needs the length as a separate argument. [Pointers](/courses/c/pointers), a later lesson, explains why.
 
 {{example function}}
 

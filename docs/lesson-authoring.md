@@ -192,9 +192,18 @@ Which flag turns on which gcc 13.3 report, measured for the C mistakes in the le
 | `[-Wsizeof-array-argument]`: `sizeof` on an array parameter | by default in gcc 13, and `-Wall` |
 | `[-Wint-conversion]`: `"A"` stored in a `char`; `excess elements in array initializer` | by default in gcc 13, and `-Wall` |
 | An assignment to an array (`second = first`) or an undeclared local variable | an error with every flag |
+| `[-Wint-conversion]`: an `int` passed where a pointer is expected (`add_one(score)`), or a pointer stored in an `int` (`int *a, b;` then `b = &y;`) | by default in gcc 13, and `-Wall` |
+| `[-Wreturn-local-addr]`: a function returns the address of a local variable | by default in gcc 13, and `-Wall` |
+| `[-Wuninitialized]`: a pointer used before it has a value | `-Wall` |
+| `[-Wmissing-field-initializers]`: a struct initializer that stops early, such as `{"Ada"}` for three members (`= {0}` was silent with every flag) | `-Wextra` |
+| `[-Wnull-dereference]`: reading or writing through a `NULL` pointer the compiler can see | `-O2 -Wnull-dereference` only |
+| `[-Wformat=]`: `scanf("%19s", &name)` for a `char` array | by default in gcc 13, and `-Wall` |
+| `p.x` on a pointer, `==` between two structs, `s.name = "Ada"` for a `char` array member | an error with every flag |
 | Nothing reports it: `char word[3] = "cat"` with no room for the terminator, `scanf("%s", name)` with no width, `else if` in the wrong order, `<` instead of `<=`, `\|\|` with a bare number, `&` between two plain numbers, a loop that never changes its variable | no flag |
 
 An index past the end of an array is undefined behavior and cannot be an example either: with `-O0` no flag warned in the tests with gcc 13.3, `-O2 -Wall` warned for a constant index (`-Warray-bounds`), and `-fsanitize=address` or `-fsanitize=undefined` reported it when the program ran. The value read differed between `-O0` and `-O2`. Teach it in prose and a choice question, and claim only what was tested.
+
+A wrong pointer is undefined behavior and cannot be an example: dereferencing `NULL` or a pointer with no value, using a returned address of a local variable, and moving a pointer outside its array. Tested with gcc 13.3: `NULL` stopped the program with a segmentation fault at `-O0` and `-O2`; a pointer with no value printed a number and seemed to work at `-O0` and crashed at `-O2`; a pointer past an array printed different values at `-O0` and `-O2`, was reported by `-O2 -Wall` only for a constant offset, was reported by `-fsanitize=address` and was not reported by `-fsanitize=undefined`. Never print an address (`%p`): it changes on every run, so compare addresses (`p == &x`) or print the value behind them.
 
 A program that never ends cannot be an example, because the runner would stop it at the timeout: teach the infinite loop in prose, say that gcc cannot warn about it, and use a choice question that claims no output.
 

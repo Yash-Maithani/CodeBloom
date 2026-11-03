@@ -1,0 +1,4 @@
+struct_equal.c: In function ‘main’:
+struct_equal.c:11:11: error: invalid operands to binary == (have ‘struct Point’ and ‘struct Point’)
+   11 |     if (a == b) {
+      |           ^~

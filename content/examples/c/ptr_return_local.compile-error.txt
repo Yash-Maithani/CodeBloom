@@ -1,0 +1,5 @@
+ptr_return_local.c: In function ‘make_number’:
+ptr_return_local.c:5:12: error: function returns address of local variable [-Werror=return-local-addr]
+    5 |     return &value;
+      |            ^~~~~~
+cc1: all warnings being treated as errors

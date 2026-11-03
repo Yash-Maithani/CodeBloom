@@ -1,0 +1,4 @@
+struct_name_assign.c: In function ‘main’:
+struct_name_assign.c:10:12: error: assignment to expression with array type
+   10 |     s.name = "Ada";
+      |            ^

@@ -39,8 +39,10 @@ test("every real lesson loads, passes its checks and the publish gate", async ()
     "/courses/c/functions published",
     "/courses/c/loops published",
     "/courses/c/numbers published",
+    "/courses/c/pointers published",
     "/courses/c/printf-scanf published",
     "/courses/c/strings published",
+    "/courses/c/structures published",
     "/courses/c/variables published",
     "/courses/python/conditions published",
     "/courses/python/decisions published",
@@ -61,12 +63,12 @@ test("every real lesson loads, passes its checks and the publish gate", async ()
 test("real courses: previous and next follow published lessons in topic order", async () => {
   const lessons = await site();
   const c = courses.find((course) => course.slug === "c")!;
-  assert.deepEqual(publishedIn(lessons, c).map((l) => l.source.slug), ["first-program", "variables", "numbers", "printf-scanf", "decisions", "else-if", "conditions", "loops", "functions", "arrays", "strings"]);
+  assert.deepEqual(publishedIn(lessons, c).map((l) => l.source.slug), ["first-program", "variables", "numbers", "printf-scanf", "decisions", "else-if", "conditions", "loops", "functions", "arrays", "strings", "pointers", "structures"]);
   const first = neighbours(lessons, find(lessons, "/courses/c/first-program"));
   assert.equal(first.number, 1);
   assert.equal(first.previous, undefined, "the first lesson has no previous lesson");
   assert.equal(first.next?.href, "/courses/c/variables");
-  // C topic order: first program, variables, numbers, printf and scanf, decisions, else if, conditions, loops, functions, arrays, strings.
+  // C topic order: first program, variables, numbers, printf and scanf, decisions, else if, conditions, loops, functions, arrays, strings, pointers, structures.
   const cNumbers = neighbours(lessons, find(lessons, "/courses/c/numbers"));
   assert.equal(cNumbers.number, 3);
   assert.equal(cNumbers.previous?.href, "/courses/c/variables");
@@ -87,9 +89,13 @@ test("real courses: previous and next follow published lessons in topic order", 
   assert.equal(cArrays.number, 10);
   assert.equal(cArrays.previous?.href, "/courses/c/functions");
   assert.equal(cArrays.next?.href, "/courses/c/strings");
-  const cLast = neighbours(lessons, find(lessons, "/courses/c/strings"));
-  assert.equal(cLast.number, 11);
-  assert.equal(cLast.previous?.href, "/courses/c/arrays");
+  const cStrings = neighbours(lessons, find(lessons, "/courses/c/strings"));
+  assert.equal(cStrings.number, 11);
+  assert.equal(cStrings.previous?.href, "/courses/c/arrays");
+  assert.equal(cStrings.next?.href, "/courses/c/pointers");
+  const cLast = neighbours(lessons, find(lessons, "/courses/c/structures"));
+  assert.equal(cLast.number, 13);
+  assert.equal(cLast.previous?.href, "/courses/c/pointers");
   assert.equal(cLast.next, undefined, "the last published C lesson has no next lesson");
   // Python topic order: first program, variables, numbers, input and output, decisions, elif, conditions, loops, functions, lists, strings, dictionaries, files.
   const python = courses.find((course) => course.slug === "python")!;

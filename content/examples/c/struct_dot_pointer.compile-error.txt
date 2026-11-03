@@ -1,0 +1,5 @@
+struct_dot_pointer.c: In function ‘show’:
+struct_dot_pointer.c:9:30: error: ‘p’ is a pointer; did you mean to use ‘->’?
+    9 |     printf("%d %d\n", p->y, p.x);
+      |                              ^
+      |                              ->
