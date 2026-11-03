@@ -153,7 +153,7 @@ Buttons are never pill-shaped.
 
 ### Shadows
 
-Three, nothing else: `press` 0 3px 0 `action-edge` (primary buttons only); `lift` 0 14px 28px -14px (ink at 45% in light, black at 60% in dark), hovered course cards only; `float` 0 8px 24px ink at 18% (none in dark, which uses an `edge` border), menus and popovers.
+Three, nothing else: `press` 0 4px 0 `action-edge` (primary buttons only; pressing moves the button down the same 4px); `lift` 0 14px 28px -14px (ink at 45% in light, black at 60% in dark), hovered course cards only; `float` 0 8px 24px ink at 18% (none in dark, which uses an `edge` border), menus and popovers.
 
 ## 6. Motion
 
@@ -166,6 +166,7 @@ Motion shows what changed or answers an action. Nothing moves on its own; nothin
 | `duration-slow` | 300ms | Ink connector, highlighter mark, bloom (the maximum) |
 | `ease-standard` | `cubic-bezier(0.2, 0, 0, 1)` | Everything except the bloom |
 | `ease-bloom` | `cubic-bezier(0.3, 0, 0, 1.3)` | The bloom only (a small overshoot) |
+| `tilt-card` | `-0.5deg` | How far a course card turns when it lifts |
 
 - Only `transform` and `opacity` animate, plus colour transitions. Nothing changes layout; CLS stays 0.
 - With `prefers-reduced-motion: reduce`: every duration token is 0ms, every transform and animation is off, and all information stays.
@@ -175,10 +176,10 @@ Motion shows what changed or answers an action. Nothing moves on its own; nothin
 
 Every interactive component defines: default, hover, focus-visible, pressed, disabled (prefer an enabled control that explains what is missing), loading and error where they apply, and the reduced-motion version. Focus-visible everywhere: 2px solid `ink` outline, 2px offset. Targets at least 44 by 44px.
 
-- **Button, primary:** `action` fill, `on-action` text, 2px `action-edge` border, `press` shadow; hover darkens the fill one step; pressed moves down 3px and drops the shadow (instant with reduced motion); disabled `sunken` fill with `ink-muted` text and `edge` border; loading keeps the label and adds "…" in words, for example "Running…".
+- **Button, primary:** `action` fill, `on-action` text, 2px `action-edge` border, `press` shadow; hover darkens the fill one step; pressed moves down 4px and drops the shadow; reduced motion: pressed keeps its place and uses the hover fill; disabled `sunken` fill with `ink-muted` text and `edge` border; loading keeps the label and adds "…" in words, for example "Running…".
 - **Button, secondary:** `surface` fill, `ink` text, 2px `edge` border; hover `primary-tint`.
 - **Link:** `primary`, always underlined; hover thickens the underline.
-- **Course card:** `surface`, `card` radius, 8px top band (`primary` published, `rule` planned), name in `h3`, one-line description, a chip "13 lessons" or "Planned". Hover and focus-within: lifts 4px and tilts -0.5 degrees with `lift` (`base`, `ease-standard`); reduced motion: band thickens to 12px, no movement.
+- **Course card:** `surface`, `card` radius, 8px top band (`primary` published, `rule` planned), name in `h3`, one-line description, a chip "13 lessons" or "Planned". Hover and focus-within: lifts 4px and turns by `tilt-card` with the `lift` shadow (`duration-base`, `ease-standard`); reduced motion: the shadow appears, nothing moves.
 - **Step rail:** sticky from 1024px; numbered steps (round markers); current step `surface` row with a 4px `primary` bar and `aria-current="location"`; links jump to sections; below 1024px it becomes a "Steps in this lesson" disclosure at the top.
 - **Code block:** `sunken`, `panel` radius, 1px `rule` border, line numbers `ink-muted` unselectable; current or hovered line `primary-tint` with a 4px `primary` bar; Copy code button (secondary, small).
 - **Figure (two-pane):** title in `h3`, code pane left, explanation pane right: "Path taken", "Output of the real run", the note for the active line. Stacks below 1024px with the explanation under the code.

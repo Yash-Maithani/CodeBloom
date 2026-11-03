@@ -70,7 +70,7 @@ export function StepThrough({ visual }: { visual: RenderedVisual }) {
                 key={index}
                 data-trace-line={index + 1}
                 data-current={current || undefined}
-                className={`flex border-l-3 pr-4 transition-colors motion-reduce:transition-none ${current ? "border-primary bg-primary-tint" : "border-transparent"}`}
+                className={`flex border-l-4 pr-4 transition-colors motion-reduce:transition-none ${current ? "border-primary bg-primary-tint" : "border-transparent"}`}
               >
                 <span aria-hidden="true" className="w-8 shrink-0 select-none text-right text-ink-muted">
                   {index + 1}
@@ -129,7 +129,7 @@ export function StepThrough({ visual }: { visual: RenderedVisual }) {
         </div>
         <div>
           <p className="text-ui font-bold">Output so far</p>
-          <div data-output-so-far className="mt-2 rounded-panel border border-l-3 border-rule border-l-ink-muted bg-sunken px-4 py-3">
+          <div data-output-so-far className="mt-2 rounded-panel border border-l-4 border-rule border-l-ink-muted bg-sunken px-4 py-3">
             <OutputLines text={step?.output ?? ""} empty="nothing yet" />
           </div>
         </div>

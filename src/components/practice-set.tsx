@@ -134,7 +134,7 @@ function Question({ item, number, onCorrect }: { item: PracticeItem; number: num
           <div
             key={feedback.attempt}
             data-feedback={feedback.kind}
-            className={`flex gap-3 rounded-panel border border-l-3 border-rule p-4 ${
+            className={`flex gap-3 rounded-panel border border-l-4 border-rule p-4 ${
               feedback.kind === "correct" ? "border-l-success bg-success-tint" : "border-l-error bg-error-tint"
             }`}
           >
@@ -162,7 +162,7 @@ function Question({ item, number, onCorrect }: { item: PracticeItem; number: num
           its content is often not announced. */}
       <ol aria-live="polite" data-hints className={`flex max-w-measure flex-col gap-2 ${hintsShown > 0 ? "mt-4" : ""}`}>
         {item.hints.slice(0, hintsShown).map((hint, index) => (
-          <li key={index} className="rounded-control border border-l-3 border-rule border-l-edge bg-surface px-4 py-2">
+          <li key={index} className="rounded-control border border-l-4 border-rule border-l-edge bg-surface px-4 py-2">
             <strong>Hint {index + 1}:</strong> <InlineText text={hint} />
           </li>
         ))}

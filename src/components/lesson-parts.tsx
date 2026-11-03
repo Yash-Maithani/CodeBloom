@@ -69,7 +69,7 @@ export function Mistakes({ lesson }: { lesson: LoadedLesson }) {
       <section
         key={mistake.rendered.id}
         aria-label={`Common mistake: ${plain(mistake.title)}`}
-        className="mt-8 rounded-panel border border-l-3 border-rule border-l-warning bg-warning-tint p-4 md:p-6"
+        className="mt-8 rounded-panel border border-l-4 border-rule border-l-warning bg-warning-tint p-4 md:p-6"
       >
         <h3 className="flex items-start gap-3 font-heading text-h3">
           <TriangleAlert aria-hidden="true" size={20} strokeWidth={1.75} className="mt-1 shrink-0 text-warning" />

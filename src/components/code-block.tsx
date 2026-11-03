@@ -182,7 +182,7 @@ export function CodeBlock({
                   <Fragment key={lineNumber}>
                     <span
                       data-line={lineNumber}
-                      className={`flex border-l-3 pr-4 transition-colors ${
+                      className={`flex border-l-4 pr-4 transition-colors ${
                         isLineActive(lineNumber) ? "border-primary bg-primary-tint" : "border-transparent"
                       }`}
                     >
@@ -210,7 +210,7 @@ export function CodeBlock({
                       <span
                         aria-hidden="true"
                         data-note-row={noteIndex + 1}
-                        className="mx-4 my-2 flex select-none gap-3 border-l-3 border-primary bg-surface px-4 py-2 font-sans text-ui whitespace-normal lg:hidden"
+                        className="mx-4 my-2 flex select-none gap-3 border-l-4 border-primary bg-surface px-4 py-2 font-sans text-ui whitespace-normal lg:hidden"
                       >
                         <NoteMarker number={noteIndex + 1} />
                         <InlineText text={note.text} />

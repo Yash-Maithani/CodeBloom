@@ -12,7 +12,7 @@
  */
 export function InputPanel({ text, of }: { text: string; of: string }) {
   return (
-    <div className="rounded-panel border border-l-3 border-rule border-l-ink-muted bg-sunken">
+    <div className="rounded-panel border border-l-4 border-rule border-l-ink-muted bg-sunken">
       <p className="px-4 pt-3 text-ui font-bold">Typed input</p>
       <p className="px-4 pt-1 text-ui text-ink-muted">
         A person typed these lines while the program ran. A terminal shows them on screen, but the program does not print them, so they are not in the Expected output below.

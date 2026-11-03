@@ -110,7 +110,7 @@
   --radius-round: 9999px;
 
   /* Shadows (DESIGN.md section 5) */
-  --shadow-press: 0 3px 0 var(--color-action-edge);
+  --shadow-press: 0 4px 0 var(--color-action-edge);
   --shadow-lift: 0 14px 28px -14px rgb(22 48 43 / 0.45);
   --shadow-float: 0 8px 24px rgb(22 48 43 / 0.18);
 
@@ -120,6 +120,7 @@
   --duration-slow: 300ms;
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --ease-bloom: cubic-bezier(0.3, 0, 0, 1.3);
+  --tilt-card: -0.5deg;
   --default-transition-duration: var(--duration-fast);
   --default-transition-timing-function: var(--ease-standard);
 
@@ -197,7 +198,9 @@
   }
 }
 
-:root[data-theme="dark"] {
+/* Any element can force a theme, so the component gallery can show light and
+   dark side by side. On <html> this forces the whole page. */
+[data-theme="dark"] {
   color-scheme: dark;
   --color-canvas: #0f1d1a;
   --color-surface: #172925;
@@ -226,6 +229,56 @@
   --shadow-float: none;
 }
 
+[data-theme="light"] {
+  color-scheme: light;
+  --color-canvas: #eef3f1;
+  --color-surface: #ffffff;
+  --color-sunken: #f6f9f8;
+  --color-ink: #16302b;
+  --color-ink-muted: #4d625d;
+  --color-rule: #cbd8d4;
+  --color-edge: #6f857f;
+  --color-primary: #00695c;
+  --color-primary-hover: #004d44;
+  --color-on-primary: #ffffff;
+  --color-primary-tint: #ddefea;
+  --color-action: #f4c542;
+  --color-action-hover: #e3b22c;
+  --color-on-action: #16302b;
+  --color-action-edge: #16302b;
+  --color-mark: #fbe7a6;
+  --color-literal: #8a4b00;
+  --color-success: #1d5fa8;
+  --color-success-tint: #e6eef8;
+  --color-error: #b3261e;
+  --color-error-tint: #fbe9e7;
+  --color-warning: #7f5300;
+  --color-warning-tint: #fff3d6;
+  --shadow-lift: 0 14px 28px -14px rgb(22 48 43 / 0.45);
+  --shadow-float: 0 8px 24px rgb(22 48 43 / 0.18);
+}
+
+/* A course card lifts and turns slightly on hover and keyboard focus
+   (DESIGN.md section 7, course card). data-state="hover" shows it in the gallery. */
+@utility card-lift {
+  transition-property: transform, box-shadow;
+  transition-duration: var(--duration-base);
+  transition-timing-function: var(--ease-standard);
+  &:hover,
+  &:focus-within,
+  &[data-state="hover"] {
+    transform: translateY(calc(var(--spacing-1) * -1)) rotate(var(--tilt-card));
+    box-shadow: var(--shadow-lift);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    &:hover,
+    &:focus-within,
+    &[data-state="hover"] {
+      transform: none;
+    }
+  }
+}
+
 /* Reduced motion (DESIGN.md section 6): every duration is 0 and every
    transform-based animation is off. Components take their timing from these
    tokens, so this one rule covers them. */
@@ -244,6 +297,12 @@
     font-family: var(--font-sans);
     font-size: var(--text-ui);
     line-height: var(--text-ui--line-height);
+  }
+
+  /* A part of the page with its own theme gets that theme's background and text. */
+  [data-theme] {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
   }
 
   /* Code is shown exactly as typed: no ligatures, so >= never becomes one glyph. */

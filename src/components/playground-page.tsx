@@ -29,7 +29,7 @@ export async function PlaygroundPage({ file, from }: { file: string; from?: { ti
       )}
       <p className="mt-2 max-w-measure text-ui text-ink-muted">Python only. C, C++ and Java are not yet supported in the playground.</p>
       <noscript>
-        <p className="mt-6 max-w-measure rounded-panel border border-l-3 border-rule border-l-warning bg-surface px-4 py-3">
+        <p className="mt-6 max-w-measure rounded-panel border border-l-4 border-rule border-l-warning bg-surface px-4 py-3">
           Running code needs JavaScript. You can still copy the code below and run it with Python on your computer.
         </p>
       </noscript>
