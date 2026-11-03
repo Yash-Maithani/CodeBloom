@@ -175,6 +175,17 @@ LANG=C.UTF-8 gcc -std=c17 -Wall -Wextra -Werror name.c -o /tmp/name && /tmp/name
 
 Nothing is echoed. A program reading a pipe prints only what it prints itself, so `name.expected.txt` holds exactly that. For `printf("How old are you? "); scanf(...); printf("Next year you will be %d.\n", age + 1);` with the input `17`, the output is `How old are you? Next year you will be 18.`, with no 17 in it. A terminal draws the typed characters on screen, but the program does not print them. That is why a lesson page shows the lines of a C input file in a separate **Typed input** panel above the Expected output panel, and why Python, whose playground really echoes them, keeps them inside the output (decision D65). In the prose, say that the typed lines are in their own panel and are not part of the output. If the input file has fewer lines than the program reads, `scanf` returns the end-of-file value and the program carries on, so keep the file exactly as long as the program needs.
 
+**Capturing a C example that creates a file.** A program that calls `fopen` with `"w"` or `"a"` creates its file in the folder it runs in. Never capture it from inside `content/examples/c`, or the file lands in the repository. Compile and run it in a temporary folder, and write the expectation to the example folder from there:
+
+```
+d=$(mktemp -d)
+LANG=C.UTF-8 gcc -std=c17 -Wall -Wextra -Werror content/examples/c/name.c -o $d/prog
+(cd $d && ./prog > /full/path/to/content/examples/c/name.expected.txt)
+rm -rf $d
+```
+
+`check:examples` already runs every example in its own temporary folder that is deleted afterwards, so the same example leaves nothing behind when it is verified. Each file-writing example writes the file it reads, so it runs on its own. After capturing, check that no `.txt` file other than an `.expected.txt` or `.input.txt` is new in `git status`.
+
 **Warnings that CodeBloom turns into errors.** C examples are compiled with `-Wall -Wextra -Werror`, so a warning stops the build. When a mistake example's message is a warning without `-Werror`, check what a learner would see: compile it with plain `gcc` and with `gcc -Wall`, and say in the lesson what each shows, because they differ between systems (on Ubuntu, plain gcc 13.3 warns about a wrong `scanf` placeholder but says nothing about `if (x = 5)`; both are warnings with `-Wall`). Never show the program that results from undefined behavior, such as a wrong `scanf` placeholder, a missing `&`, or a division by zero, as if its behavior were defined. Test it to see the outcome (it may crash, print nonsense or seem to work), record that in `PROGRESS.md`, and say only that C does not define it.
 
 Which flag turns on which gcc 13.3 report, measured for the C mistakes in the lessons (plain `gcc` reports none of these except the `scanf` format ones on Ubuntu):
@@ -191,6 +202,9 @@ Which flag turns on which gcc 13.3 report, measured for the C mistakes in the le
 | `[-Wimplicit-function-declaration]`: a call before the function is declared | by default in gcc 13, and `-Wall` |
 | `[-Wsizeof-array-argument]`: `sizeof` on an array parameter | by default in gcc 13, and `-Wall` |
 | `[-Wint-conversion]`: `"A"` stored in a `char`; `excess elements in array initializer` | by default in gcc 13, and `-Wall` |
+| `[-Wstringop-overflow=]`: `fgets` told a size bigger than the `char` array | by default in gcc 13, and `-Wall` |
+| `[-Wunused-result]`: the result of `fgets` ignored | `-O2` with `-Wall` or by default at `-O2`; not reported at `-O0` |
+| `[-Wanalyzer-possible-null-argument]`: a `fopen` result used without a `NULL` check; `[-Wanalyzer-file-leak]`: a file opened in a loop and never closed | `-fanalyzer` only |
 | An assignment to an array (`second = first`) or an undeclared local variable | an error with every flag |
 | `[-Wint-conversion]`: an `int` passed where a pointer is expected (`add_one(score)`), or a pointer stored in an `int` (`int *a, b;` then `b = &y;`) | by default in gcc 13, and `-Wall` |
 | `[-Wreturn-local-addr]`: a function returns the address of a local variable | by default in gcc 13, and `-Wall` |
@@ -199,11 +213,13 @@ Which flag turns on which gcc 13.3 report, measured for the C mistakes in the le
 | `[-Wnull-dereference]`: reading or writing through a `NULL` pointer the compiler can see | `-O2 -Wnull-dereference` only |
 | `[-Wformat=]`: `scanf("%19s", &name)` for a `char` array | by default in gcc 13, and `-Wall` |
 | `p.x` on a pointer, `==` between two structs, `s.name = "Ada"` for a `char` array member | an error with every flag |
-| Nothing reports it: `char word[3] = "cat"` with no room for the terminator, `scanf("%s", name)` with no width, `else if` in the wrong order, `<` instead of `<=`, `\|\|` with a bare number, `&` between two plain numbers, a loop that never changes its variable | no flag |
+| Nothing reports it: `"w"` instead of `"a"`, reading a file before closing the handle that wrote it, a line from `fgets` compared without removing its newline, `char word[3] = "cat"` with no room for the terminator, `scanf("%s", name)` with no width, `else if` in the wrong order, `<` instead of `<=`, `\|\|` with a bare number, `&` between two plain numbers, a loop that never changes its variable | no flag |
 
 An index past the end of an array is undefined behavior and cannot be an example either: with `-O0` no flag warned in the tests with gcc 13.3, `-O2 -Wall` warned for a constant index (`-Warray-bounds`), and `-fsanitize=address` or `-fsanitize=undefined` reported it when the program ran. The value read differed between `-O0` and `-O2`. Teach it in prose and a choice question, and claim only what was tested.
 
 A wrong pointer is undefined behavior and cannot be an example: dereferencing `NULL` or a pointer with no value, using a returned address of a local variable, and moving a pointer outside its array. Tested with gcc 13.3: `NULL` stopped the program with a segmentation fault at `-O0` and `-O2`; a pointer with no value printed a number and seemed to work at `-O0` and crashed at `-O2`; a pointer past an array printed different values at `-O0` and `-O2`, was reported by `-O2 -Wall` only for a constant offset, was reported by `-fsanitize=address` and was not reported by `-fsanitize=undefined`. Never print an address (`%p`): it changes on every run, so compare addresses (`p == &x`) or print the value behind them.
+
+Using a `NULL` `FILE *` with `fprintf`, `fgets` or `fclose` is undefined behavior and cannot be an example. Tested with gcc 13.3: each stopped the program with a segmentation fault, and only `-fanalyzer` warned. Not closing a file is not undefined: C guarantees that returning from `main` (like `exit`) flushes and closes every open file. Not guaranteed, and tested only with gcc 13.3 on glibc: a second `fopen` for reading read nothing while the first handle was open and unflushed (`fflush` fixed it); `abort()` without closing left the file empty (with `fflush` before it the text was kept); a loop that opened files without closing them got `NULL` from `fopen` in the end. The `file_no_close` example shows the second result and its lesson says it is not promised by C.
 
 A program that never ends cannot be an example, because the runner would stop it at the timeout: teach the infinite loop in prose, say that gcc cannot warn about it, and use a choice question that claims no output.
 

@@ -21,6 +21,7 @@ const COURSES = {
       ["/courses/c/strings", "Strings"],
       ["/courses/c/pointers", "Pointers"],
       ["/courses/c/structures", "Structures"],
+      ["/courses/c/files", "Reading and writing files with fopen"],
     ],
   },
   python: {
@@ -96,7 +97,7 @@ test("Python and C have no planned topics left: the Planned topics section is go
   await page.goto("/courses/c");
   await expect(page.locator("[data-planned-topics]")).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "Planned topics" })).toHaveCount(0);
-  await expect(page.locator("[data-lessons] > li")).toHaveCount(13);
+  await expect(page.locator("[data-lessons] > li")).toHaveCount(14);
   await page.goto("/courses/cpp");
   await expect(page.getByRole("heading", { name: "Planned topics" })).toBeVisible();
   await expect(page.locator("[data-planned-topics] li").first()).toBeVisible();
@@ -115,7 +116,7 @@ for (const slug of ["cpp", "java"]) {
 test("course cards show the real number of published lessons", async ({ page }) => {
   await page.goto("/courses");
   const status = (name: string) => page.locator("article").filter({ has: page.getByRole("link", { name, exact: true }) }).locator("p").last();
-  await expect(status("C")).toHaveText("13 lessons published");
+  await expect(status("C")).toHaveText("14 lessons published");
   await expect(status("Python")).toHaveText("13 lessons published");
   await expect(status("C++")).toHaveText("No lessons published yet");
   await expect(status("Java")).toHaveText("No lessons published yet");
@@ -278,6 +279,7 @@ test("the new C lessons share their idea with the matching Python lessons, and l
     ["/courses/c/functions", "/courses/python/functions"],
     ["/courses/c/arrays", "/courses/python/lists"],
     ["/courses/c/strings", "/courses/python/strings"],
+    ["/courses/c/files", "/courses/python/files"],
   ] as const;
   for (const [c, python] of pairs) {
     await page.goto(c);
