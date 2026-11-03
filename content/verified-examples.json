@@ -173,6 +173,71 @@
       "source": "f011422f2dfde18b96bc9ff3b8d1aac9378b8bc8c66caa6e9ef010ed63a021af",
       "expected": "39a0523c1e707bdbb8f23c4dda7eb1ca8302a31e1fc1fbaf4df7cb77917beafa"
     },
+    "c/file_append": {
+      "kind": "output",
+      "source": "9bfbd7fafdeb19118366ac4361c463aeef4cdeb0eb8460a4549452f6e44fb4b5",
+      "expected": "3f129db2e4c3046380fe17e1a0c4b592f349d59a6daa8c1f8896abb345718eaf"
+    },
+    "c/file_lines": {
+      "kind": "output",
+      "source": "84b7fa68c679e5a2eaea80acb823a18c8e9ba88397b5f40d717c398963a87de3",
+      "expected": "558b6796661158662de3f890e8550998683cb58f90c8da36ef13560b7a08fb28"
+    },
+    "c/file_missing": {
+      "kind": "output",
+      "source": "74f2dd6e0366fa3f9327f9618af4ed95ab64d34a7fe2e63a157685edf5e5bc7c",
+      "expected": "70defadc775288ce62ea69dff518f879904e2d8d01e0ccac0cb24e1316ef168b"
+    },
+    "c/file_newline_compare": {
+      "kind": "output",
+      "source": "76b6784b6086796acc86b1f20d1eeaa86a67f51e694c3cfb6285901b8bb27aa5",
+      "expected": "1b7f8304b0301e35b7d887fb5fd3e0565f64c8708af76ce57098058aecc83a3a"
+    },
+    "c/file_newline_compare_fix": {
+      "kind": "output",
+      "source": "202ba65e1e98c2e92285dbdcf67956b5627be7d2f28cb230e5f228accc4b864e",
+      "expected": "3539419efab065cb1b6e29ccfc0065676d6a6173402b880d5bae72897d0c899a"
+    },
+    "c/file_no_close": {
+      "kind": "output",
+      "source": "eaab68f50c7c135f86df849a015d7a37674c231887a4973864e1cf995d023f7a",
+      "expected": "505f042e673925b8c20760037f2a1c5d8c667f6b418e37bc478548b02d2ad6cf"
+    },
+    "c/file_no_close_fix": {
+      "kind": "output",
+      "source": "540893afc06b15da0ff1d6e841de4be1dce1844ade074ae635e569d01a2922d0",
+      "expected": "c73ca916071594dc0622bde69985de3003a1ce696159ff6a65aa5ae69be17513"
+    },
+    "c/file_numbers": {
+      "kind": "output",
+      "source": "55b17ff26928e87421f5225c8bffe0bb22504bf601e9694b41542c986c2cf822",
+      "expected": "29acc1bed0e2430820fe6415d6639a0a0b6dbad6fdc4071c9caf60799175303a"
+    },
+    "c/file_overwrite": {
+      "kind": "output",
+      "source": "0a8b5cb5fca1c94e782f125be23f43bbf4b63d55bd755895c7bf9206f7d00354",
+      "expected": "480c2336b410f1ad5f8bf1b28944490255804b65350c527787e74ebdd511e3a4"
+    },
+    "c/file_overwrite_fix": {
+      "kind": "output",
+      "source": "75c99acec687fe58926b026074b5278bc0d5cc39bd6aeb53dfd7349d7c2e738a",
+      "expected": "dbea9325179efe46ea2add94f7b6b745ca983fabb208dc6d34aa064623d7ee23"
+    },
+    "c/file_small_buffer": {
+      "kind": "output",
+      "source": "d0e0f568e497b5ad118e1078d8ef92079753f50e24ad446569052413bda97e32",
+      "expected": "4aa51c7cecc95f0a42ad433a38840ae4035090a52a5ef2c4111c35f9d8690fea"
+    },
+    "c/file_strip": {
+      "kind": "output",
+      "source": "c49c5c3e5b4f2dc986f3d5c6d7add2d33a35efc1b20f6204570b3fc5b083a5a1",
+      "expected": "16c6bbf1a5e56f1d629f63a7a2a88486f26465d47e9cd1ece749f4d2b199a272"
+    },
+    "c/file_write_read": {
+      "kind": "output",
+      "source": "c4872deb149feeba5815e430921fc8d9cfb8644fc2cbf80c0d0fc86e8a6d0ecf",
+      "expected": "b608bb51f0751abdcee266a6cafdf98379579f7f58916cdbd5ed14db20c9d9d7"
+    },
     "c/first_program": {
       "kind": "output",
       "source": "e5c34e065a561403177e9e4384a273cfadd4af016f7778f18ca40cfd3bcf70ac",
@@ -461,6 +526,16 @@
       "kind": "output",
       "source": "5ac19ed0107a99cfe3196e99b5bee62d331f28d4e3b0d35627ca09898ba0da17",
       "expected": "f4a8ae8e74ddfb896a256de4e3099911dcaa6a9302591713898069b0bcd6e3d7"
+    },
+    "c/practice_file_buffer": {
+      "kind": "output",
+      "source": "daf2cd8ac2b60590c0a703857c723eb4ce1075e7c2f2be335d0b70abd437894e",
+      "expected": "662af9718f52874c071b2a77867f8d4f39f654f9172d7e9acee350ccba67f14e"
+    },
+    "c/practice_file_modes": {
+      "kind": "output",
+      "source": "e6db1b8aeaae6c3d2efc55bdb71292fc5fdc4d4623d69ab01fe89359b3098eb1",
+      "expected": "1121cfccd5913f0a63fec40a6ffd44ea64f9dc135c66634ba001d10bcf4302a2"
     },
     "c/practice_fn_copy": {
       "kind": "output",

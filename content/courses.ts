@@ -46,6 +46,7 @@ export const courses: Course[] = [
       { title: "Strings", lesson: "strings" },
       { title: "Pointers", lesson: "pointers" },
       { title: "Structures", lesson: "structures" },
+      { title: "Reading and writing files with fopen", lesson: "files" },
     ],
   },
   {

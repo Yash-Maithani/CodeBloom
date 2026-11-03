@@ -4,6 +4,7 @@
 // docs/lesson-authoring.md has the full workflow.
 
 import type { LessonSource } from "@/lib/lesson-types";
+import { cFiles } from "./c/files.ts";
 import { cFirstProgram } from "./c/first-program.ts";
 import { cFunctions } from "./c/functions.ts";
 import { cArrays } from "./c/arrays.ts";
@@ -45,6 +46,7 @@ export const lessonSources: LessonSource[] = [
   cStrings,
   cPointers,
   cStructures,
+  cFiles,
   pythonFirstProgram,
   pythonVariables,
   pythonInputOutput,
