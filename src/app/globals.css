@@ -311,11 +311,35 @@
   }
 }
 
+/* Feedback and hints fade in and settle 4px (DESIGN.md section 6, duration-base). */
+@utility appear {
+  animation: appear var(--duration-base) var(--ease-standard);
+}
+@keyframes appear {
+  from {
+    opacity: 0;
+    transform: translateY(var(--spacing-1));
+  }
+}
+
+/* The bloom beside "Correct": grows and turns once (DESIGN.md section 7). */
+@utility bloom {
+  animation: bloom var(--duration-slow) var(--ease-bloom);
+}
+@keyframes bloom {
+  from {
+    opacity: 0;
+    transform: scale(0.6) rotate(-15deg);
+  }
+}
+
 /* Reduced motion (DESIGN.md section 6): every duration is 0 and every
    transform-based animation is off. Components take their timing from these
    tokens, so this one rule covers them. */
 @media (prefers-reduced-motion: reduce) {
-  .ink-draw {
+  .ink-draw,
+  .appear,
+  .bloom {
     animation: none;
   }
   :root {
