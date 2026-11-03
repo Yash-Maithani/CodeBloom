@@ -68,10 +68,10 @@ export default async function HomePage() {
       <section aria-labelledby="hero-title">
         <Container className="py-12 md:py-16">
           <div className="max-w-measure">
-            <h1 id="hero-title" className="font-heading text-3xl font-semibold md:text-4xl">
+            <h1 id="hero-title" className="font-heading text-h1">
               Learn to program with patient, line-by-line explanations
             </h1>
-            <p className="mt-6 text-lg">
+            <p className="mt-6 text-lead">
               CodeBloom is a learning site for beginners studying C, C++, Java or Python. Lessons
               explain code in plain English, with a note beside each line that matters and the
               output the code really prints.
@@ -98,7 +98,7 @@ export default async function HomePage() {
               exampleId={exampleId}
             />
             {exampleLesson && (
-              <p className="mt-4 max-w-measure text-sm">
+              <p className="mt-4 max-w-measure text-ui">
                 This example comes from the lesson{" "}
                 <Link href={exampleLesson.href} className={textLinkStyles}>
                   {exampleLesson.source.title}
@@ -112,18 +112,18 @@ export default async function HomePage() {
 
       <section aria-labelledby="lesson-steps-title" className="border-t border-rule">
         <Container className="py-12 md:py-16">
-          <h2 id="lesson-steps-title" className="font-heading text-2xl font-semibold">
+          <h2 id="lesson-steps-title" className="font-heading text-h2">
             How each lesson works
           </h2>
           <ol className="mt-8 flex max-w-measure flex-col gap-8">
             {lessonSteps.map((step, index) => (
               <li key={step.title} className="flex gap-4">
-                <span aria-hidden="true" className="w-6 shrink-0 font-heading text-xl font-semibold text-ink-muted">
+                <span aria-hidden="true" className="w-6 shrink-0 font-heading text-h3 text-ink-muted">
                   {index + 1}
                 </span>
                 <div>
-                  <h3 className="font-heading text-xl font-semibold">{step.title}</h3>
-                  <p className="mt-2 text-base">{step.text}</p>
+                  <h3 className="font-heading text-h3">{step.title}</h3>
+                  <p className="mt-2 text-body">{step.text}</p>
                 </div>
               </li>
             ))}
@@ -133,13 +133,13 @@ export default async function HomePage() {
 
       <section aria-labelledby="courses-title" className="border-t border-rule">
         <Container className="py-12 md:py-16">
-          <h2 id="courses-title" className="font-heading text-2xl font-semibold">
+          <h2 id="courses-title" className="font-heading text-h2">
             Choose a language
           </h2>
-          <p className="mt-4 max-w-measure text-base">
+          <p className="mt-4 max-w-measure text-body">
             Each course starts from zero. {statusSentence}
           </p>
-          <ul className="mt-8 grid gap-6 sm:grid-cols-2">
+          <ul className="mt-8 grid gap-6 md:grid-cols-2">
             {courses.map((course) => (
               <li key={course.slug} className="flex">
                 <CourseCard course={course} headingLevel="h3" lessonCount={byCourse.get(course.slug)?.length ?? 0} />
@@ -151,10 +151,10 @@ export default async function HomePage() {
 
       <section aria-labelledby="story-title" className="border-t border-rule">
         <Container className="py-12 md:py-16">
-          <h2 id="story-title" className="font-heading text-2xl font-semibold">
+          <h2 id="story-title" className="font-heading text-h2">
             Why CodeBloom exists
           </h2>
-          <div className="mt-6 flex max-w-measure flex-col gap-4 text-base">
+          <div className="mt-6 flex max-w-measure flex-col gap-4 text-body">
             {story.map((paragraph) => (
               <p key={paragraph}>{paragraph}</p>
             ))}

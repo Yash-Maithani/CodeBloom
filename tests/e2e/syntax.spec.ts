@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 import { normalizeLineEndings } from "../../src/lib/line-endings.ts";
 
 // Syntax colors on the homepage example (DESIGN.md section 7, "Syntax colors"):
-// keywords in ink at weight 700, strings and numbers in syntax-literal,
+// keywords in ink at weight 700, strings and numbers in literal,
 // everything else ink. The code must also stay readable with no color at all.
 
 const exampleCode = normalizeLineEndings(readFileSync("content/examples/python/vote.py", "utf8")).replace(/\n$/, "");
@@ -33,11 +33,11 @@ async function tokenColor(page: import("@playwright/test").Page, token: string):
 }
 
 for (const theme of ["light", "dark"] as const) {
-  test(`keywords are bold and literals use the syntax-literal token (${theme} theme)`, async ({ page }) => {
+  test(`keywords are bold and literals use the literal token (${theme} theme)`, async ({ page }) => {
     await page.emulateMedia({ colorScheme: theme });
     await page.goto("/");
     const ink = await tokenColor(page, "ink");
-    const literal = await tokenColor(page, "syntax-literal");
+    const literal = await tokenColor(page, "literal");
     const spans = await codeSpans(page);
 
     const keywords = spans.filter((s) => s.weight === "700").map((s) => s.text);

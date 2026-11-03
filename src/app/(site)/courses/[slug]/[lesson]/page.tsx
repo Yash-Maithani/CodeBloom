@@ -56,19 +56,19 @@ export default async function LessonPage(props: LessonPageProps) {
         <Link href={courseHref} className={backLinkStyles}>
           {lesson.course.name} course
         </Link>
-        <h1 className="mt-4 font-heading text-3xl font-semibold">{lesson.source.title}</h1>
-        <p className="mt-4 text-lg">
+        <h1 className="mt-4 font-heading text-h1">{lesson.source.title}</h1>
+        <p className="mt-4 text-lead">
           <strong>Goal:</strong> <InlineText text={lesson.source.objective} />
         </p>
       </div>
 
       {lesson.concept && (
-        <section aria-labelledby="the-idea" className="max-w-measure text-base">
-          <h2 id="the-idea" className="mt-12 font-heading text-2xl font-semibold md:mt-16">
+        <section aria-labelledby="the-idea" className="max-w-measure text-body">
+          <h2 id="the-idea" className="mt-12 font-heading text-h2 md:mt-16">
             The idea
           </h2>
           {sameConcept.length > 0 && (
-            <p className="mt-2 text-sm text-ink-muted">
+            <p className="mt-2 text-ui text-ink-muted">
               This part is the same in the{" "}
               {sameConcept.map((other, index) => (
                 <span key={other.href}>
@@ -85,7 +85,7 @@ export default async function LessonPage(props: LessonPageProps) {
         </section>
       )}
 
-      <div className="text-base">
+      <div className="text-body">
         {lesson.body.map((block, index) => {
           if (block.type === "prose") {
             return (
@@ -122,8 +122,8 @@ export default async function LessonPage(props: LessonPageProps) {
         })}
 
         {lesson.mistakes.length > 0 && (
-          <section aria-labelledby="common-mistakes" className="max-w-lesson">
-            <h2 id="common-mistakes" className="mt-12 font-heading text-2xl font-semibold md:mt-16">
+          <section aria-labelledby="common-mistakes" className="max-w-page">
+            <h2 id="common-mistakes" className="mt-12 font-heading text-h2 md:mt-16">
               Common mistakes
             </h2>
             <Mistakes lesson={lesson} />
@@ -132,7 +132,7 @@ export default async function LessonPage(props: LessonPageProps) {
 
         {lesson.practice.length > 0 && (
           <section aria-labelledby="practice">
-            <h2 id="practice" className="mt-12 font-heading text-2xl font-semibold md:mt-16">
+            <h2 id="practice" className="mt-12 font-heading text-h2 md:mt-16">
               Practice
             </h2>
             <p className="mt-4 max-w-measure">Choose an answer and check it. Hints and the solution are there when you want them.</p>
@@ -141,7 +141,7 @@ export default async function LessonPage(props: LessonPageProps) {
         )}
 
         <section aria-labelledby="recap" className="max-w-measure">
-          <h2 id="recap" className="mt-12 font-heading text-2xl font-semibold md:mt-16">
+          <h2 id="recap" className="mt-12 font-heading text-h2 md:mt-16">
             Recap
           </h2>
           <ul className="mt-4 flex list-disc flex-col gap-2 pl-8">

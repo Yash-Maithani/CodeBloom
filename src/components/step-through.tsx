@@ -55,12 +55,12 @@ export function StepThrough({ visual }: { visual: RenderedVisual }) {
   const label = plainText(visual.title);
 
   return (
-    <div data-stepper className="rounded-panel border border-rule bg-sheet p-4 md:p-6">
+    <div data-stepper className="rounded-panel border border-rule bg-surface p-4 md:p-6">
       <pre
         tabIndex={0}
         role="region"
         aria-label={`${visual.languageLabel} code: ${label}`}
-        className="overflow-x-auto rounded-panel border border-rule bg-code py-3 font-mono text-mono"
+        className="overflow-x-auto rounded-panel border border-rule bg-sunken py-3 font-mono text-code"
       >
         <code className="block">
           {visual.lines.map((tokens, index) => {
@@ -70,12 +70,12 @@ export function StepThrough({ visual }: { visual: RenderedVisual }) {
                 key={index}
                 data-trace-line={index + 1}
                 data-current={current || undefined}
-                className={`flex border-l-3 pr-4 transition-colors motion-reduce:transition-none ${current ? "border-accent bg-accent-tint" : "border-transparent"}`}
+                className={`flex border-l-3 pr-4 transition-colors motion-reduce:transition-none ${current ? "border-primary bg-primary-tint" : "border-transparent"}`}
               >
                 <span aria-hidden="true" className="w-8 shrink-0 select-none text-right text-ink-muted">
                   {index + 1}
                 </span>
-                <span aria-hidden="true" className="flex w-8 shrink-0 select-none items-center justify-center text-accent">
+                <span aria-hidden="true" className="flex w-8 shrink-0 select-none items-center justify-center text-primary">
                   {current && <ArrowRight size={16} strokeWidth={1.75} />}
                 </span>
                 <span className="whitespace-pre">
@@ -103,20 +103,20 @@ export function StepThrough({ visual }: { visual: RenderedVisual }) {
 
       <div className="mt-4 grid gap-4 md:grid-cols-2">
         <div>
-          <p className="text-sm font-bold">Variables</p>
+          <p className="text-ui font-bold">Variables</p>
           {step && step.variables.length > 0 ? (
             <ul data-variables className="mt-2 flex flex-wrap gap-4">
               {step.variables.map((variable) => (
                 <li key={variable.name} data-variable={variable.name} className="flex flex-col gap-1">
-                  <span className="text-sm">{variable.name}</span>
+                  <span className="text-ui">{variable.name}</span>
                   <span
-                    className={`min-w-12 rounded-control border px-3 py-2 font-mono text-mono ${
-                      variable.changed ? "border-2 border-accent bg-accent-tint" : "border-rule-strong bg-sheet"
+                    className={`min-w-12 rounded-control border px-3 py-2 font-mono text-code ${
+                      variable.changed ? "border-2 border-primary bg-primary-tint" : "border-edge bg-surface"
                     }`}
                   >
                     {variable.value}
                   </span>
-                  <span className="text-xs text-ink-muted">
+                  <span className="text-small text-ink-muted">
                     {variable.type}
                     {variable.changed && (variable.previous !== undefined ? `, changed (was ${variable.previous})` : ", new")}
                   </span>
@@ -124,12 +124,12 @@ export function StepThrough({ visual }: { visual: RenderedVisual }) {
               ))}
             </ul>
           ) : (
-            <p data-variables className="mt-2 text-sm italic">No variables yet</p>
+            <p data-variables className="mt-2 text-ui italic">No variables yet</p>
           )}
         </div>
         <div>
-          <p className="text-sm font-bold">Output so far</p>
-          <div data-output-so-far className="mt-2 rounded-panel border border-l-3 border-rule border-l-ink-muted bg-code px-4 py-3">
+          <p className="text-ui font-bold">Output so far</p>
+          <div data-output-so-far className="mt-2 rounded-panel border border-l-3 border-rule border-l-ink-muted bg-sunken px-4 py-3">
             <OutputLines text={step?.output ?? ""} empty="nothing yet" />
           </div>
         </div>
@@ -169,10 +169,10 @@ export function TraceTable({ visual }: { visual: RenderedVisual }) {
     // On a narrow screen the table scrolls sideways, so it can take focus and
     // keyboard users can scroll it, like the code blocks (WCAG 2.1.1).
     <div tabIndex={0} role="region" aria-label={`All steps as a table: ${plainText(visual.title)}`} className="overflow-x-auto">
-      <table data-trace-table className="w-full border-collapse text-left text-sm">
+      <table data-trace-table className="w-full border-collapse text-left text-ui">
         <caption className="sr-only">All steps of: {plainText(visual.title)}</caption>
         <thead>
-          <tr className="border-b border-rule-strong">
+          <tr className="border-b border-edge">
             <th scope="col" className="py-2 pr-4">Step</th>
             <th scope="col" className="py-2 pr-4">Line that ran</th>
             <th scope="col" className="py-2 pr-4">Variables after it</th>

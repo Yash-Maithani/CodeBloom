@@ -25,8 +25,8 @@ export function NavLinks() {
             <Link
               href={link.href}
               aria-current={isCurrent ? "page" : undefined}
-              className={`inline-flex border-b-2 py-3 text-sm font-bold transition-colors hover:text-accent ${
-                isCurrent ? "border-accent text-ink" : "border-transparent text-ink"
+              className={`inline-flex border-b-2 py-3 text-ui font-bold transition-colors hover:text-primary ${
+                isCurrent ? "border-primary text-ink" : "border-transparent text-ink"
               }`}
             >
               {link.label}

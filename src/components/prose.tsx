@@ -48,7 +48,7 @@ export function ProseBlocks({ blocks }: { blocks: ProseBlock[] }) {
     switch (block.type) {
       case "heading":
         return (
-          <h2 key={index} className="mt-12 font-heading text-2xl font-semibold md:mt-16">
+          <h2 key={index} className="mt-12 font-heading text-h2 md:mt-16">
             {block.text}
           </h2>
         );

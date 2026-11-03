@@ -3,17 +3,17 @@
 // Tailwind only generates classes it can find as complete strings.
 
 const buttonBase =
-  "inline-flex items-center justify-center gap-2 rounded-button px-6 py-3 text-sm font-bold transition-colors";
+  "inline-flex items-center justify-center gap-2 rounded-control px-6 py-3 text-ui font-bold transition-colors";
 
 /** Buttons and button-styled links. Height is 48px: 12px padding twice plus a 24px line. */
 export const buttonStyles = {
-  primary: `${buttonBase} bg-accent text-on-accent hover:bg-accent-hover active:bg-accent-hover`,
-  secondary: `${buttonBase} border border-rule-strong bg-sheet text-ink hover:bg-accent-tint active:bg-accent-tint`,
+  primary: `${buttonBase} bg-primary text-on-primary hover:bg-primary-hover active:bg-primary-hover`,
+  secondary: `${buttonBase} border border-edge bg-surface text-ink hover:bg-primary-tint active:bg-primary-tint`,
 } as const;
 
 /** Links inside text: always underlined; the underline thickens on hover. */
 export const textLinkStyles =
-  "text-accent underline decoration-1 underline-offset-3 transition-colors hover:decoration-2 active:text-accent-hover";
+  "text-primary underline decoration-1 underline-offset-3 transition-colors hover:decoration-2 active:text-primary-hover";
 
 /** The link back to the page above ("All courses", "Python course"): 48px tall. */
-export const backLinkStyles = `inline-flex py-3 text-sm ${textLinkStyles}`;
+export const backLinkStyles = `inline-flex py-3 text-ui ${textLinkStyles}`;

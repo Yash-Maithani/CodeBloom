@@ -53,7 +53,7 @@ type CodeBlockProps = {
 export const tokenStyles: Record<TokenKind, string> = {
   plain: "",
   keyword: "font-bold",
-  literal: "text-syntax-literal",
+  literal: "text-literal",
   comment: "italic text-ink-muted",
 };
 
@@ -61,7 +61,7 @@ function NoteMarker({ number }: { number: number }) {
   return (
     <span
       aria-hidden="true"
-      className="flex size-6 shrink-0 items-center justify-center rounded-round bg-accent font-sans text-xs font-bold text-on-accent"
+      className="flex size-6 shrink-0 items-center justify-center rounded-round bg-primary font-sans text-small font-bold text-on-primary"
     >
       {number}
     </span>
@@ -127,17 +127,17 @@ export function CodeBlock({
     lineNumber <= notes[activeNote].endLine;
 
   return (
-    <figure className="max-w-lesson" data-example={exampleId}>
+    <figure className="max-w-page" data-example={exampleId}>
       {caption && (
-        <figcaption className="mb-3 text-sm text-ink-muted">
+        <figcaption className="mb-3 text-ui text-ink-muted">
           <InlineText text={caption} />
         </figcaption>
       )}
 
-      <div className="rounded-panel border border-rule bg-code">
+      <div className="rounded-panel border border-rule bg-sunken">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-rule px-4 py-2">
-          <span className="text-sm font-bold">{languageLabel}</span>
-          <span className="text-sm text-ink-muted">{mistake ? "Example with a mistake" : "Runnable example"}</span>
+          <span className="text-ui font-bold">{languageLabel}</span>
+          <span className="text-ui text-ink-muted">{mistake ? "Example with a mistake" : "Runnable example"}</span>
           <div className="ml-auto flex flex-wrap gap-2">
             {notes.length > 0 && (
               <button
@@ -159,7 +159,7 @@ export function CodeBlock({
             message inside it, and screen readers announce what is added. */}
         <p
           role="status"
-          className={copy.result === "failed" ? "flex items-center gap-2 border-b border-rule px-4 py-2 text-sm" : "sr-only"}
+          className={copy.result === "failed" ? "flex items-center gap-2 border-b border-rule px-4 py-2 text-ui" : "sr-only"}
         >
           {copy.result === "failed" && <CircleAlert aria-hidden="true" size={20} strokeWidth={1.75} className="shrink-0 text-error" />}
           {copy.result === "copied" && <span key={copy.attempt}>Code copied</span>}
@@ -171,7 +171,7 @@ export function CodeBlock({
             tabIndex={0}
             role="region"
             aria-label={regionLabel}
-            className="overflow-x-auto py-4 font-mono text-mono"
+            className="overflow-x-auto py-4 font-mono text-code"
           >
             <code className="block">
               {lines.map((tokens, index) => {
@@ -183,7 +183,7 @@ export function CodeBlock({
                     <span
                       data-line={lineNumber}
                       className={`flex border-l-3 pr-4 transition-colors ${
-                        isLineActive(lineNumber) ? "border-accent bg-accent-tint" : "border-transparent"
+                        isLineActive(lineNumber) ? "border-primary bg-primary-tint" : "border-transparent"
                       }`}
                     >
                       <span aria-hidden="true" className="w-8 shrink-0 select-none text-right text-ink-muted">
@@ -210,7 +210,7 @@ export function CodeBlock({
                       <span
                         aria-hidden="true"
                         data-note-row={noteIndex + 1}
-                        className="mx-4 my-2 flex select-none gap-3 border-l-3 border-accent bg-sheet px-4 py-2 font-sans text-sm whitespace-normal lg:hidden"
+                        className="mx-4 my-2 flex select-none gap-3 border-l-3 border-primary bg-surface px-4 py-2 font-sans text-ui whitespace-normal lg:hidden"
                       >
                         <NoteMarker number={noteIndex + 1} />
                         <InlineText text={note.text} />
@@ -234,7 +234,7 @@ export function CodeBlock({
                 data-notes-list
                 className="lg:grid"
                 // One grid row per code line. 1.5rem is the code line height
-                // (text-mono: 0.9375rem size times 1.6 line height).
+                // (text-code: 0.9375rem size times 1.6 line height).
                 style={{ gridTemplateRows: `repeat(${lines.length}, minmax(1.5rem, auto))` }}
               >
                 {notes.map((note, index) => {
@@ -246,8 +246,8 @@ export function CodeBlock({
                       style={{ gridRow: `${note.startLine} / ${nextStart}` }}
                       onMouseEnter={() => setActiveNote(index)}
                       onMouseLeave={() => setActiveNote(null)}
-                      className={`flex items-start gap-3 self-start rounded-control px-2 text-sm transition-colors ${
-                        activeNote === index ? "bg-accent-tint" : ""
+                      className={`flex items-start gap-3 self-start rounded-control px-2 text-ui transition-colors ${
+                        activeNote === index ? "bg-primary-tint" : ""
                       }`}
                     >
                       <NoteMarker number={index + 1} />

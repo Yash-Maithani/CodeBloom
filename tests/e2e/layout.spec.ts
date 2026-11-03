@@ -4,7 +4,8 @@ import { expect, test } from "@playwright/test";
 // Screenshots are attached to the test report (not committed).
 
 const PAGES = ["/", "/courses", "/courses/c", "/courses/c/first-program", "/courses/python/variables"];
-const PAPER = { light: "rgb(248, 247, 242)", dark: "rgb(22, 26, 24)" };
+// The canvas token from DESIGN.md section 2: #EEF3F1 light, #0F1D1A dark.
+const CANVAS = { light: "rgb(238, 243, 241)", dark: "rgb(15, 29, 26)" };
 
 for (const path of PAGES) {
   for (const width of [360, 1440]) {
@@ -19,7 +20,7 @@ for (const path of PAGES) {
           scrollWidth: document.documentElement.scrollWidth,
           innerWidth: window.innerWidth,
         }));
-        expect(layout.background).toBe(PAPER[theme]);
+        expect(layout.background).toBe(CANVAS[theme]);
         expect(layout.scrollWidth, "page must not scroll sideways").toBeLessThanOrEqual(layout.innerWidth);
 
         await testInfo.attach(`${path} ${width} ${theme}`, {

@@ -156,11 +156,11 @@ export function Playground({ starter, starterInput = "", downloadBytes }: { star
   return (
     <div data-playground data-state={phase.name === "ended" ? phase.end.kind : phase.name} className="grid gap-8 lg:grid-cols-2">
       <div className="min-w-0">
-        <label htmlFor="playground-code" className="text-sm font-bold">
+        <label htmlFor="playground-code" className="text-ui font-bold">
           Python code
         </label>
-        <div className="mt-2 flex overflow-hidden rounded-panel border border-rule-strong bg-code focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-ink">
-          <div aria-hidden="true" className="shrink-0 select-none py-3 pr-2 pl-3 text-right font-mono text-mono text-ink-muted">
+        <div className="mt-2 flex overflow-hidden rounded-panel border border-edge bg-sunken focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-ink">
+          <div aria-hidden="true" className="shrink-0 select-none py-3 pr-2 pl-3 text-right font-mono text-code text-ink-muted">
             {Array.from({ length: lineCount }, (_, index) => (
               <div key={index}>{index + 1}</div>
             ))}
@@ -181,17 +181,17 @@ export function Playground({ starter, starterInput = "", downloadBytes }: { star
             autoComplete="off"
             autoCorrect="off"
             aria-describedby="playground-code-hint"
-            className="min-w-0 flex-1 resize-none overflow-x-auto bg-transparent py-3 pr-4 pl-2 font-mono text-mono text-ink outline-none"
+            className="min-w-0 flex-1 resize-none overflow-x-auto bg-transparent py-3 pr-4 pl-2 font-mono text-code text-ink outline-none"
           />
         </div>
-        <p id="playground-code-hint" className="mt-2 text-sm text-ink-muted">
+        <p id="playground-code-hint" className="mt-2 text-ui text-ink-muted">
           Tab adds 4 spaces. To leave the code box, press Esc, then Tab.
         </p>
 
-        <label htmlFor="playground-input" className="mt-6 block text-sm font-bold">
+        <label htmlFor="playground-input" className="mt-6 block text-ui font-bold">
           Input
         </label>
-        <p id="playground-input-hint" className="mt-1 text-sm text-ink-muted">
+        <p id="playground-input-hint" className="mt-1 text-ui text-ink-muted">
           If your program uses <code className="font-mono">input()</code>, type one line here for each call before you press Run.
         </p>
         <textarea
@@ -206,7 +206,7 @@ export function Playground({ starter, starterInput = "", downloadBytes }: { star
           autoComplete="off"
           autoCorrect="off"
           aria-describedby="playground-input-hint"
-          className="mt-2 block w-full resize-y rounded-panel border border-rule-strong bg-code px-4 py-3 font-mono text-mono"
+          className="mt-2 block w-full resize-y rounded-panel border border-edge bg-sunken px-4 py-3 font-mono text-code"
         />
 
         {/* The buttons only work once React runs in the browser, so until then
@@ -239,18 +239,18 @@ export function Playground({ starter, starterInput = "", downloadBytes }: { star
           </button>
         </div>
         {!downloaded && (
-          <p data-download-note className={`mt-2 text-sm text-ink-muted ${ready ? "" : "invisible"}`}>
+          <p data-download-note className={`mt-2 text-ui text-ink-muted ${ready ? "" : "invisible"}`}>
             The first run downloads Python ({megabytes(downloadBytes)} MB). Your browser keeps a copy for next time.
           </p>
         )}
       </div>
 
       <section aria-labelledby="your-run" className="min-w-0">
-        <h2 id="your-run" className="text-sm font-bold">
+        <h2 id="your-run" className="text-ui font-bold">
           Your run
         </h2>
-        <div className="mt-2 rounded-panel border border-rule-strong bg-sheet">
-          <p data-status className="flex items-start gap-2 border-b border-rule px-4 py-3 text-sm">
+        <div className="mt-2 rounded-panel border border-edge bg-surface">
+          <p data-status className="flex items-start gap-2 border-b border-rule px-4 py-3 text-ui">
             {icons[status.tone]}
             <span>{status.text}</span>
           </p>
@@ -260,7 +260,7 @@ export function Playground({ starter, starterInput = "", downloadBytes }: { star
                 aria-label="Python download"
                 value={phase.loaded}
                 max={phase.total}
-                className="block h-2 w-full accent-accent"
+                className="block h-2 w-full accent-primary"
               />
             </div>
           )}
@@ -269,7 +269,7 @@ export function Playground({ starter, starterInput = "", downloadBytes }: { star
             role="region"
             aria-label="Output of your run"
             data-run-output
-            className="min-h-24 overflow-x-auto px-4 py-3 font-mono text-mono whitespace-pre"
+            className="min-h-24 overflow-x-auto px-4 py-3 font-mono text-code whitespace-pre"
           >
             <code>
               {chunks.map((chunk, index) => (
@@ -281,11 +281,11 @@ export function Playground({ starter, starterInput = "", downloadBytes }: { star
           </pre>
           {error && (
             <div className="border-t border-rule px-4 py-3">
-              <p className="flex items-center gap-2 text-sm font-bold">
+              <p className="flex items-center gap-2 text-ui font-bold">
                 <CircleX aria-hidden="true" size={20} strokeWidth={1.75} className="shrink-0 text-error" />
                 Error message
               </p>
-              <pre tabIndex={0} role="region" aria-label="Error message of your run" data-run-error className="mt-2 overflow-x-auto font-mono text-mono">
+              <pre tabIndex={0} role="region" aria-label="Error message of your run" data-run-error className="mt-2 overflow-x-auto font-mono text-code">
                 <code>{error.text}</code>
               </pre>
             </div>

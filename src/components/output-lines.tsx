@@ -28,7 +28,7 @@ export function OutputLines({ text, empty, scroll = true }: { text: string; empt
     <span
       ref={ref}
       tabIndex={scrolls ? 0 : undefined}
-      className={`block min-w-0 font-mono text-mono whitespace-pre ${scroll ? "overflow-x-auto" : ""}`}
+      className={`block min-w-0 font-mono text-code whitespace-pre ${scroll ? "overflow-x-auto" : ""}`}
     >
       {lines.map((line, index) => (
         <span key={index} className="block">

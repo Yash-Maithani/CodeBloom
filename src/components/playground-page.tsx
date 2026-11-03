@@ -14,8 +14,8 @@ export async function PlaygroundPage({ file, from }: { file: string; from?: { ti
   const [starter, downloadBytes] = await Promise.all([loadStarter(file), pythonDownloadBytes()]);
   return (
     <Container className="py-12 md:py-16">
-      <h1 className="font-heading text-3xl font-semibold">Python playground</h1>
-      <p className="mt-4 max-w-measure text-lg">
+      <h1 className="font-heading text-h1">Python playground</h1>
+      <p className="mt-4 max-w-measure text-lead">
         Write Python and run it in your browser. Your code runs on your device: nothing is saved or sent anywhere.
       </p>
       {from && (
@@ -27,9 +27,9 @@ export async function PlaygroundPage({ file, from }: { file: string; from?: { ti
           . Change it and run it again.
         </p>
       )}
-      <p className="mt-2 max-w-measure text-sm text-ink-muted">Python only. C, C++ and Java are not yet supported in the playground.</p>
+      <p className="mt-2 max-w-measure text-ui text-ink-muted">Python only. C, C++ and Java are not yet supported in the playground.</p>
       <noscript>
-        <p className="mt-6 max-w-measure rounded-panel border border-l-3 border-rule border-l-warning bg-sheet px-4 py-3">
+        <p className="mt-6 max-w-measure rounded-panel border border-l-3 border-rule border-l-warning bg-surface px-4 py-3">
           Running code needs JavaScript. You can still copy the code below and run it with Python on your computer.
         </p>
       </noscript>

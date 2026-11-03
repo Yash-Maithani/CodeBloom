@@ -41,8 +41,8 @@ export default async function CoursePage({ params }: CoursePageProps) {
         <Link href="/courses" className={backLinkStyles}>
           All courses
         </Link>
-        <h1 className="mt-4 font-heading text-3xl font-semibold">{course.name}</h1>
-        <p className="mt-4 text-lg">{course.description}</p>
+        <h1 className="mt-4 font-heading text-h1">{course.name}</h1>
+        <p className="mt-4 text-lead">{course.description}</p>
 
         {lessons.length === 0 ? (
           <div className="mt-8">
@@ -59,8 +59,8 @@ export default async function CoursePage({ params }: CoursePageProps) {
 
         {lessons.length > 0 && (
           <>
-            <h2 className="mt-12 font-heading text-2xl font-semibold md:mt-16">Lessons</h2>
-            <ol data-lessons className="mt-6 flex list-decimal flex-col gap-6 pl-8 text-base">
+            <h2 className="mt-12 font-heading text-h2 md:mt-16">Lessons</h2>
+            <ol data-lessons className="mt-6 flex list-decimal flex-col gap-6 pl-8 text-body">
               {lessons.map((lesson) => (
                 <li key={lesson.href}>
                   <Link href={lesson.href} className={`font-bold ${textLinkStyles}`}>
@@ -75,18 +75,18 @@ export default async function CoursePage({ params }: CoursePageProps) {
           </>
         )}
 
-        <h2 className="mt-12 font-heading text-2xl font-semibold md:mt-16">Who this course is for</h2>
-        <p className="mt-4 text-base">
+        <h2 className="mt-12 font-heading text-h2 md:mt-16">Who this course is for</h2>
+        <p className="mt-4 text-body">
           Complete beginners and students taking a {course.name} course. You do not need any
           programming experience.
         </p>
 
         {planned.length > 0 && (
           <>
-            <h2 className="mt-12 font-heading text-2xl font-semibold md:mt-16">Planned topics</h2>
+            <h2 className="mt-12 font-heading text-h2 md:mt-16">Planned topics</h2>
             <p className="mt-2 text-ink-muted">Planned and subject to change. Listed in course order.</p>
             {/* Plain text on purpose: these topics have no lesson page yet (SPEC.md FR-C2). */}
-            <ul data-planned-topics className="mt-6 flex list-disc flex-col gap-2 pl-8 text-base">
+            <ul data-planned-topics className="mt-6 flex list-disc flex-col gap-2 pl-8 text-body">
               {planned.map((topic) => (
                 <li key={topic.title}>{topic.title}</li>
               ))}

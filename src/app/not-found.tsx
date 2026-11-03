@@ -18,8 +18,8 @@ export default function NotFound() {
       <main id="main" tabIndex={-1}>
         <Container className="py-12 md:py-16">
           <div className="max-w-measure">
-            <h1 className="font-heading text-3xl font-semibold">Page not found</h1>
-            <p className="mt-4 text-lg">
+            <h1 className="font-heading text-h1">Page not found</h1>
+            <p className="mt-4 text-lead">
               There is no page at this address. The link may be wrong or the page may have moved.
             </p>
             <ul className="mt-6 flex flex-wrap gap-x-6">

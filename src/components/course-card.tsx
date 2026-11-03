@@ -22,17 +22,17 @@ export function CourseCard({
 }) {
   const Heading = headingLevel;
   return (
-    <article className="group relative flex w-full flex-col gap-2 rounded-panel border border-rule bg-sheet p-6 transition-colors hover:border-rule-strong has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-2 has-[a:focus-visible]:outline-ink">
-      <Heading className="font-heading text-2xl font-semibold">
+    <article className="group relative flex w-full flex-col gap-2 rounded-panel border border-rule bg-surface p-6 transition-colors hover:border-edge has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-2 has-[a:focus-visible]:outline-ink">
+      <Heading className="font-heading text-h2">
         <Link
           href={`/courses/${course.slug}`}
-          className="text-ink decoration-1 underline-offset-3 transition-colors group-hover:underline focus-visible:outline-none active:text-accent-hover after:absolute after:inset-0 after:content-['']"
+          className="text-ink decoration-1 underline-offset-3 transition-colors group-hover:underline focus-visible:outline-none active:text-primary-hover after:absolute after:inset-0 after:content-['']"
         >
           {course.name}
         </Link>
       </Heading>
-      <p className="text-sm">{course.summary}</p>
-      <p className="text-sm text-ink-muted">{statusText(lessonCount)}</p>
+      <p className="text-ui">{course.summary}</p>
+      <p className="text-ui text-ink-muted">{statusText(lessonCount)}</p>
     </article>
   );
 }

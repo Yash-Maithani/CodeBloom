@@ -1,375 +1,220 @@
-# CodeBloom design system: Annotated Notebook
+# CodeBloom design system: Trailhead
 
-This file defines how CodeBloom looks and behaves. It follows the design bans in `CODEBLOOM_MASTER_BRIEF.md` Section 8, which override anything here. Product requirements are in `SPEC.md`.
+Approved by the owner on 2026-11-03 (direction C, Trailhead, with the B, Bench, figure system inside lessons). It replaces the Annotated Notebook design. The rules in brief Section 8 apply and override anything here. `npm run verify:browser` reads the tables in sections 2 to 6 and compares them with the code, so keep their format.
 
-How this was made: direction set with `frontend-design:frontend-design`, written with `website-design:web-design-system`, on 2026-10-26. UXKIN was not connected, so this direction is not based on a comparison with real reference sites. Tokens are defined here only; they become CSS variables and a Tailwind theme in Milestone 0b.
+## 1. Direction
 
-## 1. Brand
+CodeBloom is a guided path for people who have never programmed. Each course is a trail of numbered stops; each lesson is a short series of steps shown in a step rail. The learner is asked to think before they see a result ("predict, then run"), and every result shown comes from a verified run. Inside lessons, examples are figures: code on the left, and on the right the path the program took, the output of the real run and the note that explains it.
 
-- **Name and tagline:** CodeBloom. Learn. Grow. Build.
-- **Wordmark:** "CodeBloom" set in the heading face at weight 600, ink color. No logo mark or final favicon yet; both are launch items.
-- **Personality:** a patient tutor who writes notes in the margin of your exercise book. Calm, clear, encouraging, never cute.
-- **Voice:** second person, plain verbs, sentence case, short sentences. Explain, do not sell. Errors say what happened and what to do next.
+Friendly, not childish: one teal for structure and links, one marigold for the learner's own actions, generous space, large legible type. One memorable element per page: the predict-then-run figure. Everything else stays calm.
 
-## 2. Direction
+Not based on compared real sites (UXKIN not connected); based on the owner's references (press.stripe.com, ciechanow.ski, distill.pub, redblobgames.com) and the three mockups the owner reviewed.
 
-The page is a clean sheet of notebook paper. Code sits on it like a worked example, and the explanation is written beside it as margin notes tied to specific lines. That annotated code block is the one memorable element. Everything else stays quiet: left-aligned text, generous space, thin borders, almost no shadow, one green accent.
+## 2. Colour
 
-Choices made to avoid generic defaults:
-
-- The paper is a near-neutral off-white, lighter and less yellow than the common cream template background.
-- The accent is a deep pine green, not terracotta, purple or neon.
-- Borders and modest radius, not a newspaper layout of hairlines and sharp corners, and not a kit of identical rounded cards.
-- No all-caps eyebrow labels, no middle-dot metadata strings, no arrows appended to button text, no monospace for non-code labels.
-
-## 3. Color
+Every colour has one role. Components use token names only, never values. Light is the default; dark applies with `prefers-color-scheme: dark` or `data-theme="dark"` on `<html>`.
 
 ### Light theme
 
-| Token | Hex | Role |
+| Token | Value | Role |
 |---|---|---|
-| `paper` | `#F8F7F2` | Page background |
-| `sheet` | `#FFFFFF` | Raised surfaces: lesson column, cards, inputs, menus |
-| `code` | `#F1F2EC` | Code and output panel background |
-| `ink` | `#1E2320` | Body text, headings, icons, focus ring |
-| `ink-muted` | `#4F5752` | Secondary text, line numbers, captions, code comments |
-| `rule` | `#D5D7CF` | Decorative dividers only, never the only edge of a control |
-| `rule-strong` | `#767D78` | Input and secondary button borders, control edges |
-| `accent` | `#1B5E45` | Links, primary buttons, current navigation item, margin-note markers, active code line bar |
-| `accent-hover` | `#134634` | Hover and pressed state of accent elements |
-| `accent-tint` | `#E3EFE8` | Highlighted code line, selected option background |
-| `on-accent` | `#FFFFFF` | Text and icons on `accent` |
-| `success` | `#1A5A9E` | Correct answers and passed checks |
-| `success-tint` | `#E6EEF8` | Correct feedback panel background |
-| `error` | `#A8261B` | Wrong answers, form errors, compiler error display |
-| `error-tint` | `#FBEAE7` | Error feedback panel background |
-| `warning` | `#7F5300` | Common-mistake callouts, cautions |
-| `warning-tint` | `#FAF0DA` | Common-mistake callout background |
-| `syntax-literal` | `#7F4A10` | Strings and numbers in code |
+| `canvas` | `#EEF3F1` | Page background |
+| `surface` | `#FFFFFF` | Cards, figures, header |
+| `sunken` | `#F6F9F8` | Code, inputs, output |
+| `ink` | `#16302B` | Text, icons, focus ring |
+| `ink-muted` | `#4D625D` | Secondary text, line numbers |
+| `rule` | `#CBD8D4` | Decorative dividers only |
+| `edge` | `#6F857F` | Borders of controls a user must find |
+| `primary` | `#00695C` | Links, current step, trail, structure |
+| `primary-hover` | `#004D44` | Pressed or hovered `primary` |
+| `on-primary` | `#FFFFFF` | Text on `primary` |
+| `primary-tint` | `#DDEFEA` | Current line, selected option, chips |
+| `action` | `#F4C542` | The learner's own action: primary buttons, "your turn" |
+| `action-hover` | `#E3B22C` | Hovered `action` |
+| `on-action` | `#16302B` | Text on `action` |
+| `action-edge` | `#16302B` | 2px border and pressed edge of `action` buttons |
+| `mark` | `#FBE7A6` | Highlighter marks (text on it is `ink`) |
+| `literal` | `#8A4B00` | Strings and numbers in code |
+| `success` | `#1D5FA8` | Correct answers (blue, so it is never confused with teal structure) |
+| `success-tint` | `#E6EEF8` | Correct-answer panel |
+| `error` | `#B3261E` | Errors, wrong answers |
+| `error-tint` | `#FBE9E7` | Error panel |
+| `warning` | `#7F5300` | Mistakes, time limits, cut-off output |
+| `warning-tint` | `#FFF3D6` | Mistake and warning panel |
 
 ### Dark theme
 
-| Token | Hex |
+| Token | Value |
 |---|---|
-| `paper` | `#161A18` |
-| `sheet` | `#1E2321` |
-| `code` | `#121614` |
-| `ink` | `#E7EAE5` |
-| `ink-muted` | `#A9B1AB` |
-| `rule` | `#343B37` |
-| `rule-strong` | `#7D867F` |
-| `accent` | `#7CC4A2` |
-| `accent-hover` | `#9AD4B8` |
-| `accent-tint` | `#1F3A2F` |
-| `on-accent` | `#0F1F18` |
+| `canvas` | `#0F1D1A` |
+| `surface` | `#172925` |
+| `sunken` | `#1D322D` |
+| `ink` | `#E4EFEB` |
+| `ink-muted` | `#A9BEB8` |
+| `rule` | `#2E4741` |
+| `edge` | `#7F9C95` |
+| `primary` | `#5CC8B4` |
+| `primary-hover` | `#8AD9CB` |
+| `on-primary` | `#0F1D1A` |
+| `primary-tint` | `#1E3D36` |
+| `action` | `#F4C542` |
+| `action-hover` | `#E3B22C` |
+| `on-action` | `#16302B` |
+| `action-edge` | `#9C7A16` |
+| `mark` | `#5A4A12` |
+| `literal` | `#E9B46B` |
 | `success` | `#8DB8EC` |
 | `success-tint` | `#1A2B3F` |
-| `error` | `#F29A8E` |
-| `error-tint` | `#3D1F1B` |
+| `error` | `#F2A7A0` |
+| `error-tint` | `#3A1F1C` |
 | `warning` | `#E3B661` |
-| `warning-tint` | `#3A2E15` |
-| `syntax-literal` | `#E2B27A` |
+| `warning-tint` | `#3A2E12` |
 
-Roles are the same in both themes. Dark mode follows the system preference first; a manual toggle is an open decision in `SPEC.md`.
-
-### Why success is blue
-
-Green is the brand and the color of every link and primary button. If "correct" were also green, ordinary controls would look like right answers. Success therefore uses blue, error uses red, and the accent stays the only green. Blue against red is also easier to tell apart than green against red for people with the most common forms of color blindness. Color is never the only signal: feedback always pairs color with an icon and a word.
+Roles are the same in both themes.
 
 ### Contrast check
 
-Computed with the WCAG 2.1 relative luminance formula on 2026-10-26. All text pairs need 4.5:1; control edges, focus rings and state colors used as non-text need 3:1. Every pair below passes in both themes. Recheck in the browser with `design:accessibility-review` once tokens are in code.
+WCAG 2.1 ratios, computed 2026-11-03 and recomputed in the browser by `verify:browser`. Text needs 4.5:1; edges a user must see need 3:1.
 
 | Pair | Light | Dark |
 |---|---|---|
-| `ink` on `paper` / `sheet` / `code` | 14.87 / 15.95 / 14.17 | 14.47 / 13.13 / 15.03 |
-| `ink` on `accent-tint` / `success-tint` / `error-tint` / `warning-tint` | 13.50 / 13.63 / 13.69 / 14.08 | 10.15 / 11.84 / 12.27 / 10.94 |
-| `ink-muted` on `paper` / `sheet` / `code` / `accent-tint` | 6.95 / 7.45 / 6.62 / 6.31 | 8.00 / 7.26 / 8.31 / 5.61 |
-| `accent` on `paper` / `sheet` / `code` / `accent-tint` | 7.16 / 7.68 / 6.82 / 6.50 | 8.60 / 7.80 / 8.93 / 6.03 |
-| `on-accent` on `accent` / `accent-hover` / `ink-muted` | 7.68 / 10.75 / 7.45 | 8.36 / 10.15 / 7.78 |
-| `success` on `paper` / `sheet` / `success-tint` | 6.53 / 7.00 / 5.98 | 8.54 / 7.74 / 6.98 |
-| `error` on `paper` / `sheet` / `error-tint` | 6.62 / 7.10 / 6.09 | 8.19 / 7.43 / 6.94 |
-| `warning` on `paper` / `sheet` / `warning-tint` | 6.24 / 6.69 / 5.91 | 9.31 / 8.45 / 7.04 |
-| `syntax-literal` on `code` / `sheet` / `accent-tint` | 6.46 / 7.27 / 6.15 | 9.46 / 8.26 / 6.38 |
-| `rule-strong` against `paper` / `sheet` / `code` (non-text) | 3.94 / 4.22 / 3.75 | 4.68 / 4.24 / 4.86 |
+| `ink` on `canvas` / `surface` / `sunken` | 12.55 / 14.08 / 13.29 | 14.74 / 12.93 / 11.54 |
+| `ink` on `primary-tint` / `mark` | 11.80 / 11.45 | 10.05 / 7.36 |
+| `ink-muted` on `canvas` / `surface` / `sunken` | 5.81 / 6.52 / 6.16 | 8.87 / 7.78 / 6.95 |
+| `primary` on `canvas` / `surface` / `primary-tint` | 5.90 / 6.61 / 5.55 | 8.57 / 7.52 / 5.84 |
+| `primary-hover` on `canvas` / `surface` | 8.73 / 9.79 | 10.63 / 9.32 |
+| `on-primary` on `primary` | 6.61 | 8.57 |
+| `on-action` on `action` / `action-hover` | 8.66 / 7.15 | 8.66 / 7.15 |
+| `literal` on `sunken` / `surface` | 6.42 / 6.80 | 7.25 / 8.12 |
+| `success` on `surface` / `success-tint` | 6.45 / 5.52 | 7.39 / 6.98 |
+| `error` on `surface` / `error-tint` | 6.54 / 5.58 | 7.83 / 7.76 |
+| `warning` on `surface` / `warning-tint` | 6.69 / 6.07 | 8.06 / 7.05 |
+| `ink` on `success-tint` / `error-tint` / `warning-tint` | 12.03 / 12.01 / 12.77 | 12.21 / 12.81 / 11.30 |
+| `edge` against `canvas` / `surface` / `sunken` (non-text) | 3.51 / 3.93 / 3.71 | 5.86 / 5.14 / 4.59 |
+| `action-edge` against `canvas` (non-text) | 12.55 | 4.30 |
 
 Rules that keep this true:
 
-- Text on a tint uses `ink`, or the matching state color (for example `error` on `error-tint`). No other combinations without a new check.
-- `rule` is decorative. Any edge a user must see to find a control uses `rule-strong`.
+- The light `action` fill is only 1.45:1 against `canvas`, so every `action` button has a 2px `action-edge` border, which carries its boundary (12.55:1). In dark mode the fill itself is 10.66:1 against `canvas`.
+- Text on a tint is `ink` or the matching state colour. `rule` is never the only edge of a control.
+- Colour is never the only signal: states also change an icon, a word or a border.
 - Adding or changing a token means rerunning the check and updating this table.
 
-## 4. Typography
+## 3. Typography
 
-| Role | Typeface | Weights |
-|---|---|---|
-| Headings, wordmark | Literata | 600 |
-| Body, interface, margin notes | Atkinson Hyperlegible Next | 400, 700 |
-| Code, output, values in diagrams | Atkinson Hyperlegible Mono | 400, 700 |
+Free licences only (SIL Open Font License 1.1), self-hosted with `next/font`, so no request goes to Google at run time.
 
-Why: Atkinson Hyperlegible was designed by the Braille Institute for readers with low vision, with letterforms meant to keep easily confused characters apart, such as `l`, `1` and `I`, or `O` and `0`. That matters to a beginner reading code. Check these characters in the browser at scaffold time. The mono version keeps the same letterforms in code. Literata is a reading serif with enough warmth for headings without feeling decorative.
-
-All three are served by Google Fonts (checked 2026-10-26). Load them through `next/font` at scaffold time and confirm the license files then. Fallbacks: `Georgia, serif` for headings, `system-ui, sans-serif` for body, `ui-monospace, monospace` for code.
+- **Bricolage Grotesque** (700, 800): headings and stop numbers.
+- **Atkinson Hyperlegible Next** (400, 700): all other text, buttons, labels. Chosen because it keeps easily confused letters distinct.
+- **Atkinson Hyperlegible Mono** (400, 700, 400 italic): code, output, values. No ligatures: `>=` is shown as typed. Italic is for code comments.
 
 ### Scale
 
-Root size 16px. Sizes in rem.
+Size and line height below 768px, then from 768px. The weight is part of the token.
 
-| Token | Size | Line height | Use |
-|---|---|---|---|
-| `text-xs` | 0.875 (14px) | 1.45 | Line numbers, captions, metadata. Smallest size allowed. |
-| `text-sm` | 1 (16px) | 1.5 | Interface text, buttons, margin notes |
-| `text-base` | 1.125 (18px) | 1.7 | Lesson prose |
-| `text-lg` | 1.3125 (21px) | 1.45 | Lead paragraph, h4 |
-| `text-xl` | 1.5 (24px) | 1.35 | h3 |
-| `text-2xl` | 1.875 (30px) | 1.25 | h2 |
-| `text-3xl` | 2.375 (38px) | 1.15 | h1 on course and lesson pages |
-| `text-4xl` | 3 (48px) | 1.1 | Homepage headline only; 2.375rem below 768px |
-| `text-mono` | 0.9375 (15px) | 1.6 | Code and output. Not named `text-code`, which would clash with the `code` color token |
+| Token | Below 768px | Line height | From 768px | Line height | Weight | Use |
+|---|---|---|---|---|---|---|
+| `display` | 2.5 (40px) | 1.05 | 4.25 (68px) | 1 | 800 | Homepage h1 only |
+| `h1` | 2.375 (38px) | 1.1 | 3.5 (56px) | 1.05 | 800 | Page titles |
+| `h2` | 1.75 (28px) | 1.2 | 2.125 (34px) | 1.15 | 700 | Sections, lesson steps |
+| `h3` | 1.3125 (21px) | 1.3 | 1.5 (24px) | 1.25 | 700 | Figure titles, card titles |
+| `lead` | 1.1875 (19px) | 1.55 | 1.3125 (21px) | 1.55 | 400 | Goals, intros |
+| `body` | 1.125 (18px) | 1.6 | 1.125 (18px) | 1.6 | 400 | Prose, at most 68ch |
+| `ui` | 1 (16px) | 1.5 | 1 (16px) | 1.5 | 400 | Buttons, labels, rail (buttons set bold) |
+| `small` | 0.875 (14px) | 1.45 | 0.875 (14px) | 1.45 | 400 | Captions, chips, hints |
+| `code` | 0.9375 (15px) | 1.7 | 1 (16px) | 1.75 | 400 | Code, output |
 
 Rules:
 
-- Prose line length 60 to 72 characters: token `max-w-measure` (68ch). Not `max-w-prose`, which is Tailwind's built-in 65ch.
-- Headings and body are left-aligned. Center only short, single-line elements inside a component.
-- Sentence case everywhere. No all-caps labels. Emphasize with weight 700 sparingly, never by coloring one word of a headline.
-- Code never wraps by default, because wrapping can disguise Python indentation. Long lines scroll horizontally inside the code block.
-- Inline code inside a sentence may wrap where it would otherwise overflow a narrow screen (`overflow-wrap: anywhere`), so pages reflow at 320px (WCAG 1.4.10). Code blocks, output and error messages never wrap.
+- Display, h1 and h2 are tracked tighter: -0.03em, -0.025em and -0.02em.
+- No all-caps labels, no eyebrow labels above headings, no monospace for non-code labels.
 
-## 5. Spacing and layout
+## 4. Spacing, grid and breakpoints
 
-- **Scale (4px base):** 4, 8, 12, 16, 24, 32, 48, 64, 96. Use only these.
-- **Component padding:** 12 to 16 inside controls, 24 inside panels.
-- **Section spacing:** 64 on desktop, 48 below 768px.
-- **Page gutter:** 16 below 640px, 24 up to 1024px, 32 above.
-- **Containers:** prose column `max-w-measure` (68ch); lesson layout (code plus notes) up to 1200px; site container up to 1280px.
+- **Scale (4px base):** 0, 4, 8, 12, 16, 24, 32, 40, 48, 64, 96. Class names count 4px steps (`p-4` is 16px); nothing else exists.
+- **Section spacing:** 96 from 1024px, 64 below.
+- **Widths:** `page` 1240px; `measure` 68ch for prose; `lesson-main` 880px; `rail` 260px.
+- **Grid:** 12 columns, 24px gutters; page margins 40px from 1024px, 24px from 768px, 16px below.
+- **Breakpoints:** base 360, `md` 768, `lg` 1024, `xl` 1440. Every template is checked at 360, 768, 1024 and 1440. No horizontal page scroll at 320.
 
-### Breakpoints
+## 5. Shape and depth
 
-| Name | Min width | Notes |
-|---|---|---|
-| base | 0 | Single column, notes stacked under lines |
-| `sm` | 640px | Wider gutters |
-| `md` | 768px | Two-column course lists |
-| `lg` | 1024px | Margin notes move beside the code |
-| `xl` | 1280px | Maximum content width reached |
-
-### Lesson layout
-
-```
-lg and wider
-+----------------------------------------------+----------------------+
-| 1  age = 17                                  | (1) A variable is a  |
-| 2  if age >= 18:                             |     labeled box...   |
-| 3      print("You can vote")                 | (2) The condition is |
-| 4  else:                                     |     checked once...  |
-| 5      print("Not yet")                      |                      |
-+----------------------------------------------+----------------------+
-| Expected output                                                     |
-| Not yet                                                             |
-+---------------------------------------------------------------------+
-
-below lg
-+-----------------------------------+
-| 1  age = 17                       |
-|  | (1) A variable is a labeled... |
-| 2  if age >= 18:                  |
-|  | (2) The condition is checked...|
-| 3      print("You can vote")      |
-+-----------------------------------+
-| [Hide notes]              [Copy]  |
-```
-
-## 6. Shape and depth
-
-- **Radius:** 4px for inputs, tags and small controls; 6px for buttons; 8px for panels, code blocks and cards. Nothing larger. Fully round only for the small margin-note number markers.
-- **Pill-shaped buttons are banned** (brief Section 8).
-- **Borders over shadows.** Panels use a 1px border. One shadow exists, for floating layers only (menus, popovers): `0 4px 16px rgb(30 35 32 / 0.12)`. Dark theme uses a `rule-strong` border instead of a shadow.
-
-## 7. Components
-
-Every interactive component defines these states: default, hover, focus-visible, active (pressed), disabled where it applies, and loading or error where it applies.
-
-### Shared interaction states
-
-- **Focus-visible:** 2px solid `ink` outline with 2px offset, on every focusable element. Never removed. Shown for keyboard focus, not for mouse clicks.
-- **Hover:** a color or background change only. No movement, scaling or glow.
-- **Active:** the hover color, one step darker where possible.
-- **Disabled:** `ink-muted` text on `code` background, `not-allowed` cursor. Avoid disabled buttons where possible; prefer an enabled button that explains what is missing.
-- **Transitions:** color and background only, 120ms.
-
-### Buttons
-
-Minimum height and width 44px. Text label always present; an icon is optional and sits before the label.
-
-| Variant | Default | Hover |
-|---|---|---|
-| Primary | `accent` background, `on-accent` text | `accent-hover` background |
-| Secondary | `sheet` background, `ink` text, 1px `rule-strong` border | `accent-tint` background |
-| Quiet | No background, `accent` text | Underline appears |
-
-One primary button per view region. Labels say exactly what happens ("Check answer", "Next lesson"), never "Submit" or "Learn more".
-
-### Links
-
-- In prose: `accent` color, always underlined (1px, offset 3px); underline thickens to 2px on hover.
-- In navigation: `ink` text, no underline; the current page shows a 2px `accent` bar and `aria-current="page"`.
-
-### Inputs
-
-`sheet` background, 1px `rule-strong` border, 4px radius, 44px minimum height, label always visible above (never placeholder-only). Error state: `error` border plus a message with an icon below, linked with `aria-describedby`.
-
-### Code block (signature component)
-
-- **Header row:** language name in plain text ("Python"), a label saying "Runnable example", "Example with a mistake" (a real program that fails or misbehaves on purpose, shown in a Common mistake callout) or "Pseudocode, not runnable", a notes toggle where notes exist, and a Copy button. The Copy button confirms with "Copied" for two seconds.
-- **Body:** `code` background, 8px radius, 1px `rule` border, line numbers in `ink-muted` that are not selectable or copied.
-- **Syntax colors (deliberately minimal):** keywords in `ink` at weight 700, strings and numbers in `syntax-literal`, comments in `ink-muted` italic, everything else `ink`. Code must remain readable with no color at all.
-- **Pseudocode:** same panel with a dashed `rule-strong` border and the "not runnable" label. Never styled like runnable code.
-- **Output panel:** directly below the code, headed "Expected output", `code` background with a 3px `ink-muted` left bar. An error message uses an `error` left bar and an x-circle icon, headed "Compiler error message" when the compiler failed or "Error message" when the program failed. The text is always the recorded result of a real run. Like the code, the panel is a focusable region with its own name ("Error message for Python code with a mistake: ..."), so a long message can be scrolled from the keyboard.
-
-### Margin notes
-
-Each note explains one line or a short range of lines and carries a small round number marker (`accent` background, `on-accent` numeral). The same number appears in the code gutter beside the line it explains. Numbering is used because notes follow the code's order.
-
-**Wide screens (1024px and up):** notes sit in a column to the right of the code, each aligned with the top of its line. If two notes would overlap, the later one moves down; the shared number keeps the link clear. Hovering a note with a pointer highlights its line with `accent-tint` and a 3px `accent` bar at the left of the line, and the reverse works from the gutter marker. This is an extra for pointer users only: notes are not focusable (they are static text, and extra tab stops slow keyboard users down), and the shared number plus the line number in the screen reader list carry the same link without it (decision D19).
-
-**Narrow screens (below 1024px):** each note is shown directly under the line it explains, inside the code block, as an annotation row: sans-serif text on `sheet`, a 3px `accent` left bar and the number marker. A "Hide notes" button in the header collapses all notes to read the clean program; its label then changes to "Show notes". Because the label carries the state, the button does not also use `aria-pressed`. Notes are shown by default. The choice may be remembered for the visit.
-
-**For everyone:**
-
-- Copy always gives the code alone.
-- Screen readers get the program uninterrupted, then an ordered list titled "Notes on this code", each item starting with its line number ("Line 2: ..."). Visual placement must not cause notes to be read twice or mid-line. The exact markup is chosen in Milestone 2 and checked with `design:accessibility-review`.
-- Notes are text, not tooltips, so they work on touch screens and with zoom.
-
-### Callouts
-
-Three kinds only, each with an icon and a visible title:
-
-| Kind | Style | Use |
-|---|---|---|
-| Analogy | `accent-tint` background, `accent` left bar | Real-life comparison, followed by where it stops being accurate |
-| Common mistake | `warning-tint` background, `warning` left bar, triangle-alert icon | An h3 title, then the code block labeled "Example with a mistake" with its real error message or output, then bold-labeled paragraphs "What happens:", optionally "How to read it:" or "Why it is easy to miss:", and "Fix:", optionally followed by a runnable fixed version. Spans the lesson width because it holds code |
-| Note | `sheet` background, `rule-strong` left bar | Side information |
-
-### Lesson page
-
-Left-aligned, in this order: a back link to the course ("Python course"), the h1, the objective as a lead paragraph starting with a bold "Goal:", then "The idea" (the shared explanation of the concept), the lesson's own sections, "Common mistakes", "Practice", "Recap", and the lesson navigation. Prose stays in the 68ch column; code blocks and mistake callouts use the lesson width. Section headings sit 48px apart, 64px from 768px. No label above the h1.
-
-- **Shared idea:** under the "The idea" heading, a small `ink-muted` line "This part is the same in the C lesson." links the same concept in the other languages that have a published lesson. It is left out when there is none.
-- **Analogy callout:** titled "Analogy: <title>", with a bold "Where the comparison stops:" paragraph.
-
-### Practice questions
-
-Numbered, because the text can refer to "the first practice question". Each question is a `fieldset` whose legend is a bold "Question 1." plus the question, then (for predict-the-output) the code block without its output, then the options as described in "Quiz and feedback" below.
-
-- **Output options:** program output is shown as real separate lines in `text-mono`, never described in words ("10 then 15"). Screen readers hear "Line 1:", "Line 2:" before each line. An option for no output reads "Nothing is printed" in italic sans. Output never wraps; on a narrow screen a long line scrolls inside its option, which then becomes focusable.
-- **Controls:** "Check answer" (primary) and "Show hint 1 of 3" (secondary) in one row. They appear only once the page is interactive; their space is reserved so nothing moves.
-- **Status:** after a correct check, "Answered correctly" with a check-circle icon in `success`, beside the buttons. Under the Practice heading, a small `ink-muted` line "1 of 3 questions answered correctly on this page". Nothing is stored, so the line says "on this page".
-- **Solution:** the native "Show solution" disclosure (secondary button style, "Hide solution" when open, instant, no JavaScript) stays available at any time. Inside: the verified output panel, or "Answer:" with the correct option for a multiple-choice question, then the explanation.
-- Hints appear below the feedback as `sheet` rows with a `rule-strong` left bar and a bold "Hint 1:".
-
-### Playground
-
-A page for running Python in the browser (`/playground`, and `/playground/python/<example>` for a lesson example). Left-aligned: h1 "Python playground", a lead saying the code runs on the learner's device and nothing is saved or sent, a small `ink-muted` line "Python only. C, C++ and Java are not yet supported in the playground." For a lesson example, a line links back to its lesson.
-
-- **Layout:** two columns from 1024px (code and input left, "Your run" right), one column below. Nothing scrolls the page sideways at 320px; code and output scroll inside their boxes.
-- **Code box:** a labelled textarea ("Python code") on `code` with a 1px `rule-strong` border and an `ink-muted` line-number gutter, `text-mono`, no wrapping, no spellcheck or autocorrect. Its frame shows the standard focus ring. Tab adds 4 spaces, Shift+Tab removes them, Enter keeps the indentation and adds a level after a colon; Esc then Tab leaves the box, as the hint below it says.
-- **Input box:** a labelled textarea ("Input") with the hint "If your program uses `input()`, type one line here for each call before you press Run."
-- **Controls:** "Run" (primary), "Stop" (secondary, only while downloading or running), "Reset code" (secondary). Run stays focusable while busy, with `aria-disabled`, and says the program is already running. The controls appear only once the page is interactive; their space is reserved. Before the first run, a small `ink-muted` note gives the real download size.
-- **Your run:** an h2 "Your run" over a `sheet` panel with a `rule-strong` border, so it never looks like the verified "Expected output". A status line on top with an icon and words: no icon while idle, downloading, starting or running; `success` check-circle for finished; `error` x-circle for an error; `warning` triangle for a time limit, cut-off output, Stop or a failed download. Below it the output in `text-mono`, then for a Python error an "Error message" block with the message as Python prints it. Cleared at the start of every run.
-- **Download progress:** "Downloading Python: 4.2 of 13.5 MB" from the bytes really received, with a native progress bar in `accent`. Then "Starting Python…".
-- **Announcements:** state changes go to a polite live region ("Downloading Python.", "Finished. 2 lines of output.", the error or limit sentence). Progress numbers are shown but not announced.
-- **Lesson link:** "Try it in the playground" under each runnable Python example, in the back link style, with the example's name for screen readers.
-- **Without JavaScript:** the code is shown, the controls are hidden, and a note says running code needs JavaScript.
-- **Motion:** none beyond the shared colour changes.
-
-### Lesson navigation
-
-After the recap, above a `rule` divider: up to two bordered links (`sheet` background, `rule-strong` border, `accent-tint` on hover), "Previous lesson" on the left and "Next lesson" on the right, each a small `ink-muted` label above the lesson title. They follow published lessons in course order. The first lesson has no previous link and the last has no next link (absent, not disabled). The last lesson says "This is the last published lesson in the <course> course." with a link back to the course. No arrows are added to the text.
-
-### Quiz and feedback
-
-- Answer options are full-width rows (minimum 44px) with a visible radio or checkbox; selected option uses `accent-tint` and a 2px `accent` border.
-- Correct: `success-tint` panel, `success` check-circle icon, the word "Correct", then the explanation.
-- Incorrect: `error-tint` panel, `error` x-circle icon, the words "Not quite", then why, and the offer of a hint. Never mocking or celebratory.
-- Feedback appears in place below the question and is announced through a polite live region.
-- Hints are revealed one at a time with "Show hint 1 of 3"; revealed hints stay visible.
-
-### Step-through visuals
-
-A panel below an example's explanation that lets the learner run the program one line at a time. Every line, value and output in it comes from a recorded trace of a real run; only the title and step notes are written by hand.
-
-- **Heading:** an h3 title ("Step through it: watch the value of `apples`"), then a small `ink-muted` line "Move one line at a time. Every value shown comes from really running this program."
-- **Panel:** `sheet` background, 1px `rule` border, 8px radius, 16px padding (24px from 768px).
-- **Code:** a compact copy of the example on `code`, line numbers in `ink-muted`. The line that just ran gets a 3px `accent` left bar, `accent-tint` background and a 16px Lucide `arrow-right` in `accent` beside its number, so it is not shown by colour alone. Lines that never run are never marked. Code never wraps; it scrolls inside the panel.
-- **Step text:** bold "Step 3 of 4. Line 3 ran: `apples = apples + 2`", then what changed in words, generated from the trace ("apples changed from 3 to 5.", "No variable changed.", "Python went from line 2 to line 5."), then the step's note if it has one. The start state reads "Start. Nothing has run yet."
-- **Variables:** the labeled boxes from Educational diagrams, as HTML: the name above in sans, the value inside in `text-mono` on `sheet` with a 1px `rule-strong` border, the type below in `text-xs` `ink-muted`. A variable that changed on this step gets a 2px `accent` border, `accent-tint` fill and the words "changed (was 3)", or "new" when it first appears. Before anything runs: "No variables yet" in italic.
-- **Output so far:** the output panel style (`code`, 3px `ink-muted` left bar), with output as real separate lines in `text-mono`, read as "Line 1:", "Line 2:". Before anything is printed: "nothing yet" in italic.
-- **Controls:** "Back" (secondary), "Next step" (primary), "Start again" (secondary), in one row that wraps on a phone. At the ends, Back or Next step stays focusable with `aria-disabled`: text turns `ink-muted` (the primary button's fill turns `ink-muted` with `on-accent` text), and pressing it announces "This is the start. Nothing has run yet." or "This is the last step." without moving. The controls appear only once the page is interactive; their space is reserved.
-- **Announcement:** every step's full sentence (step, line, changes, note, output so far line by line) goes to a polite live region.
-- **Text equivalent:** an "All steps as a table" disclosure (secondary button style) below the panel, holding a table with a Start row and one row per step: line that ran, variables after it, output so far. It is a focusable region, because it scrolls sideways on a phone. Without JavaScript the panel is hidden and the table is shown open.
-- **Motion:** only the current line's existing 120ms colour change; values do not move. Instant with reduced motion. Nothing plays by itself.
-
-### Progress
-
-- Lesson section steps may be numbered because they are a real sequence.
-- Progress bars and checkmarks show only real state. No streaks, points or invented counters.
-
-### Cards
-
-Used for course and language entries only. `sheet` background, 1px `rule` border, 8px radius, no shadow. Each card's content differs in substance (language, what you will learn, lesson count when real). Do not use rows of interchangeable feature cards.
-
-### Navigation and footer
-
-- Top bar: wordmark left, language courses and key links right, `paper` background with a `rule` bottom border.
-- While the navigation has three links or fewer and they fit at 360px, they stay visible at every width with no menu button (decision D18). When the navigation grows past that: below 768px a "Menu" button (icon plus label) opens a disclosure panel; focus moves into it and Escape closes it.
-- Skip link "Skip to content" as the first focusable element.
-- Footer: plain links (courses, about, privacy, terms once they exist). No social proof, no newsletter box unless one really exists.
-
-## 8. Motion
-
-Motion explains a change or answers an action. Nothing moves on its own.
+### Radius
 
 | Token | Value | Use |
 |---|---|---|
-| `duration-fast` | 120ms | Hover, press, color changes |
-| `duration-base` | 200ms | Expand and collapse, hint reveal, feedback appearing |
-| `duration-slow` | 300ms | Visualization step transitions; the maximum allowed |
-| `ease-standard` | `cubic-bezier(0.2, 0, 0, 1)` | All of the above |
+| `chip` | 6px | Value chips, tags |
+| `control` | 8px | Buttons, inputs, options |
+| `panel` | 10px | Code blocks, figures, callouts |
+| `card` | 12px | Course cards, step cards |
+| `round` | 9999px | Number markers and trail stops only |
 
-- Use CSS transitions first. Motion for React only where CSS cannot do the job (for example exit or layout animations), recorded as a dependency decision.
-- No scroll-triggered reveals, parallax, auto-playing animation, looping decoration or custom cursors.
-- Visualization steps advance only when the learner asks.
-- Animate only `opacity` and `transform`, except color transitions. Never shift layout.
-- With `prefers-reduced-motion: reduce`, all transitions become instant except opacity fades of 120ms or less. All information stays available.
+Buttons are never pill-shaped.
 
-## 9. Icons and imagery
+### Shadows
 
-- **Icons:** one outline set, Lucide proposed (confirm license and package at scaffold). 20px default, 16px inline, stroke 1.75. Every icon has a visible text label next to it or an accessible name. No emoji as icons.
-- **Photography:** none by default. No stock or AI-generated imagery.
-- **Illustration:** simple line drawings only when an analogy truly benefits, using token colors.
+Three, nothing else: `press` 0 3px 0 `action-edge` (primary buttons only); `lift` 0 14px 28px -14px (ink at 45% in light, black at 60% in dark), hovered course cards only; `float` 0 8px 24px ink at 18% (none in dark, which uses an `edge` border), menus and popovers.
 
-### Educational diagrams
+## 6. Motion
 
-Built as inline SVG with token colors so they work in both themes.
+Motion shows what changed or answers an action. Nothing moves on its own; nothing loops.
 
-- **Variables:** a labeled box; the name above in sans-serif, the value inside in mono. Built in HTML in the step-through visuals (Components).
-- **Arrays:** a row of equal cells with the index below each cell, starting at 0.
-- **Pointers and references:** an arrow from the pointer's box to the target's box, with the address shown in mono when it matters.
-- **Call stack:** stacked frames with the newest on top, each showing its function name and local variables.
-- **Loop trace:** a table with one row per iteration and one column per variable, current row highlighted.
-- **Color:** lines in `ink` at 1.5px, the active element in `accent` with `accent-tint` fill, everything else neutral. `success` and `error` only when showing a real result.
-- **Labels** at `text-sm` minimum. Every diagram has a caption and a text description that conveys the same information.
+| Token | Value | Use |
+|---|---|---|
+| `duration-fast` | 120ms | Colour, background, press |
+| `duration-base` | 200ms | Hints, feedback, step highlight, values, card lift |
+| `duration-slow` | 300ms | Ink connector, highlighter mark, bloom (the maximum) |
+| `ease-standard` | `cubic-bezier(0.2, 0, 0, 1)` | Everything except the bloom |
+| `ease-bloom` | `cubic-bezier(0.3, 0, 0, 1.3)` | The bloom only (a small overshoot) |
 
-## 10. Prohibited patterns
+- Only `transform` and `opacity` animate, plus colour transitions. Nothing changes layout; CLS stays 0.
+- With `prefers-reduced-motion: reduce`: every duration token is 0ms, every transform and animation is off, and all information stays.
+- The only motion not caused by a click, key or hover is the highlighter mark, which draws once when a marked term first enters the viewport and never again.
 
-All bans in brief Section 8 apply. Specific ways they could creep into this design:
+## 7. Components
 
-- A green-to-teal gradient hero, or any gradient used as identity or decoration.
-- Rounding buttons to a pill "because it looks friendly".
-- "Join thousands of learners", star ratings, invented quotes, or a counter of lessons completed.
-- A "Coming soon" button that looks clickable.
-- Notebook-paper texture, ruled-line backgrounds, doodles or tape graphics as decoration.
-- Margin notes as hover-only tooltips.
-- Section-by-section fade-up on scroll, or animated code typing on the homepage.
-- A glass navigation bar or blurred panels.
-- Uppercase tracked labels above headings, or monospace used for non-code labels.
+Every interactive component defines: default, hover, focus-visible, pressed, disabled (prefer an enabled control that explains what is missing), loading and error where they apply, and the reduced-motion version. Focus-visible everywhere: 2px solid `ink` outline, 2px offset. Targets at least 44 by 44px.
+
+- **Button, primary:** `action` fill, `on-action` text, 2px `action-edge` border, `press` shadow; hover darkens the fill one step; pressed moves down 3px and drops the shadow (instant with reduced motion); disabled `sunken` fill with `ink-muted` text and `edge` border; loading keeps the label and adds "…" in words, for example "Running…".
+- **Button, secondary:** `surface` fill, `ink` text, 2px `edge` border; hover `primary-tint`.
+- **Link:** `primary`, always underlined; hover thickens the underline.
+- **Course card:** `surface`, `card` radius, 8px top band (`primary` published, `rule` planned), name in `h3`, one-line description, a chip "13 lessons" or "Planned". Hover and focus-within: lifts 4px and tilts -0.5 degrees with `lift` (`base`, `ease-standard`); reduced motion: band thickens to 12px, no movement.
+- **Step rail:** sticky from 1024px; numbered steps (round markers); current step `surface` row with a 4px `primary` bar and `aria-current="location"`; links jump to sections; below 1024px it becomes a "Steps in this lesson" disclosure at the top.
+- **Code block:** `sunken`, `panel` radius, 1px `rule` border, line numbers `ink-muted` unselectable; current or hovered line `primary-tint` with a 4px `primary` bar; Copy code button (secondary, small).
+- **Figure (two-pane):** title in `h3`, code pane left, explanation pane right: "Path taken", "Output of the real run", the note for the active line. Stacks below 1024px with the explanation under the code.
+- **Value chip:** `small` mono on `primary-tint`, `chip` radius, shown only on lines a note or an explorer is about.
+- **Path taken:** a row of steps ("line 2: False", "line 3 skipped", "line 5 runs"): runs in `primary-tint` with a `primary` border, skipped with a dashed `edge` border and the word "skipped".
+- **Callout:** analogy (`primary-tint`, lightbulb icon), mistake (`warning-tint`, triangle icon), each with a 4px left bar.
+- **Practice question:** fieldset of options (radio rows, 2px `edge`, selected `primary-tint` with `primary` border); "Check answer" primary; feedback panel in `success-tint` or `error-tint` with icon and word; hints one at a time.
+- **Explorer:** a figure with a labelled native control (slider or select) above the code; results only from verified variants; announced in words.
+- **Typed input panel:** `sunken`, heading "Typed input", the typed lines in mono.
+- **Ink connector:** 1.6px `primary` curve with a 3px dot at the code end, from a note or prose term to its line; from 1024px only; grows from the note in `slow`; reduced motion: appears at once; `aria-hidden`.
+- **Highlighter mark:** `mark` band under up to three defined terms per lesson; draws once (`slow`); reduced motion: shown at once.
+- **Bloom:** Lucide `flower-2` in `primary` beside "Correct", grows from 60% to 100% and turns 15 degrees with `ease-bloom` over `slow`, once per correct check; reduced motion: shown at once; `aria-hidden`.
+- **Header:** `surface`, wordmark left, Courses and Playground right; current page marked with a 3px `primary` underline and `aria-current`.
+
+## 8. Patterns
+
+- **Lesson step:** one section of a lesson as a step card on `surface` with the step number and `h2`; every step is always on the page (no paging).
+- **Predict then run:** before an example's output, the figure shows "Think about what line N prints, then press Show." and a secondary Show button; Show reveals the verified output and its note. No new lesson text.
+- **Path taken:** described above; built from the recorded trace or variant.
+- **Mistake block:** warning callout with the wrong code, the real error message, how to read it and the fix.
+- **Practice block:** numbered questions as above, the count "on this page", the bloom on a correct answer.
+- **Recap:** a short list on `surface` with a `primary` check icon per point, then the next-lesson link.
+
+## 9. Templates
+
+- **Homepage:** hero 6:5 (display heading, lead, status sentence from data, "Start Python lesson 1" primary, "Browse the courses" secondary) beside a "Your turn" vote figure; the Python trail; course cards.
+- **Courses:** course cards in a 2 by 2 grid.
+- **Course page:** the trail of numbered stops, horizontal from 1024px and vertical below (checked at 360px); each stop has its number, title and goal; planned topics as muted stops with "Planned".
+- **Lesson:** step rail plus main column; title and goal; steps; mistakes; practice; recap; previous and next.
+- **Playground:** editor and Your run side by side from 1024px; designed empty state for Your run.
+- **404:** short message and two links.
+
+## 10. Icons and imagery
+
+Lucide outline icons, 20px (16px inline), 1.75 stroke, always with a text label or an accessible name. No emoji, photos or stock illustration. Concept diagrams are inline SVG in a hand-drawn ink style using tokens, each with a caption that carries the same information.
+
+## 11. Prohibited
+
+Everything in brief Section 8, plus: gradients as decoration, glass panels, scroll-triggered reveals other than the one-time highlighter mark, animated typing, more than one marigold action per figure, value chips on every line.

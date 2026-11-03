@@ -67,22 +67,30 @@ function parseDesign(text) {
     backgrounds.forEach((bg, i) => contrast.push({ fg, bg, nonText, light: light[i], dark: dark[i] }));
   }
 
+  // Each type token has a size below 768px and one from 768px (DESIGN.md section 3).
   const type = {};
   for (const line of section(text, "### Scale", "Rules:").split("\n")) {
-    const m = line.match(/^\| `([a-z0-9-]+)` \| ([0-9.]+) \((\d+)px\) \| ([0-9.]+) \|/);
-    if (m) type[m[1]] = { rem: Number(m[2]), px: Number(m[3]), lineHeight: Number(m[4]) };
+    const m = line.match(/^\| `([a-z0-9-]+)` \| ([0-9.]+) \((\d+)px\) \| ([0-9.]+) \| ([0-9.]+) \((\d+)px\) \| ([0-9.]+) \| (\d+) \|/);
+    if (m) type[m[1]] = { small: { rem: Number(m[2]), lineHeight: Number(m[4]) }, large: { rem: Number(m[5]), lineHeight: Number(m[7]) }, weight: Number(m[8]) };
   }
 
   const fast = text.match(/\| `duration-fast` \| (\d+)ms \|/);
   const spacing = text.match(/\*\*Scale \(4px base\):\*\* ([0-9, ]+)\./)?.[1].split(",").map((n) => Number(n.trim()));
-  const radius = text.match(/(\d+)px for inputs[^;]*; (\d+)px for buttons; (\d+)px for panels/);
+  const radius = {};
+  for (const line of section(text, "### Radius", "Buttons are never").split("\n")) {
+    const m = line.match(/^\| `([a-z]+)` \| (\d+)px \|/);
+    if (m && m[1] !== "round") radius[m[1]] = Number(m[2]);
+  }
+  // Fonts named in DESIGN.md section 3, for example "**Bricolage Grotesque** (700, 800)".
+  const fonts = [...section(text, "## 3. Typography", "### Scale").matchAll(/^- \*\*([A-Za-z ]+)\*\* \(([^)]*)\)/gm)].map((m) => ({ family: m[1], weights: m[2] }));
   return {
     colors,
     contrast,
     type,
     spacing,
     motion: { fast: fast ? Number(fast[1]) : NaN },
-    radius: radius && { control: Number(radius[1]), button: Number(radius[2]), panel: Number(radius[3]) },
+    radius,
+    fonts,
   };
 }
 
@@ -254,15 +262,13 @@ async function runScenario(browser, design, { label, theme, systemScheme, width,
       return [`--text-${name}`, `--text-${name}--line-height`];
     }),
     ...design.spacing.map((px) => `--spacing-${px / 4}`),
-    "--radius-control",
-    "--radius-button",
-    "--radius-panel",
+    ...Object.keys(design.radius).map((name) => `--radius-${name}`),
     "--duration-fast",
   ];
   const m = await page.evaluate(measureInPage, { probes, tokenNames: Object.keys(colors), cssVars });
 
   // 1. Theme really applied, and the browser's own preference did not win.
-  check(group, `theme is ${theme} (browser preference was ${systemScheme})`, m.tokenColors.paper === hexToRgb(colors.paper), `paper computed ${m.tokenColors.paper}, expected ${hexToRgb(colors.paper)}`);
+  check(group, `theme is ${theme} (browser preference was ${systemScheme})`, m.tokenColors.canvas === hexToRgb(colors.canvas), `canvas computed ${m.tokenColors.canvas}, expected ${hexToRgb(colors.canvas)}`);
 
   // 2. Every color token matches DESIGN.md.
   const wrong = Object.entries(colors).filter(([name, hex]) => m.tokenColors[name] !== hexToRgb(hex));
@@ -299,10 +305,11 @@ async function runScenario(browser, design, { label, theme, systemScheme, width,
   // 6. Type scale, spacing, radius and motion tokens.
   const num = (v) => parseFloat(v);
   const sizeFailures = [];
+  // Below 768px the small sizes apply, from 768px the large ones.
   for (const [token, spec] of Object.entries(design.type)) {
-    const name = token.replace("text-", "");
-    if (Math.abs(num(m.vars[`--text-${name}`]) - spec.rem) > 1e-6) sizeFailures.push(`${token}: ${m.vars[`--text-${name}`]} vs ${spec.rem}rem`);
-    if (Math.abs(num(m.vars[`--text-${name}--line-height`]) - spec.lineHeight) > 1e-6) sizeFailures.push(`${token} line height: ${m.vars[`--text-${name}--line-height`]} vs ${spec.lineHeight}`);
+    const expected = width < 768 ? spec.small : spec.large;
+    if (Math.abs(num(m.vars[`--text-${token}`]) - expected.rem) > 1e-6) sizeFailures.push(`${token}: ${m.vars[`--text-${token}`]} vs ${expected.rem}rem`);
+    if (Math.abs(num(m.vars[`--text-${token}--line-height`]) - expected.lineHeight) > 1e-6) sizeFailures.push(`${token} line height: ${m.vars[`--text-${token}--line-height`]} vs ${expected.lineHeight}`);
   }
   check(group, `${Object.keys(design.type).length} type sizes match DESIGN.md`, sizeFailures.length === 0, sizeFailures.join("; "));
   const spaceFailures = design.spacing.filter((px) => Math.abs(num(m.vars[`--spacing-${px / 4}`]) * 16 - px) > 1e-6);
@@ -316,11 +323,15 @@ async function runScenario(browser, design, { label, theme, systemScheme, width,
 
   // 7. Fonts.
   const f = await measureFonts(page);
-  const wanted = ["Literata|600|normal", "Atkinson Hyperlegible Next|400|normal", "Atkinson Hyperlegible Next|700|normal", "Atkinson Hyperlegible Mono|400|normal", "Atkinson Hyperlegible Mono|700|normal", "Atkinson Hyperlegible Mono|400|italic"];
+  // Every weight DESIGN.md lists; "400 italic" means the italic style.
+  const wanted = design.fonts.flatMap(({ family, weights }) =>
+    weights.split(",").map((w) => w.trim()).map((w) => (w.endsWith("italic") ? `${family}|${w.split(" ")[0]}|italic` : `${family}|${w}|normal`)),
+  );
   const notLoaded = wanted.filter((w) => !f.loaded.includes(w));
   check(group, "all font files used on the page are loaded", notLoaded.length === 0, `not loaded: ${notLoaded}`);
   const firstFamily = (s) => s?.family.split(",")[0].replace(/"/g, "").trim();
-  check(group, "heading uses Literata 600, body uses Atkinson Next, code uses Atkinson Mono", firstFamily(f.heading) === "Literata" && f.heading.weight === "600" && firstFamily(f.body) === "Atkinson Hyperlegible Next" && firstFamily(f.code) === "Atkinson Hyperlegible Mono", JSON.stringify({ heading: f.heading, body: f.body, code: f.code }));
+  const [headingFont, textFont, codeFont] = design.fonts.map((font) => font.family);
+  check(group, `heading uses ${headingFont} ${design.type.h1.weight}, body uses ${textFont}, code uses ${codeFont}`, firstFamily(f.heading) === headingFont && Number(f.heading.weight) === design.type.h1.weight && firstFamily(f.body) === textFont && firstFamily(f.code) === codeFont, JSON.stringify({ heading: f.heading, body: f.body, code: f.code }));
   check(group, "code keyword is bold 700 and comment is italic", f.bold?.weight === "700" && f.italic?.style === "italic", JSON.stringify({ bold: f.bold, italic: f.italic }));
   const external = fontRequests.filter((u) => !u.startsWith(BASE));
   check(group, `${fontRequests.length} font files served from our own origin, none from Google`, fontRequests.length >= 3 && external.length === 0, `external: ${external}; total: ${fontRequests.length}`);
@@ -350,8 +361,10 @@ async function runScenario(browser, design, { label, theme, systemScheme, width,
 
 // A Windows checkout may save DESIGN.md with \r\n line endings; the parser expects \n.
 const design = parseDesign((await readFile(`${ROOT}DESIGN.md`, "utf8")).replace(/\r\n?/g, "\n"));
-check("DESIGN.md", "parsed 18 light colors, 18 dark colors", Object.keys(design.colors.light).length === 18 && Object.keys(design.colors.dark).length === 18, `${Object.keys(design.colors.light).length} / ${Object.keys(design.colors.dark).length}`);
-check("DESIGN.md", "parsed contrast pairs, type scale, spacing and radius", design.contrast.length > 0 && Object.keys(design.type).length === 9 && design.spacing?.length === 9 && !!design.radius && design.motion.fast === 120, `pairs ${design.contrast.length}, type ${Object.keys(design.type).length}, spacing ${design.spacing?.length}, radius ${JSON.stringify(design.radius)}`);
+// Counts from the approved Trailhead DESIGN.md (2026-11-03). A count that changes
+// means DESIGN.md changed: update this line with the owner's approval.
+check("DESIGN.md", "parsed 23 light colors, 23 dark colors, the same names", Object.keys(design.colors.light).length === 23 && Object.keys(design.colors.light).join() === Object.keys(design.colors.dark).join(), `${Object.keys(design.colors.light).length} / ${Object.keys(design.colors.dark).length}`);
+check("DESIGN.md", "parsed contrast pairs, 9 type sizes, 11 spacing steps, 4 radii, 3 fonts", design.contrast.length > 0 && Object.keys(design.type).length === 9 && design.spacing?.length === 11 && Object.keys(design.radius).length === 4 && design.fonts.length === 3 && design.motion.fast === 120, `pairs ${design.contrast.length}, type ${Object.keys(design.type).length}, spacing ${design.spacing?.length}, radius ${JSON.stringify(design.radius)}, fonts ${design.fonts.length}`);
 
 await mkdir(SCREENSHOTS, { recursive: true });
 const server = await startServer();
