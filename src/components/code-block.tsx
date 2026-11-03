@@ -11,11 +11,15 @@
 //   - Screen readers, at every width: the code first, then one ordered list
 //     "Notes on this code", where every note starts with its line number.
 //
-// This is a client component only for three small interactions: Copy code, the
-// Hide notes button, and highlighting a line while a pointer hovers its note.
-// Highlighting is an extra (decision D19); nothing depends on it.
+// This is a client component for small interactions: Copy code, the Hide notes
+// button, and linking a note to its line. From 1024px the notes list is one tab
+// stop: arrow keys move between notes, and hovering or focusing a note
+// highlights its line and draws an ink connector to it (decision D19 as changed
+// by the owner on 2026-11-03). Nothing depends on the highlight: every note
+// also starts with its line number for screen readers.
 
-import { Fragment, useEffect, useId, useState } from "react";
+import { Fragment, useEffect, useId, useRef, useState, useSyncExternalStore, type KeyboardEvent } from "react";
+import { InkConnector } from "@/components/ink-connector";
 import { CircleAlert } from "lucide-react";
 import { InputPanel } from "@/components/input-panel";
 import { OutputPanel } from "@/components/output-panel";
@@ -68,6 +72,13 @@ function NoteMarker({ number }: { number: number }) {
   );
 }
 
+const WIDE = "(min-width: 64rem)";
+function subscribeWide(onChange: () => void) {
+  const query = window.matchMedia(WIDE);
+  query.addEventListener("change", onChange);
+  return () => query.removeEventListener("change", onChange);
+}
+
 function lineLabel(note: CodeNote) {
   return note.startLine === note.endLine
     ? `Line ${note.startLine}: `
@@ -100,6 +111,11 @@ export function CodeBlock({
     attempt: 0,
   });
   const notesTitleId = useId();
+  const box = useRef<HTMLDivElement>(null);
+  // The notes column is only visible from 1024px; below that the list is for
+  // screen readers only, so its notes must not become invisible tab stops.
+  const wide = useSyncExternalStore(subscribeWide, () => window.matchMedia(WIDE).matches, () => false);
+  const [roving, setRoving] = useState(0);
 
   // "Copied" goes back to "Copy code" two seconds after the LAST click
   // (DESIGN.md section 7). A new click changes `copy`, which clears the old
@@ -121,6 +137,19 @@ export function CodeBlock({
   }
 
   const noteStartingAt = new Map(notes.map((note, index) => [note.startLine, index]));
+
+  function onNotesKey(event: KeyboardEvent<HTMLOListElement>) {
+    const moves: Record<string, number> = { ArrowDown: roving + 1, ArrowUp: roving - 1, Home: 0, End: notes.length - 1 };
+    if (!(event.key in moves)) return;
+    event.preventDefault();
+    const next = Math.min(Math.max(moves[event.key], 0), notes.length - 1);
+    setRoving(next);
+    box.current?.querySelector<HTMLElement>(`[data-note="${next + 1}"]`)?.focus();
+  }
+
+  // The two ends of the ink connector for the active note.
+  const activeEnd = activeNote === null ? null : `[data-note="${activeNote + 1}"] [data-marker]`;
+  const activeLine = activeNote === null ? null : `[data-line="${notes[activeNote].startLine}"] [data-code-text]`;
   const isLineActive = (lineNumber: number) =>
     activeNote !== null &&
     lineNumber >= notes[activeNote].startLine &&
@@ -134,8 +163,8 @@ export function CodeBlock({
         </figcaption>
       )}
 
-      <div className="rounded-panel border border-rule bg-sunken">
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-rule px-4 py-2">
+      <div ref={box} className="relative rounded-panel border border-rule bg-sunken">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-t-panel border-b border-rule bg-surface px-4 py-2">
           <span className="text-ui font-bold">{languageLabel}</span>
           <span className="text-ui text-ink-muted">{mistake ? "Example with a mistake" : "Runnable example"}</span>
           <div className="ml-auto flex flex-wrap gap-2">
@@ -182,11 +211,11 @@ export function CodeBlock({
                   <Fragment key={lineNumber}>
                     <span
                       data-line={lineNumber}
-                      className={`flex border-l-4 pr-4 transition-colors ${
+                      className={`flex border-l-4 pr-4 transition-colors duration-fast hover:bg-primary-tint ${
                         isLineActive(lineNumber) ? "border-primary bg-primary-tint" : "border-transparent"
                       }`}
                     >
-                      <span aria-hidden="true" className="w-8 shrink-0 select-none text-right text-ink-muted">
+                      <span aria-hidden="true" className="w-10 shrink-0 select-none border-r border-rule pr-3 text-right text-ink-muted">
                         {lineNumber}
                       </span>
                       <span
@@ -197,7 +226,7 @@ export function CodeBlock({
                       >
                         {noteIndex !== undefined && <NoteMarker number={noteIndex + 1} />}
                       </span>
-                      <span className="whitespace-pre">
+                      <span data-code-text className="whitespace-pre">
                         {tokens.map((token, tokenIndex) => (
                           <span key={tokenIndex} className={tokenStyles[token.kind]}>
                             {token.text}
@@ -232,6 +261,7 @@ export function CodeBlock({
               <ol
                 aria-labelledby={notesTitleId}
                 data-notes-list
+                onKeyDown={wide ? onNotesKey : undefined}
                 className="lg:grid"
                 // One grid row per code line. 1.5rem is the code line height
                 // (text-code: 0.9375rem size times 1.6 line height).
@@ -243,14 +273,22 @@ export function CodeBlock({
                     <li
                       key={note.startLine}
                       data-note={index + 1}
+                      tabIndex={wide ? (index === roving ? 0 : -1) : undefined}
                       style={{ gridRow: `${note.startLine} / ${nextStart}` }}
                       onMouseEnter={() => setActiveNote(index)}
                       onMouseLeave={() => setActiveNote(null)}
-                      className={`flex items-start gap-3 self-start rounded-control px-2 text-ui transition-colors ${
+                      onFocus={() => {
+                        setRoving(index);
+                        setActiveNote(index);
+                      }}
+                      onBlur={() => setActiveNote(null)}
+                      className={`flex items-start gap-3 self-start rounded-control px-2 text-ui transition-colors duration-fast ${
                         activeNote === index ? "bg-primary-tint" : ""
                       }`}
                     >
-                      <NoteMarker number={index + 1} />
+                      <span data-marker>
+                        <NoteMarker number={index + 1} />
+                      </span>
                       <span>
                         <span className="sr-only">{lineLabel(note)}</span>
                         <InlineText text={note.text} />
@@ -262,6 +300,7 @@ export function CodeBlock({
             </div>
           )}
         </div>
+        {wide && <InkConnector container={box} from={activeEnd} to={activeLine} />}
       </div>
 
       {showOutput && typedInput !== undefined && (

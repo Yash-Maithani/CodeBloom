@@ -279,10 +279,45 @@
   }
 }
 
+/* Ink connector: grows from the note end (DESIGN.md section 7). */
+@utility ink-draw {
+  transform-box: fill-box;
+  transform-origin: left center;
+  animation: ink-grow var(--duration-slow) var(--ease-standard);
+}
+@keyframes ink-grow {
+  from {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+}
+
+/* Highlighter mark: a band behind the lower part of the text, drawn from the
+   left when the term first scrolls into view (DESIGN.md section 7). */
+@utility highlighter-mark {
+  position: relative;
+  z-index: 0;
+  &::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: 55% calc(var(--spacing-1) * -0.5) 0;
+    background-color: var(--color-mark);
+    transform-origin: left center;
+    transition: transform var(--duration-slow) var(--ease-standard);
+  }
+  &[data-mark="pending"]::after {
+    transform: scaleX(0);
+  }
+}
+
 /* Reduced motion (DESIGN.md section 6): every duration is 0 and every
    transform-based animation is off. Components take their timing from these
    tokens, so this one rule covers them. */
 @media (prefers-reduced-motion: reduce) {
+  .ink-draw {
+    animation: none;
+  }
   :root {
     --duration-fast: 0ms;
     --duration-base: 0ms;
