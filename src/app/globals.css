@@ -333,6 +333,36 @@
   }
 }
 
+/* Theme toggle icons (DESIGN.md section 7): the moon shows in light (it
+   switches to dark), the sun in dark. The leaving icon turns and shrinks out
+   while the other turns and grows in. Same theme rules as the colours. */
+.theme-icon-moon,
+.theme-icon-sun {
+  transition: transform var(--duration-slow) var(--ease-standard), opacity var(--duration-slow) var(--ease-standard);
+}
+.theme-icon-sun {
+  opacity: 0;
+  transform: rotate(-90deg) scale(0.5);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .theme-icon-moon {
+    opacity: 0;
+    transform: rotate(90deg) scale(0.5);
+  }
+  :root:not([data-theme="light"]) .theme-icon-sun {
+    opacity: 1;
+    transform: none;
+  }
+}
+:root[data-theme="dark"] .theme-icon-moon {
+  opacity: 0;
+  transform: rotate(90deg) scale(0.5);
+}
+:root[data-theme="dark"] .theme-icon-sun {
+  opacity: 1;
+  transform: none;
+}
+
 /* Reduced motion (DESIGN.md section 6): every duration is 0 and every
    transform-based animation is off. Components take their timing from these
    tokens, so this one rule covers them. */
@@ -353,6 +383,8 @@
   body {
     background-color: var(--color-canvas);
     color: var(--color-ink);
+    /* Switching theme changes the colours with the usual colour transition. */
+    transition: background-color var(--duration-fast) var(--ease-standard), color var(--duration-fast) var(--ease-standard);
     font-family: var(--font-sans);
     font-size: var(--text-ui);
     line-height: var(--text-ui--line-height);

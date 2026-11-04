@@ -4,6 +4,7 @@ import {
   Atkinson_Hyperlegible_Next,
   Bricolage_Grotesque,
 } from "next/font/google";
+import { THEME_BOOT_SCRIPT } from "@/lib/theme";
 import "./globals.css";
 
 // next/font downloads these font files at build time and serves them from our
@@ -56,10 +57,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
+    // The boot script may set data-theme before React runs, so the attribute
+    // can differ from the server HTML on purpose.
     <html
       lang="en"
       className={`${bricolage.variable} ${atkinson.variable} ${atkinsonMono.variable}`}
+      suppressHydrationWarning
     >
+      <head>
+        {/* Applies a stored light or dark choice before the first paint (no flash). */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
+      </head>
       <body>{children}</body>
     </html>
   );

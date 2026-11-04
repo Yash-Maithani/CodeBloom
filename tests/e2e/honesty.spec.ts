@@ -19,13 +19,19 @@ test("the homepage example shows the checked code and its real output", async ({
   await expect(page.locator("figure pre").last()).toHaveText(exampleOutput);
 });
 
-test("buttons exist only where they do something: two on the homepage, none on course pages", async ({ page }) => {
+test("buttons exist only where they do something: two on the homepage, none on course pages, plus the theme toggle", async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 800 });
-  await page.goto("/");
-  await expect(page.getByRole("button")).toHaveText(["Hide notes", "Copy code"]);
+  // Every page has exactly one theme toggle, in the header; theme.spec.ts tests what it does.
+  const pageButtons = page.locator("main").getByRole("button");
+  await page.goto("/", { waitUntil: "networkidle" });
+  await expect(page.locator("[data-theme-toggle]")).toHaveCount(1);
+  await expect(page.getByRole("button")).toHaveCount(3);
+  await expect(pageButtons).toHaveText(["Hide notes", "Copy code"]);
   for (const path of ["/courses", ...COURSE_PAGES]) {
-    await page.goto(path);
-    await expect(page.getByRole("button"), path).toHaveCount(0);
+    await page.goto(path, { waitUntil: "networkidle" });
+    await expect(pageButtons, path).toHaveCount(0);
+    await expect(page.getByRole("button"), path).toHaveCount(1);
+    await expect(page.locator("[data-theme-toggle]"), path).toHaveCount(1);
   }
 });
 

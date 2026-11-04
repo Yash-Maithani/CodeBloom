@@ -142,7 +142,7 @@ UI redesign rounds 2 (templates and every page) and 3 (explorers from verified v
 2. Measure the first Python start on a real mid-range phone (Chromium's CPU throttling does not reach workers, so the emulated numbers understate CPU time).
 3. Owner runs the screen reader checklist above and reports the results; then Milestone 3 can be marked Verified in browser. Deferred by the owner; kept open.
 4. A screen reader pass over one visual and one playground run (Next step, the ends, the table) when the owner does the Milestone 3 walkthrough; not done.
-5. Launch items still open (brief Section 16): the final favicon, social sharing metadata, removing `/dev/tokens`, `/dev/components` and `public/dev/`, and a privacy policy that says the playground runs on the learner's device and sends nothing (owner requirement). The host must serve `.wasm` as `application/wasm`, apply the worker's Content Security Policy and the immutable cache header, and ideally compress the files.
+5. Launch items still open (brief Section 16): the final favicon, social sharing metadata, removing `/dev/tokens`, `/dev/components` and `public/dev/`, and a privacy policy that says the playground runs on the learner's device and sends nothing (owner requirement) and that the theme toggle stores one preference, the word "light" or "dark", in the browser's localStorage under `codebloom-theme`, and nothing else (owner requirement, 2026-11-04). The host must serve `.wasm` as `application/wasm`, apply the worker's Content Security Policy and the immutable cache header, and ideally compress the files.
 6. Owner answers the open decisions in `SPEC.md` Section 10 as each milestone needs them. Decision 3 (remembering completed lessons) stays open.
 
 ## Stack and versions (checked 2026-10-26)

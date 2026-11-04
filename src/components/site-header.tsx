@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Container } from "@/components/container";
 import { NavLinks } from "@/components/nav-links";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 // The skip link is the first focusable element on every page. It stays off
 // screen until it receives keyboard focus (DESIGN.md section 7, navigation).
@@ -27,9 +28,12 @@ export function SiteHeader() {
           >
             Code<span className="text-primary">Bloom</span>
           </Link>
-          <nav aria-label="Main">
-            <NavLinks />
-          </nav>
+          <div className="flex items-center gap-4">
+            <nav aria-label="Main">
+              <NavLinks />
+            </nav>
+            <ThemeToggle />
+          </div>
         </Container>
       </header>
     </>

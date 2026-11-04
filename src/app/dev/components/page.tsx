@@ -14,6 +14,7 @@ import { HighlighterMark } from "@/components/highlighter-mark";
 import { LessonCodeBlock, Mistakes, Practice } from "@/components/lesson-parts";
 import { InlineText, ProseBlocks } from "@/components/prose";
 import { StepRail } from "@/components/step-rail";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { buttonStyles, textLinkStyles } from "@/components/styles";
 import { ValueChip } from "@/components/value-chip";
 import { figureFromVisual } from "@/lib/figure-data";
@@ -136,6 +137,27 @@ export default async function ComponentGallery() {
             </div>
           </div>
         </Both>
+      </Section>
+
+      <Section id="theme" title="Theme toggle">
+        <p className="mb-4 max-w-measure text-ui text-ink-muted">
+          In the header. The moon shows in light mode and switches to dark; the sun shows in dark mode. The real button reads the page theme; these copies are fixed previews.
+        </p>
+        <div className="grid gap-4 xl:grid-cols-2">
+          {(["light", "dark"] as const).map((theme) => (
+            <div key={theme} data-theme={theme} inert={theme === "dark"} className="flex flex-wrap gap-6 rounded-card border border-rule p-4 md:p-6">
+              <State label="Default">
+                <ThemeToggle preview={theme} />
+              </State>
+              <State label="Hover">
+                <ThemeToggle preview={theme} state="hover" />
+              </State>
+              <State label="Focus">
+                <ThemeToggle preview={theme} state="focus" />
+              </State>
+            </div>
+          ))}
+        </div>
       </Section>
 
       <Section id="cards" title="Course cards">
