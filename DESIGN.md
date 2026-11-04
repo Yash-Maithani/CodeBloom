@@ -208,7 +208,7 @@ Every interactive component defines: default, hover, focus-visible, pressed, dis
 
 - **Homepage:** hero 6:5 (display heading, lead, status sentence from data, "Start Python lesson 1" primary, "Browse the courses" secondary) beside a "Your turn" vote figure; the Python trail; course cards.
 - **Courses:** course cards in a 2 by 2 grid.
-- **Course page:** the trail of numbered stops, horizontal from 1024px and vertical below (checked at 360px); each stop has its number, title and goal; planned topics as muted stops with "Planned".
+- **Course page:** from 1024px the course introduction (title, description, count, "Start the first lesson", who it is for) on the left and the trail on the right; below that, stacked. The trail runs down the page at every width, because each stop carries its title and goal and 13 or more goals do not fit across (checked at 360px); planned topics follow as a separate muted trail with "Planned", continuing the numbers. The homepage uses the compact trail, which runs across from 1024px without goals.
 - **Lesson:** step rail plus main column; title and goal; steps; mistakes; practice; recap; previous and next.
 - **Playground:** editor and Your run side by side from 1024px; designed empty state for Your run.
 - **404:** short message and two links.

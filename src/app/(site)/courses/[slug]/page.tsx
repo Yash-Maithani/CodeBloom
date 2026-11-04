@@ -4,8 +4,8 @@ import { notFound } from "next/navigation";
 import { courses, findCourse } from "@content/courses";
 import { NoteCallout } from "@/components/callout";
 import { Container } from "@/components/container";
-import { InlineText } from "@/components/prose";
-import { backLinkStyles, buttonStyles, textLinkStyles } from "@/components/styles";
+import { backLinkStyles, buttonStyles } from "@/components/styles";
+import { Trail } from "@/components/trail";
 import { publishedByCourse } from "@/lib/site-lessons";
 
 // One page per course, built at build time from content/courses.ts and the
@@ -36,63 +36,75 @@ export default async function CoursePage({ params }: CoursePageProps) {
   const planned = course.topics.filter((topic) => !topic.lesson || !published.has(topic.lesson));
 
   return (
-    <Container className="py-12 md:py-16">
-      <div className="max-w-measure">
-        <Link href="/courses" className={backLinkStyles}>
-          All courses
-        </Link>
-        <h1 className="mt-4 font-heading text-h1">{course.name}</h1>
-        <p className="mt-4 text-lead">{course.description}</p>
-
-        {lessons.length === 0 ? (
-          <div className="mt-8">
-            <NoteCallout title="No lessons yet">
-              This course has no published lessons. The topics below are the plan and may change as
-              lessons are written.
-            </NoteCallout>
+    <Container className="py-16 lg:py-24">
+      <div className="lg:grid lg:grid-cols-12 lg:gap-12">
+        <div className="lg:col-span-4">
+          <div className="lg:sticky lg:top-6">
+            <Link href="/courses" className={backLinkStyles}>
+              All courses
+            </Link>
+            <h1 className="mt-4 font-heading text-h1">{course.name}</h1>
+            <p className="mt-4 max-w-measure text-lead">{course.description}</p>
+            {lessons.length === 0 ? (
+              <div className="mt-8">
+                <NoteCallout title="No lessons yet">
+                  This course has no published lessons. The topics on this page are the plan and may change as lessons are written.
+                </NoteCallout>
+              </div>
+            ) : (
+              <>
+                <p className="mt-4 text-ui text-ink-muted">
+                  {lessons.length} {lessons.length === 1 ? "lesson" : "lessons"}
+                  {planned.length === 0 ? ", all published" : ` published, ${planned.length} planned`}. Each lesson builds on the ones before it.
+                </p>
+                <Link href={lessons[0].href} className={`mt-8 ${buttonStyles.primary}`}>
+                  Start the first lesson
+                </Link>
+              </>
+            )}
+            <h2 className="mt-12 font-heading text-h3">Who this course is for</h2>
+            <p className="mt-2 max-w-measure text-body">
+              Complete beginners and students taking a {course.name} course. You do not need any programming experience.
+            </p>
           </div>
-        ) : (
-          <Link href={lessons[0].href} className={`mt-8 ${buttonStyles.primary}`}>
-            Start the first lesson
-          </Link>
-        )}
+        </div>
 
-        {lessons.length > 0 && (
-          <>
-            <h2 className="mt-12 font-heading text-h2 md:mt-16">Lessons</h2>
-            <ol data-lessons className="mt-6 flex list-decimal flex-col gap-6 pl-8 text-body">
-              {lessons.map((lesson) => (
-                <li key={lesson.href}>
-                  <Link href={lesson.href} className={`font-bold ${textLinkStyles}`}>
-                    {lesson.source.title}
-                  </Link>
-                  <p className="mt-1 text-ink-muted">
-                    <InlineText text={lesson.source.objective} />
-                  </p>
-                </li>
-              ))}
-            </ol>
-          </>
-        )}
-
-        <h2 className="mt-12 font-heading text-h2 md:mt-16">Who this course is for</h2>
-        <p className="mt-4 text-body">
-          Complete beginners and students taking a {course.name} course. You do not need any
-          programming experience.
-        </p>
-
-        {planned.length > 0 && (
-          <>
-            <h2 className="mt-12 font-heading text-h2 md:mt-16">Planned topics</h2>
-            <p className="mt-2 text-ink-muted">Planned and subject to change. Listed in course order.</p>
-            {/* Plain text on purpose: these topics have no lesson page yet (SPEC.md FR-C2). */}
-            <ul data-planned-topics className="mt-6 flex list-disc flex-col gap-2 pl-8 text-body">
-              {planned.map((topic) => (
-                <li key={topic.title}>{topic.title}</li>
-              ))}
-            </ul>
-          </>
-        )}
+        <div className="mt-16 min-w-0 lg:col-span-8 lg:mt-0">
+          {lessons.length > 0 && (
+            <section aria-labelledby="lessons-title">
+              <h2 id="lessons-title" className="font-heading text-h2">
+                Lessons
+              </h2>
+              <div className="mt-8">
+                <Trail
+                  label={`${course.name} lessons in order`}
+                  across={false}
+                  showGoals
+                  dataAttribute="data-lessons"
+                  stops={lessons.map((lesson) => ({ title: lesson.source.title, href: lesson.href, goal: lesson.source.objective }))}
+                />
+              </div>
+            </section>
+          )}
+          {planned.length > 0 && (
+            <section aria-labelledby="planned-title" className={lessons.length > 0 ? "mt-16" : ""}>
+              <h2 id="planned-title" className="font-heading text-h2">
+                Planned topics
+              </h2>
+              <p className="mt-2 text-ui text-ink-muted">Planned and subject to change. Listed in course order.</p>
+              {/* Plain text on purpose: these topics have no lesson page yet (SPEC.md FR-C2). */}
+              <div className="mt-8">
+                <Trail
+                  label={`${course.name} planned topics in order`}
+                  across={false}
+                  start={lessons.length + 1}
+                  dataAttribute="data-planned-topics"
+                  stops={planned.map((topic) => ({ title: topic.title }))}
+                />
+              </div>
+            </section>
+          )}
+        </div>
       </div>
     </Container>
   );
