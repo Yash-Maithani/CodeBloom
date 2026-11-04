@@ -400,3 +400,14 @@ test("the missing-file mistake shows Errno 44 in the playground, as the lesson s
   expect(run.error).toContain("[Errno 44] No such file or directory: 'greeting.txt'");
   expect(readText("content/examples/python/file_missing.run-error.txt")).toContain("[Errno 2]");
 });
+
+test("before the first run, Your run shows an empty state that says what will appear there", async ({ page }) => {
+  const playground = await open(page);
+  await expect(page.locator("[data-status]")).toHaveText("Not run yet.");
+  await expect(page.locator("[data-run-empty]")).toContainText("Press Run, and what your program prints appears here");
+  await expect(page.locator("[data-run-output]")).toHaveCount(0);
+  await playground.getByRole("button", { name: "Run" }).click();
+  await expect(playground).toHaveAttribute("data-state", "finished", { timeout: 60_000 });
+  await expect(page.locator("[data-run-empty]")).toHaveCount(0);
+  await expect(page.locator("[data-run-output]")).toHaveText("Fruit: 7\n");
+});

@@ -7,7 +7,7 @@
 // enforces the limits; this component shows each state in words.
 
 import { useEffect, useRef, useState, useSyncExternalStore, type KeyboardEvent } from "react";
-import { CircleCheck, CircleX, TriangleAlert } from "lucide-react";
+import { CircleCheck, CircleX, SquareTerminal, TriangleAlert } from "lucide-react";
 import { buttonStyles } from "@/components/styles";
 import { OUTPUT_LIMIT, TIME_LIMIT_MS, splitInput } from "@/lib/playground";
 import { PythonRunner, type RunEnd, type WorkerLike } from "@/lib/python-runner";
@@ -26,7 +26,7 @@ const megabytes = (bytes: number) => (bytes / 1_000_000).toFixed(1);
 
 /** What the status line says, in words. Exported for tests of the wording. */
 export function describe(phase: Phase, printed: boolean): { text: string; tone: "plain" | "success" | "error" | "warning" } {
-  if (phase.name === "idle") return { text: "Press Run to see what your program prints.", tone: "plain" };
+  if (phase.name === "idle") return { text: "Not run yet.", tone: "plain" };
   if (phase.name === "downloading") {
     return phase.loaded >= phase.total
       ? { text: "Starting Python…", tone: "plain" }
@@ -264,6 +264,13 @@ export function Playground({ starter, starterInput = "", downloadBytes }: { star
               />
             </div>
           )}
+          {phase.name === "idle" ? (
+            // Empty state (DESIGN.md section 9, playground): what this panel is and how to fill it.
+            <div data-run-empty className="flex min-h-24 items-start gap-3 px-4 py-6 text-ui text-ink-muted">
+              <SquareTerminal aria-hidden="true" size={20} strokeWidth={1.75} className="mt-1 shrink-0 text-primary" />
+              <p className="max-w-measure">Press Run, and what your program prints appears here, line by line. Each run starts a fresh Python, so nothing is left over from the last one.</p>
+            </div>
+          ) : (
           <pre
             tabIndex={0}
             role="region"
@@ -279,6 +286,7 @@ export function Playground({ starter, starterInput = "", downloadBytes }: { star
               ))}
             </code>
           </pre>
+          )}
           {error && (
             <div className="border-t border-rule px-4 py-3">
               <p className="flex items-center gap-2 text-ui font-bold">
