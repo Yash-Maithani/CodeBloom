@@ -11,6 +11,7 @@ import { InlineText } from "@/components/prose";
 import { StepThrough, TraceTable } from "@/components/step-through";
 import { backLinkStyles, buttonStyles } from "@/components/styles";
 import { opensInPlayground, type LoadedLesson, type RenderedExample, type RenderedVisual } from "@/lib/lessons";
+import { figureFromVisual } from "@/lib/figure-data";
 import { plainText as plain } from "@/lib/prose";
 
 export function LessonCodeBlock({
@@ -19,6 +20,7 @@ export function LessonCodeBlock({
   mistake,
   showOutput,
   playground,
+  predict,
 }: {
   example: RenderedExample;
   regionLabel: string;
@@ -26,6 +28,8 @@ export function LessonCodeBlock({
   showOutput?: boolean;
   /** Adds "Try it in the playground" (only for examples that open there; see opensInPlayground) */
   playground?: boolean;
+  /** Predict then run: the output waits for Show */
+  predict?: { line?: number };
 }) {
   return (
     <>
@@ -42,6 +46,7 @@ export function LessonCodeBlock({
       showOutput={showOutput}
       exampleId={example.id}
       typedInput={example.typedInput}
+      predict={predict}
     />
     {playground && opensInPlayground(example) && (
       <p className="mt-2">
@@ -185,6 +190,9 @@ export function LessonNav({
 /** A step-through visual with its text equivalent (DESIGN.md "Step-through visuals"). */
 export function VisualBlock({ visual }: { visual: RenderedVisual }) {
   const headingId = `visual-${visual.id}`;
+  // Path and condition chips from the recorded trace (src/lib/figure-data.ts).
+  const figure = figureFromVisual(visual);
+  const chips = Object.fromEntries(figure.lines.flatMap((line, index) => (line.chip ? [[index + 1, line.chip]] : [])));
   return (
     <section aria-labelledby={headingId} data-visual={visual.id} className="max-w-page">
       <h3 id={headingId} className="font-heading text-h3">
@@ -194,7 +202,7 @@ export function VisualBlock({ visual }: { visual: RenderedVisual }) {
         Move one line at a time. Every value shown comes from really running this program.
       </p>
       <div className="mt-4">
-        <StepThrough visual={visual} />
+        <StepThrough visual={visual} chips={chips} path={figure.path} />
       </div>
       <details data-trace-details className="mt-4">
         <summary className={`${buttonStyles.secondary} cursor-pointer list-none [&::-webkit-details-marker]:hidden`}>

@@ -4,13 +4,32 @@
 
 import Link from "next/link";
 import { Fragment } from "react";
+import { HighlighterMark } from "@/components/highlighter-mark";
 import { textLinkStyles } from "@/components/styles";
+import { TermLink } from "@/components/term-link";
 import { parseInline, type Inline, type ProseBlock } from "@/lib/prose";
 
-function InlineNodes({ parts }: { parts: Inline[] }) {
+/**
+ * Optional extras for lesson prose (DESIGN.md section 7):
+ * - terms: identifiers in the example just above, linked to the lines that use
+ *   them. Each term is linked once; `linked` remembers which already are.
+ * - marks: the defined terms that get a highlighter mark, the first time each appears.
+ */
+export type ProseExtras = {
+  terms?: Map<string, { anchors: string[]; lines: number[] }>;
+  linked?: Set<string>;
+  marks?: Set<string>;
+};
+
+function InlineNodes({ parts, extras }: { parts: Inline[]; extras?: ProseExtras }) {
   return parts.map((part, index) => {
     switch (part.type) {
-      case "code":
+      case "code": {
+        const term = extras?.terms?.get(part.text);
+        if (term && extras?.linked && !extras.linked.has(part.text)) {
+          extras.linked.add(part.text);
+          return <TermLink key={index} term={part.text} anchors={term.anchors} lines={term.lines} />;
+        }
         return (
           // Inline code may wrap where it would overflow a narrow screen (WCAG 1.4.10).
           // Code blocks never wrap (DESIGN.md section 4).
@@ -18,7 +37,16 @@ function InlineNodes({ parts }: { parts: Inline[] }) {
             {part.text}
           </code>
         );
+      }
       case "strong":
+        if (extras?.marks?.has(part.text)) {
+          extras.marks.delete(part.text);
+          return (
+            <HighlighterMark key={index}>
+              <strong>{part.text}</strong>
+            </HighlighterMark>
+          );
+        }
         return <strong key={index}>{part.text}</strong>;
       case "link":
         return (
@@ -43,7 +71,7 @@ export function InlineText({ text }: { text: string }) {
 }
 
 /** Headings, paragraphs and lists. Placeholders are handled by the lesson page. */
-export function ProseBlocks({ blocks }: { blocks: ProseBlock[] }) {
+export function ProseBlocks({ blocks, extras }: { blocks: ProseBlock[]; extras?: ProseExtras }) {
   return blocks.map((block, index) => {
     switch (block.type) {
       case "heading":
@@ -55,7 +83,7 @@ export function ProseBlocks({ blocks }: { blocks: ProseBlock[] }) {
       case "paragraph":
         return (
           <p key={index} className="mt-4">
-            <InlineNodes parts={block.content} />
+            <InlineNodes parts={block.content} extras={extras} />
           </p>
         );
       case "list":
@@ -63,7 +91,7 @@ export function ProseBlocks({ blocks }: { blocks: ProseBlock[] }) {
           <ul key={index} className="mt-4 flex list-disc flex-col gap-2 pl-8">
             {block.items.map((item, itemIndex) => (
               <li key={itemIndex}>
-                <InlineNodes parts={item} />
+                <InlineNodes parts={item} extras={extras} />
               </li>
             ))}
           </ul>

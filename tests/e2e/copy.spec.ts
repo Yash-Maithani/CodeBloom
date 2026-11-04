@@ -14,13 +14,14 @@ import { expect, test, type Page } from "@playwright/test";
 // to a live region, so these tests record what the browser adds to the status
 // region. That checks the mechanism; it does not replace trying NVDA or VoiceOver.
 
-const firstBlock = (page: Page) => page.locator("figure").first();
+// The first code block (a lesson page can also have figures that are diagrams).
+const firstBlock = (page: Page) => page.locator("figure[data-example]").first();
 const copyButton = (page: Page) => firstBlock(page).locator("button", { hasText: /^(Copy code|Copied)$/ });
 
 /** Starts recording every piece of text added to the code block's status region. */
 async function recordAnnouncements(page: Page) {
   await page.evaluate(() => {
-    const region = document.querySelector("figure [role=status]");
+    const region = document.querySelector("figure[data-example] [role=status]");
     if (!region) throw new Error("no status region in the first code block");
     const added: string[] = [];
     (window as unknown as { __announced: string[] }).__announced = added;

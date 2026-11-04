@@ -43,7 +43,8 @@ for (const path of ["/courses/c/first-program", "/courses/c/variables", "/course
     test(`${path} at ${width}px: no horizontal scroll, solutions open`, async ({ page }) => {
       await page.setViewportSize({ width, height: 900 });
       await page.goto(path);
-      for (const summary of await page.locator("details summary").all()) await summary.click();
+      // Open every visible disclosure (the solutions). The step rail's phone disclosure is hidden from 1024px on purpose.
+      for (const summary of await page.locator("details summary").filter({ visible: true }).all()) await summary.click();
       const { scrollWidth, innerWidth } = await page.evaluate(() => ({ scrollWidth: document.documentElement.scrollWidth, innerWidth: window.innerWidth }));
       expect(scrollWidth, "page must not scroll sideways").toBeLessThanOrEqual(innerWidth);
     });

@@ -23,6 +23,8 @@ import { InkConnector } from "@/components/ink-connector";
 import { CircleAlert } from "lucide-react";
 import { InputPanel } from "@/components/input-panel";
 import { OutputPanel } from "@/components/output-panel";
+import { PredictReveal } from "@/components/predict-reveal";
+import { lineAnchor } from "@/lib/anchors";
 import { InlineText } from "@/components/prose";
 import { buttonStyles } from "@/components/styles";
 import { tokenStyles } from "@/components/token-styles";
@@ -53,6 +55,8 @@ type CodeBlockProps = {
   exampleId?: string;
   /** The lines typed while a C program ran. Shown above the output, because the output does not contain them. */
   typedInput?: string;
+  /** Predict then run: hide the output until Show. `line` names the line that prints, when a trace shows it. */
+  predict?: { line?: number };
 };
 
 
@@ -93,6 +97,7 @@ export function CodeBlock({
   showOutput = true,
   exampleId,
   typedInput,
+  predict,
 }: CodeBlockProps) {
   const [notesHidden, setNotesHidden] = useState(false);
   const [activeNote, setActiveNote] = useState<number | null>(null);
@@ -206,7 +211,8 @@ export function CodeBlock({
                   <Fragment key={lineNumber}>
                     <span
                       data-line={lineNumber}
-                      className={`flex border-l-4 pr-4 transition-colors duration-fast hover:bg-primary-tint ${
+                      id={exampleId ? lineAnchor(exampleId, lineNumber) : undefined}
+                      className={`flex scroll-mt-24 border-l-4 pr-4 transition-colors duration-fast hover:bg-primary-tint data-[term-active]:border-primary data-[term-active]:bg-primary-tint ${
                         isLineActive(lineNumber) ? "border-primary bg-primary-tint" : "border-transparent"
                       }`}
                     >
@@ -305,7 +311,13 @@ export function CodeBlock({
       )}
       {showOutput && (
         <div className="mt-4">
-          <OutputPanel kind={kind} text={expectedOutput} of={regionLabel} />
+          {predict ? (
+            <PredictReveal line={predict.line}>
+              <OutputPanel kind={kind} text={expectedOutput} of={regionLabel} />
+            </PredictReveal>
+          ) : (
+            <OutputPanel kind={kind} text={expectedOutput} of={regionLabel} />
+          )}
         </div>
       )}
     </figure>

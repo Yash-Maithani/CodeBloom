@@ -11,7 +11,9 @@
 
 import { Fragment, useState, useSyncExternalStore } from "react";
 import { ArrowRight } from "lucide-react";
+import { PathTaken, type PathStep } from "@/components/figure";
 import { tokenStyles } from "@/components/token-styles";
+import { ValueChip } from "@/components/value-chip";
 import { OutputLines } from "@/components/output-lines";
 import { InlineText } from "@/components/prose";
 import { buttonStyles } from "@/components/styles";
@@ -36,7 +38,17 @@ export function changesInWords(step: RenderedStep): string {
   return parts.join(" ");
 }
 
-export function StepThrough({ visual }: { visual: RenderedVisual }) {
+export function StepThrough({
+  visual,
+  chips = {},
+  path,
+}: {
+  visual: RenderedVisual;
+  /** A condition's result by line number, from the trace (src/lib/figure-data.ts) */
+  chips?: Record<number, string>;
+  /** The whole run's path, from the trace */
+  path?: PathStep[];
+}) {
   const total = visual.steps.length;
   // 0 is the start, before anything has run; 1 to total are the lines that ran.
   const [position, setPosition] = useState(0);
@@ -55,12 +67,13 @@ export function StepThrough({ visual }: { visual: RenderedVisual }) {
   const label = plainText(visual.title);
 
   return (
-    <div data-stepper className="rounded-panel border border-rule bg-surface p-4 md:p-6">
+    // The two-pane figure (DESIGN.md section 7): code on the left, the step on the right.
+    <div data-stepper className="rounded-panel border border-rule bg-surface lg:grid lg:grid-cols-[minmax(0,6fr)_minmax(0,5fr)]">
       <pre
         tabIndex={0}
         role="region"
         aria-label={`${visual.languageLabel} code: ${label}`}
-        className="overflow-x-auto rounded-panel border border-rule bg-sunken py-3 font-mono text-code"
+        className="overflow-x-auto rounded-t-panel bg-sunken py-4 font-mono text-code lg:rounded-l-panel lg:rounded-tr-none"
       >
         <code className="block">
           {visual.lines.map((tokens, index) => {
@@ -85,13 +98,20 @@ export function StepThrough({ visual }: { visual: RenderedVisual }) {
                     </span>
                   ))}
                 </span>
+                {chips[index + 1] && (
+                  <span className="ml-auto pl-4 font-sans">
+                    <ValueChip>{chips[index + 1]}</ValueChip>
+                  </span>
+                )}
               </span>
             );
           })}
         </code>
       </pre>
 
-      <div className="mt-4 max-w-measure" data-step-text>
+      <div className="flex min-w-0 flex-col gap-4 border-t border-rule p-4 md:p-6 lg:border-t-0 lg:border-l">
+
+      <div className="max-w-measure" data-step-text>
         <p className="font-bold">{step ? <>Step {position} of {total}. Line {step.line} ran: <code className="font-mono">{step.code}</code></> : "Start. Nothing has run yet."}</p>
         {step && <p className="mt-1">{changesInWords(step)}</p>}
         {step?.note && (
@@ -101,7 +121,7 @@ export function StepThrough({ visual }: { visual: RenderedVisual }) {
         )}
       </div>
 
-      <div className="mt-4 grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
         <div>
           <p className="text-ui font-bold">Variables</p>
           {step && step.variables.length > 0 ? (
@@ -135,6 +155,15 @@ export function StepThrough({ visual }: { visual: RenderedVisual }) {
         </div>
       </div>
 
+      {path && (
+        <div>
+          <p className="text-ui font-bold">Path taken in the whole run</p>
+          <div className="mt-2">
+            <PathTaken steps={path} />
+          </div>
+        </div>
+      )}
+
       {/* Each step is announced in words: the same facts as above, with the
           output read line by line. */}
       <div role="status" className="sr-only" data-announcement>
@@ -148,16 +177,17 @@ export function StepThrough({ visual }: { visual: RenderedVisual }) {
 
       {/* The buttons only work once React runs in the browser, so until then
           they are invisible and out of the tab order; their space is kept. */}
-      <div className={`mt-4 flex flex-wrap gap-2 ${ready ? "" : "invisible"}`} inert={!ready}>
-        <button type="button" onClick={() => go(position - 1)} aria-disabled={position === 0} className={`${buttonStyles.secondary} aria-disabled:text-ink-muted`}>
+      <div className={`flex flex-wrap gap-2 ${ready ? "" : "invisible"}`} inert={!ready}>
+        <button type="button" onClick={() => go(position - 1)} aria-disabled={position === 0} className={buttonStyles.secondary}>
           Back
         </button>
-        <button type="button" onClick={() => go(position + 1)} aria-disabled={position === total} className={`${buttonStyles.primary} aria-disabled:bg-ink-muted`}>
+        <button type="button" onClick={() => go(position + 1)} aria-disabled={position === total} className={buttonStyles.primary}>
           Next step
         </button>
         <button type="button" onClick={() => go(0)} className={buttonStyles.secondary}>
           Start again
         </button>
+      </div>
       </div>
     </div>
   );
