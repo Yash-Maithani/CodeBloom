@@ -30,7 +30,7 @@ const drawings: Record<string, { caption: string; viewBox: string; art: React.Re
   decisions: {
     caption:
       "A decision: the program reaches a condition and goes down one of two paths, one when the condition is true and another when it is false. After either path it carries on with the same instructions.",
-    viewBox: "0 0 420 170",
+    viewBox: "0 0 460 170",
     art: (
       <>
         <path d="M14,86 C54,84 82,87 112,85" className={`${stroke}`} />
@@ -41,13 +41,13 @@ const drawings: Record<string, { caption: string; viewBox: string; art: React.Re
         <rect x="214" y="115" width="90" height="32" rx="4" className={`${stroke}`} />
         <path d="M304,38 C334,40 352,60 372,84" className={`${stroke}`} />
         <path d="M304,131 C336,129 354,110 372,86" className={`${stroke}`} />
-        <path d="M372,85 C390,86 400,84 412,85" className={`${stroke}`} />
+        <path d="M372,85 C400,86 424,84 452,85" className={`${stroke}`} />
         <text x="76" y="64" className={label}>condition</text>
         <text x="148" y="44" className={label}>true</text>
         <text x="148" y="142" className={label}>false</text>
         <text x="226" y="43" className={label}>one group</text>
         <text x="222" y="136" className={label}>other group</text>
-        <text x="338" y="114" className={label}>carry on</text>
+        <text x="384" y="72" className={label}>carry on</text>
       </>
     ),
   },
@@ -62,12 +62,12 @@ const drawings: Record<string, { caption: string; viewBox: string; art: React.Re
         <text x="60" y="30" className={label}>go round again?</text>
         <path d="M98,64 C96,92 99,112 98,128" className={`${stroke}`} />
         <text x="106" y="98" className={label}>yes</text>
-        <rect x="52" y="128" width="96" height="34" rx="4" className={`${stroke}`} />
-        <text x="66" y="150" className={label}>one pass</text>
-        <path d="M148,146 C214,150 236,112 218,72 C204,46 150,44 112,50" className={`${stroke}`} />
-        <path d="M122,42 L110,50 L122,58" className={`${stroke}`} />
+        <rect x="70" y="128" width="96" height="34" rx="4" className={`${stroke}`} />
+        <text x="84" y="150" className={label}>one pass</text>
+        <path d="M70,146 C30,148 22,110 28,84 C32,66 38,56 50,53" className={`${stroke}`} />
+        <path d="M40,45 L52,52 L40,59" className={`${stroke}`} />
         <path d="M110,52 C200,51 300,53 400,52" className={`${stroke}`} />
-        <text x="250" y="42" className={label}>no</text>
+        <text x="230" y="42" className={label}>no</text>
         <text x="318" y="76" className={label}>carry on</text>
       </>
     ),
