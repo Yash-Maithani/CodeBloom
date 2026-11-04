@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { expect, test } from "@playwright/test";
 import { normalizeLineEndings } from "../../src/lib/line-endings.ts";
+import { pythonDecisions } from "../../content/lessons/python/decisions.ts";
 
 // Checks that nothing on the site pretends a feature exists when it does not,
 // and that every button does what it says.
@@ -8,25 +9,34 @@ import { normalizeLineEndings } from "../../src/lib/line-endings.ts";
 const exampleCode = normalizeLineEndings(readFileSync("content/examples/python/vote.py", "utf8")).replace(/\n$/, "");
 const exampleOutput = normalizeLineEndings(readFileSync("content/examples/python/vote.expected.txt", "utf8")).replace(/\n$/, "");
 const COURSE_PAGES = ["/courses/c", "/courses/cpp", "/courses/java", "/courses/python"];
+// The annotated code block with the same program, on its lesson page.
+const LESSON = "/courses/python/decisions";
+const voteNotes = pythonDecisions.examples.vote.notes;
+const lineLabel = (n: { startLine: number; endLine: number }) => (n.startLine === n.endLine ? `Line ${n.startLine}: ` : `Lines ${n.startLine} to ${n.endLine}: `);
 
-test("the homepage example shows the checked code and its real output", async ({ page }) => {
-  await page.goto("/");
-  const lines = await page.locator("pre[role=region] [data-line]").evaluateAll((spans) =>
-    // The last child of each line holds the code; the first two are the gutter.
-    spans.map((span) => span.lastElementChild?.textContent ?? ""),
-  );
+test("the homepage figure shows the checked code, its real output and the path from the recorded trace", async ({ page }) => {
+  await page.goto("/", { waitUntil: "networkidle" });
+  const figure = page.locator("[data-figure]").first();
+  const lines = await figure.locator("[data-line] [data-code-text]").evaluateAll((spans) => spans.map((span) => span.textContent ?? ""));
   expect(lines.join("\n")).toBe(exampleCode);
-  await expect(page.locator("figure pre").last()).toHaveText(exampleOutput);
+  // Predict then run: the output is hidden (inert) until Show is pressed.
+  await expect(figure.getByRole("region", { name: /^Output of the real run/ })).toHaveCount(0);
+  await figure.getByRole("button", { name: "Show" }).click();
+  await expect(figure.getByRole("region", { name: /^Output of the real run/ })).toHaveText(exampleOutput);
+  // The lines that ran are exactly the trace's lines, in order.
+  const trace = JSON.parse(readFileSync("content/examples/python/vote.trace.json", "utf8")) as { steps: Array<{ line: number }> };
+  await expect(figure.locator('[data-path-step="ran"]')).toHaveText(trace.steps.map((step) => `Line ${step.line} ran`));
 });
 
-test("buttons exist only where they do something: two on the homepage, none on course pages, plus the theme toggle", async ({ page }) => {
+test("buttons exist only where they do something: one on the homepage, none on course pages, plus the theme toggle", async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 800 });
   // Every page has exactly one theme toggle, in the header; theme.spec.ts tests what it does.
   const pageButtons = page.locator("main").getByRole("button");
   await page.goto("/", { waitUntil: "networkidle" });
   await expect(page.locator("[data-theme-toggle]")).toHaveCount(1);
-  await expect(page.getByRole("button")).toHaveCount(3);
-  await expect(pageButtons).toHaveText(["Hide notes", "Copy code"]);
+  await expect(page.getByRole("button")).toHaveCount(2);
+  // The figure's Show button (predict then run) is the homepage's only other button.
+  await expect(pageButtons).toHaveText(["Show"]);
   for (const path of ["/courses", ...COURSE_PAGES]) {
     await page.goto(path, { waitUntil: "networkidle" });
     await expect(pageButtons, path).toHaveCount(0);
@@ -37,32 +47,34 @@ test("buttons exist only where they do something: two on the homepage, none on c
 
 test("Copy code puts only the code on the clipboard and says Copied", async ({ page, context }) => {
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
-  await page.goto("/");
-  await page.getByRole("button", { name: "Copy code" }).click();
-  await expect(page.getByRole("button", { name: "Copied" })).toBeVisible();
-  await expect(page.getByRole("status")).toHaveText("Code copied");
+  await page.goto(LESSON);
+  const block = page.locator('[data-example="python/vote"]');
+  await block.getByRole("button", { name: "Copy code" }).click();
+  await expect(block.getByRole("button", { name: "Copied" })).toBeVisible();
+  await expect(block.getByRole("status")).toHaveText("Code copied");
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(exampleCode);
   // Goes back to "Copy code" after two seconds.
-  await expect(page.getByRole("button", { name: "Copy code" })).toBeVisible({ timeout: 4000 });
+  await expect(block.getByRole("button", { name: "Copy code" })).toBeVisible({ timeout: 4000 });
 });
 
 test("Hide notes hides the notes under the code on a phone, and Show notes brings them back", async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 800 });
-  await page.goto("/");
-  const noteRows = page.locator("[data-note-row]");
-  await expect(noteRows).toHaveCount(3);
-  await page.getByRole("button", { name: "Hide notes" }).click();
+  await page.goto(LESSON);
+  const block = page.locator('[data-example="python/vote"]');
+  const noteRows = block.locator("[data-note-row]");
+  await expect(noteRows).toHaveCount(voteNotes.length);
+  await block.getByRole("button", { name: "Hide notes" }).click();
   await expect(noteRows).toHaveCount(0);
   // The screen reader list is not affected by the visual toggle.
-  await expect(page.locator("[data-notes-list] li")).toHaveCount(3);
-  await page.getByRole("button", { name: "Show notes" }).click();
-  await expect(noteRows).toHaveCount(3);
+  await expect(block.locator("[data-notes-list] li")).toHaveCount(voteNotes.length);
+  await block.getByRole("button", { name: "Show notes" }).click();
+  await expect(noteRows).toHaveCount(voteNotes.length);
 });
 
 test("screen readers get every note with its line number", async ({ page }) => {
-  await page.goto("/");
-  const list = page.getByRole("list", { name: "Notes on this code" });
-  await expect(list.getByRole("listitem")).toHaveText([/^1Line 1: /, /^2Line 2: /, /^3Lines 4 to 5: /]);
+  await page.goto(LESSON);
+  const list = page.locator('[data-example="python/vote"]').getByRole("list", { name: "Notes on this code" });
+  await expect(list.getByRole("listitem")).toHaveText(voteNotes.map((note, i) => new RegExp(`^${i + 1}${lineLabel(note)}`)));
 });
 
 test("courses without lessons say so plainly; planned topics are plain text on every course page", async ({ page }) => {
@@ -94,10 +106,13 @@ test("courses without lessons say so plainly; planned topics are plain text on e
   }
 });
 
-test("practice is described honestly: written solutions now, hints and feedback planned", async ({ page }) => {
+test("practice is described honestly on the homepage: feedback, hints and solutions, with nothing pretending to be there", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "Practice questions" })).toBeVisible();
-  await expect(page.getByText("Hints and instant feedback are planned.")).toBeVisible();
+  await expect(page.getByText("Check your answer for instant feedback, show hints one at a time, or open the written solution.")).toBeVisible();
+  await expect(page.getByText("planned.", { exact: false }).filter({ hasText: "Hints" })).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "Step through it" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Try it in the playground" })).toBeVisible();
   for (const word of ["Start practice", "Sign up", "Log in", "Check answer"]) {
     await expect(page.getByText(word)).toHaveCount(0);
   }

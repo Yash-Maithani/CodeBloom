@@ -1,13 +1,15 @@
 import { courses } from "@content/courses";
 import { homeExample } from "@content/home-example";
-import { CodeBlock } from "@/components/code-block";
 import { Container } from "@/components/container";
 import { CourseCard } from "@/components/course-card";
+import { Figure } from "@/components/figure";
 import { buttonStyles, textLinkStyles } from "@/components/styles";
+import { Trail } from "@/components/trail";
 import { checkNotes } from "@/lib/code-notes";
 import { CODE_LANGUAGES, readExample } from "@/lib/examples";
+import { figureFromVisual } from "@/lib/figure-data";
 import { highlight } from "@/lib/highlight";
-import { allLessons, courseStatusSentence, joinNames, publishedByCourse } from "@/lib/site-lessons";
+import { allLessons, courseStatusSentence, publishedByCourse, publishedStatusLine } from "@/lib/site-lessons";
 import { assertVerified, readRecord } from "@/lib/verified";
 import Link from "next/link";
 
@@ -26,12 +28,20 @@ const lessonSteps = [
     text: "Every runnable example is run before it is published, so the output shown is what the code actually printed.",
   },
   {
+    title: "Step through it",
+    text: "In some lessons you move through a program one line at a time and watch each value change. Every step comes from a recorded run.",
+  },
+  {
     title: "Common mistakes",
     text: "Errors beginners often make, what happens when you make them, and how to fix them.",
   },
   {
     title: "Practice questions",
-    text: "A few questions at the end of the lesson, each with a written solution you open when you are ready. Hints and instant feedback are planned.",
+    text: "A few questions at the end of the lesson. Check your answer for instant feedback, show hints one at a time, or open the written solution.",
+  },
+  {
+    title: "Try it in the playground",
+    text: "Python examples open in the playground, where you can change the code and run it in your browser. C, C++ and Java are not supported there yet.",
   },
 ];
 
@@ -56,74 +66,97 @@ export default async function HomePage() {
 
   // Everything said about lessons comes from the lesson data, so it cannot go stale.
   const byCourse = await publishedByCourse();
-  const coursesWithLessons = courses.filter((course) => (byCourse.get(course.slug) ?? []).length > 0).map((course) => course.name);
+  const statusLine = await publishedStatusLine();
   const statusSentence = await courseStatusSentence();
-  // The published lesson that teaches with this same example, if there is one.
-  const exampleLesson = (await allLessons()).find(
-    (lesson) => lesson.source.status === "published" && lesson.body.some((block) => block.type === "example" && block.example.id === exampleId),
-  );
+  const lessons = await allLessons();
+  const python = byCourse.get("python") ?? [];
+  // The lesson that teaches with this example, and its recorded trace (step-through visual).
+  const exampleLesson = lessons.find((lesson) => lesson.source.status === "published" && lesson.body.some((block) => block.type === "example" && block.example.id === exampleId));
+  const visual = exampleLesson?.body.flatMap((block) => (block.type === "visual" && block.visual.steps.length > 0 ? [block.visual] : [])).find((v) => v.lines.length === lines.length);
+  const figure = visual ? figureFromVisual(visual) : { lines: lines.map((tokens) => ({ tokens })), path: undefined, output: example.expectedOutput, predictLine: undefined };
+  const conditionNote = homeExample.notes.find((note) => note.startLine === 2);
 
   return (
     <>
       <section aria-labelledby="hero-title">
-        <Container className="py-12 md:py-16">
-          <div className="max-w-measure">
-            <h1 id="hero-title" className="font-heading text-h1">
-              Learn to program with patient, line-by-line explanations
-            </h1>
-            <p className="mt-6 text-lead">
-              CodeBloom is a learning site for beginners studying C, C++, Java or Python. Lessons
-              explain code in plain English, with a note beside each line that matters and the
-              output the code really prints.
-            </p>
-            <p className="mt-4 text-ink-muted">
-              {coursesWithLessons.length === 0
-                ? "CodeBloom is new. The first lessons are being written, and each course page shows what it will cover."
-                : `CodeBloom is new. The first lessons are published for ${joinNames(coursesWithLessons)}, and more are being written.`}
-            </p>
-            <Link href="/courses" className={`mt-8 ${buttonStyles.primary}`}>
-              Browse the courses
-            </Link>
-          </div>
-
-          <div className="mt-12">
-            <CodeBlock
-              caption={homeExample.caption}
-              regionLabel={`${CODE_LANGUAGES[example.language].label} code: ${homeExample.caption}`}
-              languageLabel={CODE_LANGUAGES[example.language].label}
-              code={example.code}
-              lines={lines}
-              notes={homeExample.notes}
-              expectedOutput={example.expectedOutput}
-              exampleId={exampleId}
-            />
-            {exampleLesson && (
-              <p className="mt-4 max-w-measure text-ui">
-                This example comes from the lesson{" "}
-                <Link href={exampleLesson.href} className={textLinkStyles}>
-                  {exampleLesson.source.title}
-                </Link>{" "}
-                in the {exampleLesson.course.name} course.
+        <Container className="py-16 lg:py-24">
+          <div className="lg:grid lg:grid-cols-12 lg:items-center lg:gap-12">
+            <div className="lg:col-span-6">
+              <h1 id="hero-title" className="font-heading text-display">
+                Learn to program with patient, line-by-line explanations
+              </h1>
+              <p className="mt-6 max-w-measure text-lead">
+                CodeBloom is a learning site for beginners studying C, C++, Java or Python. Lessons explain code in plain English, with a note beside each line that
+                matters and the output the code really prints.
               </p>
-            )}
+              <p data-status-line className="mt-4 text-ui text-ink-muted">
+                {statusLine}
+              </p>
+              <div className="mt-8 flex flex-wrap gap-4">
+                {python[0] && (
+                  <Link href={python[0].href} className={buttonStyles.primary}>
+                    Start Python lesson 1
+                  </Link>
+                )}
+                <Link href="/courses" className={buttonStyles.secondary}>
+                  Browse the courses
+                </Link>
+              </div>
+            </div>
+            <div className="mt-12 min-w-0 lg:col-span-6 lg:mt-0">
+              <Figure
+                title="Your turn: what does this print?"
+                regionLabel={`${CODE_LANGUAGES[example.language].label} code: ${homeExample.caption}`}
+                lines={figure.lines}
+                path={figure.path}
+                output={figure.output}
+                note={conditionNote ? { line: 2, text: conditionNote.text } : undefined}
+                predict={{ line: figure.predictLine }}
+              />
+              {exampleLesson && (
+                <p className="mt-4 text-small text-ink-muted">
+                  The path and output come from a recorded run of this program, from the lesson{" "}
+                  <Link href={exampleLesson.href} className={textLinkStyles}>
+                    {exampleLesson.source.title}
+                  </Link>
+                  .
+                </p>
+              )}
+            </div>
           </div>
         </Container>
       </section>
 
+      {python.length > 0 && (
+        <section aria-labelledby="trail-title" className="border-t border-rule bg-surface">
+          <Container className="py-16 lg:py-24">
+            <h2 id="trail-title" className="font-heading text-h2">
+              The Python path
+            </h2>
+            <p className="mt-4 max-w-measure text-body">
+              {python.length} lessons, in order. Each one builds on the lessons before it.
+            </p>
+            <div className="mt-10">
+              <Trail label="Python lessons in order" stops={python.map((lesson) => ({ title: lesson.source.title, href: lesson.href }))} />
+            </div>
+          </Container>
+        </section>
+      )}
+
       <section aria-labelledby="lesson-steps-title" className="border-t border-rule">
-        <Container className="py-12 md:py-16">
+        <Container className="py-16 lg:py-24">
           <h2 id="lesson-steps-title" className="font-heading text-h2">
             How each lesson works
           </h2>
-          <ol className="mt-8 flex max-w-measure flex-col gap-8">
+          <ol className="mt-10 grid gap-x-12 gap-y-10 md:grid-cols-2">
             {lessonSteps.map((step, index) => (
               <li key={step.title} className="flex gap-4">
-                <span aria-hidden="true" className="w-6 shrink-0 font-heading text-h3 text-ink-muted">
+                <span aria-hidden="true" className="flex size-12 shrink-0 items-center justify-center rounded-round border-2 border-primary font-heading text-h3 text-primary">
                   {index + 1}
                 </span>
                 <div>
                   <h3 className="font-heading text-h3">{step.title}</h3>
-                  <p className="mt-2 text-body">{step.text}</p>
+                  <p className="mt-2 max-w-measure text-body">{step.text}</p>
                 </div>
               </li>
             ))}
@@ -132,14 +165,14 @@ export default async function HomePage() {
       </section>
 
       <section aria-labelledby="courses-title" className="border-t border-rule">
-        <Container className="py-12 md:py-16">
+        <Container className="py-16 lg:py-24">
           <h2 id="courses-title" className="font-heading text-h2">
             Choose a language
           </h2>
           <p className="mt-4 max-w-measure text-body">
             Each course starts from zero. {statusSentence}
           </p>
-          <ul className="mt-8 grid gap-6 md:grid-cols-2">
+          <ul className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
             {courses.map((course) => (
               <li key={course.slug} className="flex">
                 <CourseCard course={course} headingLevel="h3" lessonCount={byCourse.get(course.slug)?.length ?? 0} />
@@ -149,8 +182,8 @@ export default async function HomePage() {
         </Container>
       </section>
 
-      <section aria-labelledby="story-title" className="border-t border-rule">
-        <Container className="py-12 md:py-16">
+      <section aria-labelledby="story-title" className="border-t border-rule bg-surface">
+        <Container className="py-16 lg:py-24">
           <h2 id="story-title" className="font-heading text-h2">
             Why CodeBloom exists
           </h2>

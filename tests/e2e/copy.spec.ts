@@ -38,7 +38,8 @@ async function recordAnnouncements(page: Page) {
 const announced = (page: Page) => page.evaluate(() => (window as unknown as { __announced: string[] }).__announced);
 
 /**
- * Opens the homepage, then freezes time. Installing the clock after loading
+ * Opens a lesson (its first code block has Copy code; the homepage shows a
+ * figure instead since the Trailhead redesign), then freezes time. Installing the clock after loading
  * means no real time passes inside the test's own timeline, and pausing far
  * ahead of the install moment (60 s) cannot be overtaken by a slow machine.
  */
@@ -49,7 +50,7 @@ async function openWithFrozenClock(page: Page, slowAssetsMs = 0) {
       await route.continue();
     });
   }
-  await page.goto("/", { waitUntil: "networkidle" });
+  await page.goto("/courses/python/decisions", { waitUntil: "networkidle" });
   const start = new Date("2026-01-01T09:00:00");
   await page.clock.install({ time: start });
   await page.clock.pauseAt(new Date(start.getTime() + 60_000));
@@ -139,7 +140,7 @@ for (const [name, slowAssetsMs] of [
 
 test("when copying fails, every attempt is announced with what to do", async ({ page }) => {
   // No clipboard permission is granted, so the browser refuses the write.
-  await page.goto("/");
+  await page.goto("/courses/python/decisions");
   await recordAnnouncements(page);
   const message = "Copy failed. Select the code and copy it manually.";
 

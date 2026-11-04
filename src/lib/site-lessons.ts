@@ -39,6 +39,20 @@ export async function playgroundExamples(): Promise<Array<{ example: RenderedExa
   );
 }
 
+/** "27 lessons are published: 14 in C and 13 in Python. C++ and Java are planned." Built from the data. */
+export async function publishedStatusLine(): Promise<string> {
+  const byCourse = await publishedByCourse();
+  const counts = courses.map((c) => ({ name: c.name, count: (byCourse.get(c.slug) ?? []).length }));
+  const published = counts.filter((c) => c.count > 0);
+  const planned = counts.filter((c) => c.count === 0).map((c) => c.name);
+  const total = published.reduce((sum, c) => sum + c.count, 0);
+  if (total === 0) return "No lessons are published yet.";
+  const parts = joinNames(published.map((c) => `${c.count} in ${c.name}`));
+  const first = `${total} ${total === 1 ? "lesson is" : "lessons are"} published: ${parts}.`;
+  if (planned.length === 0) return first;
+  return `${first} ${joinNames(planned)} ${planned.length === 1 ? "is" : "are"} planned.`;
+}
+
 /** "C", "C and Python", "C, C++ and Python" */
 export function joinNames(names: string[]): string {
   return names.length <= 1 ? (names[0] ?? "") : `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;

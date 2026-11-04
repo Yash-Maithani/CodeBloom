@@ -263,7 +263,7 @@ test("the C Variables lesson links to the first C lesson", async ({ page }) => {
 
 test("the homepage example links to the lesson it comes from", async ({ page }) => {
   await page.goto("/");
-  await page.getByText("This example comes from the lesson").getByRole("link", { name: "Making decisions with if and else" }).click();
+  await page.getByText("The path and output come from a recorded run of this program").getByRole("link", { name: "Making decisions with if and else" }).click();
   await expect(page).toHaveURL(/\/courses\/python\/decisions$/);
 });
 
