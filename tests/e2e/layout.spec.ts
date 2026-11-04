@@ -4,8 +4,8 @@ import { expect, test } from "@playwright/test";
 // Screenshots are attached to the test report (not committed).
 
 const PAGES = ["/", "/courses", "/courses/c", "/courses/c/first-program", "/courses/python/variables"];
-// The canvas token from DESIGN.md section 2: #EEF3F1 light, #0F1D1A dark.
-const CANVAS = { light: "rgb(238, 243, 241)", dark: "rgb(15, 29, 26)" };
+// The canvas token from DESIGN.md section 2: #F7F4EE light, #0F1D1A dark.
+const CANVAS = { light: "rgb(247, 244, 238)", dark: "rgb(15, 29, 26)" };
 
 for (const path of PAGES) {
   for (const width of [360, 1440]) {

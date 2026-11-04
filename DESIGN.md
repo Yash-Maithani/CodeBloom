@@ -18,13 +18,13 @@ Every colour has one role. Components use token names only, never values. Light 
 
 | Token | Value | Role |
 |---|---|---|
-| `canvas` | `#EEF3F1` | Page background |
-| `surface` | `#FFFFFF` | Cards, figures, header |
-| `sunken` | `#F6F9F8` | Code, inputs, output |
+| `canvas` | `#F7F4EE` | Page background |
+| `surface` | `#FFFDF9` | Cards, figures, header |
+| `sunken` | `#F2EEE7` | Code, inputs, output |
 | `ink` | `#16302B` | Text, icons, focus ring |
-| `ink-muted` | `#4D625D` | Secondary text, line numbers |
-| `rule` | `#CBD8D4` | Decorative dividers only |
-| `edge` | `#6F857F` | Borders of controls a user must find |
+| `ink-muted` | `#584F45` | Secondary text, line numbers |
+| `rule` | `#DDD5C9` | Decorative dividers only |
+| `edge` | `#7F7466` | Borders of controls a user must find |
 | `primary` | `#00695C` | Links, current step, trail, structure |
 | `primary-hover` | `#004D44` | Pressed or hovered `primary` |
 | `on-primary` | `#FFFFFF` | Text on `primary` |
@@ -74,28 +74,28 @@ Roles are the same in both themes.
 
 ### Contrast check
 
-WCAG 2.1 ratios, computed 2026-11-03 and recomputed in the browser by `verify:browser`. Text needs 4.5:1; edges a user must see need 3:1.
+WCAG 2.1 ratios, computed 2026-11-03 (light neutrals updated 2026-11-04 to the owner's warmer option 1) and recomputed in the browser by `verify:browser`. Text needs 4.5:1; edges a user must see need 3:1.
 
 | Pair | Light | Dark |
 |---|---|---|
-| `ink` on `canvas` / `surface` / `sunken` | 12.55 / 14.08 / 13.29 | 14.74 / 12.93 / 11.54 |
+| `ink` on `canvas` / `surface` / `sunken` | 12.82 / 13.86 / 12.17 | 14.74 / 12.93 / 11.54 |
 | `ink` on `primary-tint` / `mark` | 11.80 / 11.45 | 10.05 / 7.36 |
-| `ink-muted` on `canvas` / `surface` / `sunken` | 5.81 / 6.52 / 6.16 | 8.87 / 7.78 / 6.95 |
-| `primary` on `canvas` / `surface` / `primary-tint` | 5.90 / 6.61 / 5.55 | 8.57 / 7.52 / 5.84 |
-| `primary-hover` on `canvas` / `surface` | 8.73 / 9.79 | 10.63 / 9.32 |
+| `ink-muted` on `canvas` / `surface` / `sunken` | 7.30 / 7.89 / 6.93 | 8.87 / 7.78 / 6.95 |
+| `primary` on `canvas` / `surface` / `primary-tint` | 6.02 / 6.51 / 5.55 | 8.57 / 7.52 / 5.84 |
+| `primary-hover` on `canvas` / `surface` | 8.92 / 9.64 | 10.63 / 9.32 |
 | `on-primary` on `primary` | 6.61 | 8.57 |
 | `on-action` on `action` / `action-hover` | 8.66 / 7.15 | 8.66 / 7.15 |
-| `literal` on `sunken` / `surface` | 6.42 / 6.80 | 7.25 / 8.12 |
-| `success` on `surface` / `success-tint` | 6.45 / 5.52 | 7.39 / 6.98 |
-| `error` on `surface` / `error-tint` | 6.54 / 5.58 | 7.83 / 7.76 |
-| `warning` on `surface` / `warning-tint` | 6.69 / 6.07 | 8.06 / 7.05 |
+| `literal` on `sunken` / `surface` | 5.88 / 6.70 | 7.25 / 8.12 |
+| `success` on `surface` / `success-tint` | 6.35 / 5.52 | 7.39 / 6.98 |
+| `error` on `surface` / `error-tint` | 6.43 / 5.58 | 7.83 / 7.76 |
+| `warning` on `surface` / `warning-tint` | 6.58 / 6.07 | 8.06 / 7.05 |
 | `ink` on `success-tint` / `error-tint` / `warning-tint` | 12.03 / 12.01 / 12.77 | 12.21 / 12.81 / 11.30 |
-| `edge` against `canvas` / `surface` / `sunken` (non-text) | 3.51 / 3.93 / 3.71 | 5.86 / 5.14 / 4.59 |
-| `action-edge` against `canvas` (non-text) | 12.55 | 4.30 |
+| `edge` against `canvas` / `surface` / `sunken` (non-text) | 4.17 / 4.50 / 3.95 | 5.86 / 5.14 / 4.59 |
+| `action-edge` against `canvas` (non-text) | 12.82 | 4.30 |
 
 Rules that keep this true:
 
-- The light `action` fill is only 1.45:1 against `canvas`, so every `action` button has a 2px `action-edge` border, which carries its boundary (12.55:1). In dark mode the fill itself is 10.66:1 against `canvas`.
+- The light `action` fill is only 1.48:1 against `canvas`, so every `action` button has a 2px `action-edge` border, which carries its boundary (12.82:1). In dark mode the fill itself is 10.66:1 against `canvas`.
 - Text on a tint is `ink` or the matching state colour. `rule` is never the only edge of a control.
 - Colour is never the only signal: states also change an icon, a word or a border.
 - Adding or changing a token means rerunning the check and updating this table.

@@ -28,13 +28,13 @@
   --ease-*: initial;
 
   /* Colour, light theme (DESIGN.md section 2) */
-  --color-canvas: #eef3f1;
-  --color-surface: #ffffff;
-  --color-sunken: #f6f9f8;
+  --color-canvas: #f7f4ee;
+  --color-surface: #fffdf9;
+  --color-sunken: #f2eee7;
   --color-ink: #16302b;
-  --color-ink-muted: #4d625d;
-  --color-rule: #cbd8d4;
-  --color-edge: #6f857f;
+  --color-ink-muted: #584f45;
+  --color-rule: #ddd5c9;
+  --color-edge: #7f7466;
   --color-primary: #00695c;
   --color-primary-hover: #004d44;
   --color-on-primary: #ffffff;
@@ -231,13 +231,13 @@
 
 [data-theme="light"] {
   color-scheme: light;
-  --color-canvas: #eef3f1;
-  --color-surface: #ffffff;
-  --color-sunken: #f6f9f8;
+  --color-canvas: #f7f4ee;
+  --color-surface: #fffdf9;
+  --color-sunken: #f2eee7;
   --color-ink: #16302b;
-  --color-ink-muted: #4d625d;
-  --color-rule: #cbd8d4;
-  --color-edge: #6f857f;
+  --color-ink-muted: #584f45;
+  --color-rule: #ddd5c9;
+  --color-edge: #7f7466;
   --color-primary: #00695c;
   --color-primary-hover: #004d44;
   --color-on-primary: #ffffff;
