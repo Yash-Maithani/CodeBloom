@@ -19,8 +19,8 @@ const headings: Record<ExpectationKind, string> = {
 export function OutputPanel({ kind, text, of }: { kind: ExpectationKind; text: string; of: string }) {
   const isError = kind !== "output";
   return (
-    <div className={`rounded-panel border border-l-3 border-rule bg-code ${isError ? "border-l-error" : "border-l-ink-muted"}`}>
-      <p className="flex items-center gap-2 px-4 pt-3 text-sm font-bold">
+    <div className={`rounded-panel border border-l-4 border-rule bg-sunken ${isError ? "border-l-error" : "border-l-ink-muted"}`}>
+      <p className="flex items-center gap-2 px-4 pt-3 text-ui font-bold">
         {isError && <CircleX aria-hidden="true" size={20} strokeWidth={1.75} className="shrink-0 text-error" />}
         {headings[kind]}
       </p>
@@ -29,7 +29,7 @@ export function OutputPanel({ kind, text, of }: { kind: ExpectationKind; text: s
         role="region"
         aria-label={`${headings[kind]} for ${of}`}
         data-output={kind}
-        className="overflow-x-auto px-4 pt-1 pb-4 font-mono text-mono"
+        className="overflow-x-auto px-4 pt-1 pb-4 font-mono text-code"
       >
         <code>{text}</code>
       </pre>

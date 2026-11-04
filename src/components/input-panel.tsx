@@ -12,9 +12,9 @@
  */
 export function InputPanel({ text, of }: { text: string; of: string }) {
   return (
-    <div className="rounded-panel border border-l-3 border-rule border-l-ink-muted bg-code">
-      <p className="px-4 pt-3 text-sm font-bold">Typed input</p>
-      <p className="px-4 pt-1 text-sm text-ink-muted">
+    <div className="rounded-panel border border-l-4 border-rule border-l-ink-muted bg-sunken">
+      <p className="px-4 pt-3 text-ui font-bold">Typed input</p>
+      <p className="px-4 pt-1 text-ui text-ink-muted">
         A person typed these lines while the program ran. A terminal shows them on screen, but the program does not print them, so they are not in the Expected output below.
       </p>
       <pre
@@ -22,7 +22,7 @@ export function InputPanel({ text, of }: { text: string; of: string }) {
         role="region"
         aria-label={`Typed input for ${of}`}
         data-typed-input
-        className="overflow-x-auto px-4 pt-1 pb-4 font-mono text-mono"
+        className="overflow-x-auto px-4 pt-1 pb-4 font-mono text-code"
       >
         <code>{text}</code>
       </pre>

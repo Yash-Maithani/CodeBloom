@@ -16,7 +16,9 @@ test("the skip link is the first stop and moves focus to the main content", asyn
 for (const [path, width] of [["/", 360], ["/", 1440], ["/courses/python/variables", 360], ["/courses/c/first-program", 1440]] as const) {
   test(`${path} at ${width}px, Tab reaches every control once, each with a visible focus ring`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
-    await page.goto(path);
+    // Wait until the page is interactive: from 1024px each notes list becomes
+    // one tab stop once its script runs (decision D19 as changed 2026-11-03).
+    await page.goto(path, { waitUntil: "networkidle" });
 
     const expected = await page.evaluate(() =>
       [...document.querySelectorAll<HTMLElement>("a[href], button, summary, [tabindex='0'], pre, input[type=radio]")]
@@ -26,6 +28,8 @@ for (const [path, width] of [["/", 360], ["/", 1440], ["/courses/python/variable
         // keyboard users can scroll it (a long error message on a phone).
         .filter((el) => el.tagName !== "PRE" || el.hasAttribute("tabindex") || el.scrollWidth > el.clientWidth)
         // checkVisibility also leaves out what is inside a closed "Show solution".
+        // Content inside an inert area (an output waiting for Show) is not a tab stop.
+        .filter((el) => !el.closest("[inert]"))
         .filter((el) => el.checkVisibility() || el.getAttribute("href") === "#main")
         .map((el) => (el instanceof HTMLInputElement ? `radio ${el.closest("label")?.textContent?.trim()}` : el.textContent?.trim() || el.getAttribute("aria-label") || el.tagName)),
     );
@@ -63,10 +67,11 @@ test("Enter on a course card opens that course", async ({ page }) => {
 
 test("the code block buttons work from the keyboard", async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 800 });
-  await page.goto("/");
-  await page.getByRole("button", { name: "Hide notes" }).focus();
+  await page.goto("/courses/python/decisions");
+  const block = page.locator('[data-example="python/vote"]');
+  await block.getByRole("button", { name: "Hide notes" }).focus();
   await page.keyboard.press("Enter");
-  await expect(page.getByRole("button", { name: "Show notes" })).toBeFocused();
+  await expect(block.getByRole("button", { name: "Show notes" })).toBeFocused();
   await page.keyboard.press("Space");
-  await expect(page.getByRole("button", { name: "Hide notes" })).toBeFocused();
+  await expect(block.getByRole("button", { name: "Hide notes" })).toBeFocused();
 });

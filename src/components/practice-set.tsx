@@ -11,7 +11,7 @@
 // browser beyond the options, hints and feedback text.
 
 import { useId, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
-import { CircleCheck, CircleX } from "lucide-react";
+import { CircleCheck, CircleX, Flower2 } from "lucide-react";
 import { OutputLines } from "@/components/output-lines";
 import { InlineText } from "@/components/prose";
 import { buttonStyles } from "@/components/styles";
@@ -89,11 +89,11 @@ function Question({ item, number, onCorrect }: { item: PracticeItem; number: num
           <strong>Question {number}.</strong> <InlineText text={item.question} />
         </legend>
         {item.code && <div className="mt-4">{item.code}</div>}
-        <div className="mt-4 flex max-w-lesson flex-col gap-2">
+        <div className="mt-4 flex max-w-page flex-col gap-2">
           {item.options.map((option, index) => (
             <label
               key={index}
-              className="flex min-w-0 cursor-pointer items-start gap-3 rounded-control border border-rule-strong bg-sheet px-4 py-3 transition-colors hover:bg-accent-tint has-[:checked]:border-2 has-[:checked]:border-accent has-[:checked]:bg-accent-tint"
+              className="flex min-w-0 cursor-pointer items-start gap-3 rounded-control border-2 border-edge bg-surface px-4 py-3 transition-colors duration-fast hover:bg-primary-tint has-[:checked]:border-primary has-[:checked]:bg-primary-tint"
             >
               <input
                 type="radio"
@@ -101,7 +101,7 @@ function Question({ item, number, onCorrect }: { item: PracticeItem; number: num
                 value={index}
                 checked={selected === index}
                 onChange={() => choose(index)}
-                className="mt-1 size-4 shrink-0 accent-accent"
+                className="mt-1 size-4 shrink-0 accent-primary"
               />
               {option.output ? <OutputLines text={option.text} empty="Nothing is printed" /> : <InlineText text={option.text} />}
             </label>
@@ -119,7 +119,7 @@ function Question({ item, number, onCorrect }: { item: PracticeItem; number: num
           </button>
         )}
         {answered && (
-          <p data-status className="flex items-center gap-2 text-sm font-bold text-success">
+          <p data-status className="flex items-center gap-2 text-ui font-bold text-success">
             <CircleCheck aria-hidden="true" size={20} strokeWidth={1.75} className="shrink-0" />
             Answered correctly
           </p>
@@ -134,7 +134,7 @@ function Question({ item, number, onCorrect }: { item: PracticeItem; number: num
           <div
             key={feedback.attempt}
             data-feedback={feedback.kind}
-            className={`flex gap-3 rounded-panel border border-l-3 border-rule p-4 ${
+            className={`appear flex gap-3 rounded-panel border border-l-4 border-rule p-4 ${
               feedback.kind === "correct" ? "border-l-success bg-success-tint" : "border-l-error bg-error-tint"
             }`}
           >
@@ -146,12 +146,17 @@ function Question({ item, number, onCorrect }: { item: PracticeItem; number: num
               )}
             </span>
             <div>
-              <p className="font-bold">{feedback.kind === "correct" ? "Correct" : "Not quite"}</p>
+              <p className="flex items-center gap-2 font-bold">
+                {feedback.kind === "correct" ? "Correct" : "Not quite"}
+                {/* The one delightful moment (DESIGN.md section 7, bloom):
+                    decorative, replays on each correct check. */}
+                {feedback.kind === "correct" && <Flower2 aria-hidden="true" data-bloom size={20} strokeWidth={1.75} className="bloom text-primary" />}
+              </p>
               <p className="mt-1">
                 <InlineText text={feedback.why} />
               </p>
               {feedback.kind === "wrong" && hintsShown < item.hints.length && (
-                <p className="mt-2 text-sm">Try again, or show a hint.</p>
+                <p className="mt-2 text-ui">Try again, or show a hint.</p>
               )}
             </div>
           </div>
@@ -162,7 +167,7 @@ function Question({ item, number, onCorrect }: { item: PracticeItem; number: num
           its content is often not announced. */}
       <ol aria-live="polite" data-hints className={`flex max-w-measure flex-col gap-2 ${hintsShown > 0 ? "mt-4" : ""}`}>
         {item.hints.slice(0, hintsShown).map((hint, index) => (
-          <li key={index} className="rounded-control border border-l-3 border-rule border-l-rule-strong bg-sheet px-4 py-2">
+          <li key={index} className="appear rounded-control border border-l-4 border-rule border-l-edge bg-surface px-4 py-2">
             <strong>Hint {index + 1}:</strong> <InlineText text={hint} />
           </li>
         ))}
@@ -177,7 +182,7 @@ export function PracticeSet({ items }: { items: PracticeItem[] }) {
   const [correct, setCorrect] = useState(0);
   return (
     <>
-      <p data-practice-summary className="mt-2 text-sm text-ink-muted">
+      <p data-practice-summary className="mt-2 text-ui text-ink-muted">
         {correct} of {items.length} {items.length === 1 ? "question" : "questions"} answered correctly on this page
       </p>
       <ol className="mt-8 flex flex-col gap-12">

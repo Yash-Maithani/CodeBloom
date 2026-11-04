@@ -170,10 +170,14 @@ test("unknown lesson addresses return the 404 page", async ({ page }) => {
 
 for (const path of LESSON_PAGES) {
   test(`${path}: every code block, output and error message is exactly its checked file`, async ({ page }) => {
-    await page.goto(path);
+    await page.goto(path, { waitUntil: "networkidle" });
     const figures = page.locator("figure[data-example]");
     const count = await figures.count();
     expect(count).toBeGreaterThan(3);
+    // Predict then run: an output waits for Show. Press each Show, as a learner would.
+    // Each press removes that button from the waiting ones, so always press the first left.
+    const waiting = page.locator('[data-predict="waiting"]').getByRole("button", { name: "Show" });
+    while ((await waiting.count()) > 0) await waiting.first().click();
 
     for (let index = 0; index < count; index++) {
       const figure = figures.nth(index);
@@ -248,7 +252,8 @@ test("the shared idea links the same lesson in the other language, both ways", a
 test("the shared idea is the same text on both Variables pages", async ({ page }) => {
   const idea = async (path: string) => {
     await page.goto(path);
-    return page.locator("section[aria-labelledby=the-idea] p:not(.text-ink-muted)").allInnerTexts();
+    // The shared idea's own paragraphs (The idea card also holds the analogy and the diagram).
+    return page.locator("section[aria-labelledby=the-idea] [data-concept-text] p").allInnerTexts();
   };
   const python = await idea("/courses/python/variables");
   expect(python.length).toBe(4);
@@ -263,7 +268,7 @@ test("the C Variables lesson links to the first C lesson", async ({ page }) => {
 
 test("the homepage example links to the lesson it comes from", async ({ page }) => {
   await page.goto("/");
-  await page.getByText("This example comes from the lesson").getByRole("link", { name: "Making decisions with if and else" }).click();
+  await page.getByText("The path and output come from a recorded run of this program").getByRole("link", { name: "Making decisions with if and else" }).click();
   await expect(page).toHaveURL(/\/courses\/python\/decisions$/);
 });
 

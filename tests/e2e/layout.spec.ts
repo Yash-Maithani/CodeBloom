@@ -1,10 +1,16 @@
 import { expect, test } from "@playwright/test";
+import { pythonDecisions } from "../../content/lessons/python/decisions.ts";
+
+// The annotated code block on its lesson page (the homepage shows a figure).
+const VOTE = '[data-example="python/vote"]';
+const voteNotes = pythonDecisions.examples.vote.notes;
 
 // Responsive and theme checks at 360px and 1440px, light and dark.
 // Screenshots are attached to the test report (not committed).
 
 const PAGES = ["/", "/courses", "/courses/c", "/courses/c/first-program", "/courses/python/variables"];
-const PAPER = { light: "rgb(248, 247, 242)", dark: "rgb(22, 26, 24)" };
+// The canvas token from DESIGN.md section 2: #F7F4EE light, #0F1D1A dark.
+const CANVAS = { light: "rgb(247, 244, 238)", dark: "rgb(15, 29, 26)" };
 
 for (const path of PAGES) {
   for (const width of [360, 1440]) {
@@ -19,7 +25,7 @@ for (const path of PAGES) {
           scrollWidth: document.documentElement.scrollWidth,
           innerWidth: window.innerWidth,
         }));
-        expect(layout.background).toBe(PAPER[theme]);
+        expect(layout.background).toBe(CANVAS[theme]);
         expect(layout.scrollWidth, "page must not scroll sideways").toBeLessThanOrEqual(layout.innerWidth);
 
         await testInfo.attach(`${path} ${width} ${theme}`, {
@@ -37,7 +43,8 @@ for (const path of ["/courses/c/first-program", "/courses/c/variables", "/course
     test(`${path} at ${width}px: no horizontal scroll, solutions open`, async ({ page }) => {
       await page.setViewportSize({ width, height: 900 });
       await page.goto(path);
-      for (const summary of await page.locator("details summary").all()) await summary.click();
+      // Open every visible disclosure (the solutions). The step rail's phone disclosure is hidden from 1024px on purpose.
+      for (const summary of await page.locator("details summary").filter({ visible: true }).all()) await summary.click();
       const { scrollWidth, innerWidth } = await page.evaluate(() => ({ scrollWidth: document.documentElement.scrollWidth, innerWidth: window.innerWidth }));
       expect(scrollWidth, "page must not scroll sideways").toBeLessThanOrEqual(innerWidth);
     });
@@ -46,32 +53,34 @@ for (const path of ["/courses/c/first-program", "/courses/c/variables", "/course
 
 test("at 1440px the notes sit in a column beside the code", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto("/");
-  const code = await page.locator("pre[role=region]:has([data-line])").boundingBox();
-  const notes = await page.locator("[data-notes-list]").boundingBox();
+  await page.goto("/courses/python/decisions");
+  const block = page.locator(VOTE);
+  const code = await block.locator("pre[role=region]:has([data-line])").boundingBox();
+  const notes = await block.locator("[data-notes-list]").boundingBox();
   expect(notes!.width).toBeGreaterThan(100);
   expect(notes!.x).toBeGreaterThanOrEqual(code!.x + code!.width - 1);
-  await expect(page.locator("[data-note-row]").first()).toBeHidden();
-  await expect(page.getByRole("button", { name: "Hide notes" })).toBeHidden();
+  await expect(block.locator("[data-note-row]").first()).toBeHidden();
+  await expect(block.getByRole("button", { name: "Hide notes" })).toBeHidden();
 
   // Each note starts level with, or below, the line it explains.
-  for (const [note, line] of [[1, 1], [2, 2], [3, 4]]) {
-    const noteTop = (await page.locator(`[data-note="${note}"]`).boundingBox())!.y;
-    const lineTop = (await page.locator(`[data-line="${line}"]`).boundingBox())!.y;
-    expect(noteTop, `note ${note}`).toBeGreaterThanOrEqual(lineTop - 1);
+  for (const [index, note] of voteNotes.entries()) {
+    const noteTop = (await block.locator(`[data-note="${index + 1}"]`).boundingBox())!.y;
+    const lineTop = (await block.locator(`[data-line="${note.startLine}"]`).boundingBox())!.y;
+    expect(noteTop, `note ${index + 1}`).toBeGreaterThanOrEqual(lineTop - 1);
   }
 });
 
 test("at 360px each note sits under its line and the list is kept for screen readers", async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 900 });
-  await page.goto("/");
-  for (const [note, line] of [[1, 1], [2, 2], [3, 4]]) {
-    const row = page.locator(`[data-note-row="${note}"]`);
+  await page.goto("/courses/python/decisions");
+  const block = page.locator(VOTE);
+  for (const [index, note] of voteNotes.entries()) {
+    const row = block.locator(`[data-note-row="${index + 1}"]`);
     await expect(row).toBeVisible();
     const rowTop = (await row.boundingBox())!.y;
-    const lineBox = (await page.locator(`[data-line="${line}"]`).boundingBox())!;
-    expect(rowTop, `note ${note} below line ${line}`).toBeGreaterThanOrEqual(lineBox.y + lineBox.height - 1);
+    const lineBox = (await block.locator(`[data-line="${note.startLine}"]`).boundingBox())!;
+    expect(rowTop, `note ${index + 1} below line ${note.startLine}`).toBeGreaterThanOrEqual(lineBox.y + lineBox.height - 1);
   }
-  const listBox = await page.locator("[data-notes-list]").boundingBox();
+  const listBox = await block.locator("[data-notes-list]").boundingBox();
   expect(listBox === null || listBox.width <= 1).toBe(true);
 });

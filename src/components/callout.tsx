@@ -9,7 +9,7 @@ import type { Analogy } from "@/lib/lesson-types";
 // A "Note" callout: side information.
 export function NoteCallout({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="flex gap-3 rounded-panel border border-l-3 border-rule border-l-rule-strong bg-sheet p-4">
+    <div className="flex gap-3 rounded-panel border border-l-4 border-rule border-l-edge bg-surface p-4">
       <span className="flex h-6 shrink-0 items-center">
         <Info aria-hidden="true" size={20} strokeWidth={1.75} />
       </span>
@@ -24,9 +24,9 @@ export function NoteCallout({ title, children }: { title: string; children: Reac
 /** An "Analogy" callout: the comparison, then where it stops being accurate. */
 export function AnalogyCallout({ analogy }: { analogy: Analogy }) {
   return (
-    <aside aria-label={`Analogy: ${analogy.title}`} className="flex gap-3 rounded-panel border border-l-3 border-rule border-l-accent bg-accent-tint p-4">
+    <aside aria-label={`Analogy: ${analogy.title}`} className="flex gap-3 rounded-panel border border-l-4 border-rule border-l-primary bg-primary-tint p-4">
       <span className="flex h-6 shrink-0 items-center">
-        <Lightbulb aria-hidden="true" size={20} strokeWidth={1.75} className="text-accent" />
+        <Lightbulb aria-hidden="true" size={20} strokeWidth={1.75} className="text-primary" />
       </span>
       <div>
         <p className="font-bold">Analogy: {analogy.title}</p>

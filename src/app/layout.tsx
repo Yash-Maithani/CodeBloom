@@ -2,18 +2,19 @@ import type { Metadata } from "next";
 import {
   Atkinson_Hyperlegible_Mono,
   Atkinson_Hyperlegible_Next,
-  Literata,
+  Bricolage_Grotesque,
 } from "next/font/google";
+import { THEME_BOOT_SCRIPT } from "@/lib/theme";
 import "./globals.css";
 
 // next/font downloads these font files at build time and serves them from our
 // own domain, so visitors' browsers never contact Google. All three are
-// licensed under the SIL Open Font License 1.1. Roles are in DESIGN.md section 4.
-const literata = Literata({
+// licensed under the SIL Open Font License 1.1. Roles are in DESIGN.md section 3.
+const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
-  weight: "600",
+  weight: ["700", "800"],
   display: "swap",
-  variable: "--font-literata",
+  variable: "--font-bricolage",
 });
 
 const atkinson = Atkinson_Hyperlegible_Next({
@@ -23,7 +24,7 @@ const atkinson = Atkinson_Hyperlegible_Next({
   variable: "--font-atkinson",
 });
 
-// Italic is loaded because code comments are italic (DESIGN.md section 7).
+// Italic is loaded because code comments are italic (DESIGN.md section 3).
 const atkinsonMono = Atkinson_Hyperlegible_Mono({
   subsets: ["latin"],
   weight: ["400", "700"],
@@ -56,10 +57,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
+    // The boot script may set data-theme before React runs, so the attribute
+    // can differ from the server HTML on purpose.
     <html
       lang="en"
-      className={`${literata.variable} ${atkinson.variable} ${atkinsonMono.variable}`}
+      className={`${bricolage.variable} ${atkinson.variable} ${atkinsonMono.variable}`}
+      suppressHydrationWarning
     >
+      <head>
+        {/* Applies a stored light or dark choice before the first paint (no flash). */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
+      </head>
       <body>{children}</body>
     </html>
   );

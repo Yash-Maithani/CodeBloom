@@ -15,7 +15,7 @@ export function SiteFooter() {
     <footer className="border-t border-rule">
       <Container className="grid gap-6 py-12 md:grid-cols-2">
         <div>
-          <p className="font-heading text-xl font-semibold">CodeBloom</p>
+          <p className="font-heading text-h3">CodeBloom</p>
           <p className="mt-2 text-ink-muted">Learn. Grow. Build.</p>
         </div>
         <nav aria-label="Footer">

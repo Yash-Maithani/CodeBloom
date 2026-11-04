@@ -26,7 +26,7 @@ test("home route opens, shows its heading and loads the three fonts", async ({
       .map((font) => font.family);
   });
   for (const family of [
-    "Literata",
+    "Bricolage Grotesque",
     "Atkinson Hyperlegible Next",
     "Atkinson Hyperlegible Mono",
   ]) {
