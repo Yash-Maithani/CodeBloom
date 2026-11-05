@@ -25,10 +25,11 @@ import { chromium } from "@playwright/test";
 const ROOT = fileURLToPath(new URL("../", import.meta.url));
 const PORT = 3101;
 const BASE = `http://127.0.0.1:${PORT}/`;
-// Checked on the homepage, which uses all three fonts. The probes for colours
-// and contrast are made inside the page, so no special page is needed (the
-// development token page was removed for launch, Milestone 7).
+// The development token page was removed for launch (Milestone 7, D119). The
+// checks now open the real homepage, so the production CSS and fonts load, and
+// replace its body with the token specimen in scripts/fixtures/ (never served).
 const TOKENS_PAGE = BASE;
+const SPECIMEN = await readFile(`${ROOT}scripts/fixtures/token-specimen.html`, "utf8");
 const SCREENSHOTS = `${ROOT}screenshots/`;
 const WIDTHS = [360, 1440];
 const THEMES = ["light", "dark"];
@@ -252,6 +253,7 @@ async function runScenario(browser, design, { label, theme, systemScheme, width,
   });
 
   await page.goto(TOKENS_PAGE, { waitUntil: "networkidle" });
+  await page.evaluate((html) => { document.body.innerHTML = html; }, SPECIMEN);
   if (forceAttribute) await page.evaluate((t) => document.documentElement.setAttribute("data-theme", t), theme);
   await page.evaluate(() => document.fonts.ready);
 

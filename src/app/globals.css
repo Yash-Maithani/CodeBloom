@@ -1,4 +1,7 @@
 @import "tailwindcss";
+/* The token specimen that npm run verify:browser puts on the homepage; its
+   classes must exist in the built CSS (scripts/fixtures/token-specimen.html). */
+@source "../../scripts/fixtures/token-specimen.html";
 
 /*
  * CodeBloom design tokens (Trailhead). DESIGN.md is the source of truth: every

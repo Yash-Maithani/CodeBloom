@@ -1,0 +1,78 @@
+<!-- Token specimen for npm run verify:browser. Never served by the site: the
+     script opens the homepage (real CSS and fonts) and puts this markup in its
+     body. globals.css lists this file as a Tailwind source, so every class used
+     here exists in the built CSS. Made from the former /dev/tokens page (removed
+     for launch, Milestone 7, D119). Keep the data-* hooks the script reads. -->
+<main class="mx-auto w-full max-w-page px-4 py-12 md:px-6 md:py-16 lg:px-8">
+<h1 class="font-heading text-h1" data-role="heading">Design tokens check</h1>
+<ul class="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+<li class="flex flex-col gap-2"><div aria-hidden="true" data-token="canvas" class="h-12 rounded-control border border-edge bg-canvas"></div><span class="font-bold">canvas</span><span class="text-small text-ink-muted">Page background</span></li>
+<li class="flex flex-col gap-2"><div aria-hidden="true" data-token="surface" class="h-12 rounded-control border border-edge bg-surface"></div><span class="font-bold">surface</span><span class="text-small text-ink-muted">Cards, figures, header</span></li>
+<li class="flex flex-col gap-2"><div aria-hidden="true" data-token="sunken" class="h-12 rounded-control border border-edge bg-sunken"></div><span class="font-bold">sunken</span><span class="text-small text-ink-muted">Code, inputs, output</span></li>
+<li class="flex flex-col gap-2"><div aria-hidden="true" data-token="ink" class="h-12 rounded-control border border-edge bg-ink"></div><span class="font-bold">ink</span><span class="text-small text-ink-muted">Text, icons, focus ring</span></li>
+<li class="flex flex-col gap-2"><div aria-hidden="true" data-token="ink-muted" class="h-12 rounded-control border border-edge bg-ink-muted"></div><span class="font-bold">ink-muted</span><span class="text-small text-ink-muted">Secondary text, line numbers</span></li>
+<li class="flex flex-col gap-2"><div aria-hidden="true" data-token="rule" class="h-12 rounded-control border border-edge bg-rule"></div><span class="font-bold">rule</span><span class="text-small text-ink-muted">Decorative dividers only</span></li>
+<li class="flex flex-col gap-2"><div aria-hidden="true" data-token="edge" class="h-12 rounded-control border border-edge bg-edge"></div><span class="font-bold">edge</span><span class="text-small text-ink-muted">Borders of controls</span></li>
+<li class="flex flex-col gap-2"><div aria-hidden="true" data-token="primary" class="h-12 rounded-control border border-edge bg-primary"></div><span class="font-bold">primary</span><span class="text-small text-ink-muted">Links, current step, trail</span></li>
+<li class="flex flex-col gap-2"><div aria-hidden="true" data-token="primary-hover" class="h-12 rounded-control border border-edge bg-primary-hover"></div><span class="font-bold">primary-hover</span><span class="text-small text-ink-muted">Hovered or pressed primary</span></li>
+<li class="flex flex-col gap-2"><div aria-hidden="true" data-token="on-primary" class="h-12 rounded-control border border-edge bg-on-primary"></div><span class="font-bold">on-primary</span><span class="text-small text-ink-muted">Text on primary</span></li>
+<li class="flex flex-col gap-2"><div aria-hidden="true" data-token="primary-tint" class="h-12 rounded-control border border-edge bg-primary-tint"></div><span class="font-bold">primary-tint</span><span class="text-small text-ink-muted">Current line, selected option, chips</span></li>
+<li class="flex flex-col gap-2"><div aria-hidden="true" data-token="action" class="h-12 rounded-control border border-edge bg-action"></div><span class="font-bold">action</span><span class="text-small text-ink-muted">The learner's own action</span></li>
+<li class="flex flex-col gap-2"><div aria-hidden="true" data-token="action-hover" class="h-12 rounded-control border border-edge bg-action-hover"></div><span class="font-bold">action-hover</span><span class="text-small text-ink-muted">Hovered action</span></li>
+<li class="flex flex-col gap-2"><div aria-hidden="true" data-token="on-action" class="h-12 rounded-control border border-edge bg-on-action"></div><span class="font-bold">on-action</span><span class="text-small text-ink-muted">Text on action</span></li>
+<li class="flex flex-col gap-2"><div aria-hidden="true" data-token="action-edge" class="h-12 rounded-control border border-edge bg-action-edge"></div><span class="font-bold">action-edge</span><span class="text-small text-ink-muted">Border and pressed edge of action buttons</span></li>
+<li class="flex flex-col gap-2"><div aria-hidden="true" data-token="mark" class="h-12 rounded-control border border-edge bg-mark"></div><span class="font-bold">mark</span><span class="text-small text-ink-muted">Highlighter marks</span></li>
+<li class="flex flex-col gap-2"><div aria-hidden="true" data-token="literal" class="h-12 rounded-control border border-edge bg-literal"></div><span class="font-bold">literal</span><span class="text-small text-ink-muted">Strings and numbers in code</span></li>
+<li class="flex flex-col gap-2"><div aria-hidden="true" data-token="success" class="h-12 rounded-control border border-edge bg-success"></div><span class="font-bold">success</span><span class="text-small text-ink-muted">Correct answers</span></li>
+<li class="flex flex-col gap-2"><div aria-hidden="true" data-token="success-tint" class="h-12 rounded-control border border-edge bg-success-tint"></div><span class="font-bold">success-tint</span><span class="text-small text-ink-muted">Correct-answer panel</span></li>
+<li class="flex flex-col gap-2"><div aria-hidden="true" data-token="error" class="h-12 rounded-control border border-edge bg-error"></div><span class="font-bold">error</span><span class="text-small text-ink-muted">Errors, wrong answers</span></li>
+<li class="flex flex-col gap-2"><div aria-hidden="true" data-token="error-tint" class="h-12 rounded-control border border-edge bg-error-tint"></div><span class="font-bold">error-tint</span><span class="text-small text-ink-muted">Error panel</span></li>
+<li class="flex flex-col gap-2"><div aria-hidden="true" data-token="warning" class="h-12 rounded-control border border-edge bg-warning"></div><span class="font-bold">warning</span><span class="text-small text-ink-muted">Mistakes, time limits</span></li>
+<li class="flex flex-col gap-2"><div aria-hidden="true" data-token="warning-tint" class="h-12 rounded-control border border-edge bg-warning-tint"></div><span class="font-bold">warning-tint</span><span class="text-small text-ink-muted">Mistake and warning panel</span></li>
+</ul><ul class="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
+<li data-fg="ink" data-bg="canvas" class="rounded-control border border-rule p-4 bg-canvas text-ink">ink on canvas</li>
+<li data-fg="ink-muted" data-bg="sunken" class="rounded-control border border-rule p-4 bg-sunken text-ink-muted">ink-muted on sunken</li>
+<li data-fg="primary" data-bg="surface" class="rounded-control border border-rule p-4 bg-surface text-primary">primary on surface</li>
+<li data-fg="on-primary" data-bg="primary" class="rounded-control border border-rule p-4 bg-primary text-on-primary">on-primary on primary</li>
+<li data-fg="on-action" data-bg="action" class="rounded-control border border-rule p-4 bg-action text-on-action">on-action on action</li>
+<li data-fg="ink" data-bg="mark" class="rounded-control border border-rule p-4 bg-mark text-ink">ink on mark</li>
+<li data-fg="success" data-bg="success-tint" class="rounded-control border border-rule p-4 bg-success-tint text-success">success on success-tint</li>
+<li data-fg="error" data-bg="error-tint" class="rounded-control border border-rule p-4 bg-error-tint text-error">error on error-tint</li>
+<li data-fg="warning" data-bg="warning-tint" class="rounded-control border border-rule p-4 bg-warning-tint text-warning">warning on warning-tint</li>
+<li data-fg="literal" data-bg="sunken" class="rounded-control border border-rule p-4 bg-sunken text-literal">literal on sunken</li>
+</ul>
+<p class="mt-2 font-heading text-h3" data-role="heading-specimen"><span class="font-extrabold">Bold 800.</span> Every beginner deserves a patient explanation.</p>
+<p class="mt-2 text-body" data-role="body-specimen">Every beginner deserves a patient explanation. <strong class="font-bold">This sentence is bold.</strong></p>
+<p class="mt-2 text-body" data-role="glyph-sans">Easily confused characters: l 1 I O 0 o</p>
+<pre class="mt-2 overflow-x-auto rounded-panel border border-rule bg-sunken p-4 font-mono text-code" data-role="code-specimen" role="region" tabindex="0" aria-label="Code sample"><code><span class="italic text-ink-muted"># a comment is italic</span>
+age = <span class="text-literal">17</span>
+<span class="font-bold">if</span> age &gt;= 18:
+    <span class="font-bold">print</span>(<span class="text-literal">&quot;adult&quot;</span>)
+glyphs = <span class="text-literal">&quot;l 1 I O 0 o&quot;</span></code></pre>
+<ul class="mt-8 flex flex-col gap-3">
+<li class="border-b border-rule pb-3"><span class="font-heading text-display">text-display</span><span class="ml-4 text-small text-ink-muted">Homepage heading</span></li>
+<li class="border-b border-rule pb-3"><span class="font-heading text-h1">text-h1</span><span class="ml-4 text-small text-ink-muted">Page titles</span></li>
+<li class="border-b border-rule pb-3"><span class="font-heading text-h2">text-h2</span><span class="ml-4 text-small text-ink-muted">Sections, lesson steps</span></li>
+<li class="border-b border-rule pb-3"><span class="font-heading text-h3">text-h3</span><span class="ml-4 text-small text-ink-muted">Figure and card titles</span></li>
+<li class="border-b border-rule pb-3"><span class="text-lead">text-lead</span><span class="ml-4 text-small text-ink-muted">Goals, intros</span></li>
+<li class="border-b border-rule pb-3"><span class="text-body">text-body</span><span class="ml-4 text-small text-ink-muted">Prose</span></li>
+<li class="border-b border-rule pb-3"><span class="text-ui">text-ui</span><span class="ml-4 text-small text-ink-muted">Buttons, labels</span></li>
+<li class="border-b border-rule pb-3"><span class="text-small">text-small</span><span class="ml-4 text-small text-ink-muted">Captions, chips</span></li>
+<li class="border-b border-rule pb-3"><span class="font-mono text-code">text-code</span><span class="ml-4 text-small text-ink-muted">Code and output</span></li>
+</ul><ul class="mt-6 flex flex-col gap-2">
+<li class="flex items-center gap-4"><span class="w-24 text-ui">1 (4px)</span><span aria-hidden="true" class="h-4 bg-primary w-1"></span></li>
+<li class="flex items-center gap-4"><span class="w-24 text-ui">2 (8px)</span><span aria-hidden="true" class="h-4 bg-primary w-2"></span></li>
+<li class="flex items-center gap-4"><span class="w-24 text-ui">3 (12px)</span><span aria-hidden="true" class="h-4 bg-primary w-3"></span></li>
+<li class="flex items-center gap-4"><span class="w-24 text-ui">4 (16px)</span><span aria-hidden="true" class="h-4 bg-primary w-4"></span></li>
+<li class="flex items-center gap-4"><span class="w-24 text-ui">6 (24px)</span><span aria-hidden="true" class="h-4 bg-primary w-6"></span></li>
+<li class="flex items-center gap-4"><span class="w-24 text-ui">8 (32px)</span><span aria-hidden="true" class="h-4 bg-primary w-8"></span></li>
+<li class="flex items-center gap-4"><span class="w-24 text-ui">10 (40px)</span><span aria-hidden="true" class="h-4 bg-primary w-10"></span></li>
+<li class="flex items-center gap-4"><span class="w-24 text-ui">12 (48px)</span><span aria-hidden="true" class="h-4 bg-primary w-12"></span></li>
+<li class="flex items-center gap-4"><span class="w-24 text-ui">16 (64px)</span><span aria-hidden="true" class="h-4 bg-primary w-16"></span></li>
+<li class="flex items-center gap-4"><span class="w-24 text-ui">24 (96px)</span><span aria-hidden="true" class="h-4 bg-primary w-24"></span></li>
+</ul><ul class="mt-8 flex flex-wrap gap-6">
+<li class="flex flex-col items-start gap-2"><span aria-hidden="true" class="h-12 w-24 border border-edge bg-surface rounded-chip"></span><span class="text-ui">chip (6px)</span></li>
+<li class="flex flex-col items-start gap-2"><span aria-hidden="true" class="h-12 w-24 border border-edge bg-surface rounded-control"></span><span class="text-ui">control (8px)</span></li>
+<li class="flex flex-col items-start gap-2"><span aria-hidden="true" class="h-12 w-24 border border-edge bg-surface rounded-panel"></span><span class="text-ui">panel (10px)</span></li>
+<li class="flex flex-col items-start gap-2"><span aria-hidden="true" class="h-12 w-24 border border-edge bg-surface rounded-card"></span><span class="text-ui">card (12px)</span></li>
+</ul></main>
