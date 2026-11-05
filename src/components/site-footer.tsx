@@ -3,12 +3,13 @@ import { courses } from "@content/courses";
 import { Container } from "@/components/container";
 import { textLinkStyles } from "@/components/styles";
 
-// Only links to pages that exist. Privacy and terms links are added when those
-// pages are written (Milestone 7).
+// Only links to pages that exist.
 export function SiteFooter() {
   const links = [
     { href: "/courses", label: "Courses" },
     ...courses.map((course) => ({ href: `/courses/${course.slug}`, label: course.name })),
+    { href: "/privacy", label: "Privacy" },
+    { href: "/terms", label: "Terms" },
   ];
 
   return (

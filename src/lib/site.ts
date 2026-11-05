@@ -5,6 +5,9 @@ export const SITE_URL = "https://codebloom.vercel.app";
 
 export const SITE_NAME = "CodeBloom";
 
+/** Where visitors ask questions and report mistakes (no email address is published). */
+export const CONTACT_URL = "https://github.com/Yash-Maithani/CodeBloom/issues";
+
 export const DEFAULT_TITLE = "CodeBloom: programming explained line by line";
 export const DEFAULT_DESCRIPTION =
   "Beginner programming lessons in C, C++, Java and Python, with plain-English notes beside the code and the output it really prints.";

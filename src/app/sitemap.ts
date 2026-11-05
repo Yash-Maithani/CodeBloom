@@ -7,6 +7,6 @@ import { allLessons } from "@/lib/site-lessons";
 // examples are left out: they repeat code that is already on lesson pages.
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const lessons = (await allLessons()).filter((lesson) => lesson.source.status === "published");
-  const paths = ["/", "/courses", ...courses.map((course) => `/courses/${course.slug}`), ...lessons.map((lesson) => lesson.href), "/playground"];
+  const paths = ["/", "/courses", ...courses.map((course) => `/courses/${course.slug}`), ...lessons.map((lesson) => lesson.href), "/playground", "/privacy", "/terms"];
   return paths.map((path) => ({ url: new URL(path, SITE_URL).toString() }));
 }
