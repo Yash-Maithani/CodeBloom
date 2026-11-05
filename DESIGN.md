@@ -163,13 +163,15 @@ Motion shows what changed or answers an action. Nothing moves on its own; nothin
 |---|---|---|
 | `duration-fast` | 120ms | Colour, background, press |
 | `duration-base` | 200ms | Hints, feedback, step highlight, values, card lift |
-| `duration-slow` | 300ms | Ink connector, highlighter mark, bloom (the maximum) |
+| `duration-slow` | 300ms | Ink connector, highlighter mark, bloom (the maximum, with one exception below) |
+| `duration-theme` | 560ms | The theme switch reveal only (exception below) |
 | `ease-standard` | `cubic-bezier(0.2, 0, 0, 1)` | Everything except the bloom |
 | `ease-bloom` | `cubic-bezier(0.3, 0, 0, 1.3)` | The bloom only (a small overshoot) |
 | `tilt-card` | `-0.5deg` | How far a course card turns when it lifts |
 
 - Only `transform` and `opacity` animate, plus colour transitions. Nothing changes layout; CLS stays 0.
 - With `prefers-reduced-motion: reduce`: every duration token is 0ms, every transform and animation is off, and all information stays.
+- **Exception, the theme switch (requested by the owner on 2026-11-05):** pressing the theme toggle reveals the new theme as a circle that grows from the toggle's centre until it covers the farthest corner of the screen, over `duration-theme` with `ease-standard`, the same in both directions, while the icon turns for the same time. It uses the browser's View Transitions API (`document.startViewTransition`) and a `clip-path` circle; no library. It is the only motion longer than `duration-slow`, because the whole screen changes and a short reveal reads as a flash. Where the API is missing, all colours cross-fade over `duration-slow` instead, never a hard snap. With reduced motion the switch is instant. Layout never moves (CLS 0) and focus stays on the toggle.
 - The only motion not caused by a click, key or hover is the highlighter mark, which draws once when a marked term first enters the viewport and never again.
 
 ## 7. Components
@@ -193,7 +195,7 @@ Every interactive component defines: default, hover, focus-visible, pressed, dis
 - **Highlighter mark:** `mark` band under up to three defined terms per lesson; draws once (`slow`); reduced motion: shown at once.
 - **Bloom:** Lucide `flower-2` in `primary` beside "Correct", grows from 60% to 100% and turns 15 degrees with `ease-bloom` over `slow`, once per correct check; reduced motion: shown at once; `aria-hidden`.
 - **Header:** `surface`, wordmark left, Courses and Playground right; current page marked with a 3px `primary` underline and `aria-current`; the theme toggle at the end.
-- **Theme toggle:** a 48px square button with a Lucide moon (in light mode, it switches to dark) or sun (in dark mode). Its accessible name says what pressing does, "Switch to dark mode" or "Switch to light mode", and changes on each press. Default: `ink` icon on transparent; hover and pressed: `primary-tint` background; focus: the standard ring; it has no disabled, loading or error state. Without a stored choice the site follows `prefers-color-scheme`; pressing stores "light" or "dark" in localStorage (if storage is blocked, the choice still applies until the page is left), and a tiny script in `<head>` applies a stored choice before the first paint, so the wrong theme never flashes. Pressing: the shown icon turns 90 degrees and shrinks out while the other turns and grows in (`duration-slow`, `ease-standard`, transform and opacity only), and colours change with the `duration-fast` colour transition; reduced motion: both are instant. Before the page is interactive the button is invisible and out of the tab order, with its space kept.
+- **Theme toggle:** a 48px square button with a Lucide moon (in light mode, it switches to dark) or sun (in dark mode). Its accessible name says what pressing does, "Switch to dark mode" or "Switch to light mode", and changes on each press. Default: `ink` icon on transparent; hover and pressed: `primary-tint` background; focus: the standard ring; it has no disabled, loading or error state. Without a stored choice the site follows `prefers-color-scheme`; pressing stores "light" or "dark" in localStorage (if storage is blocked, the choice still applies until the page is left), and a tiny script in `<head>` applies a stored choice before the first paint, so the wrong theme never flashes. Pressing: the new theme spreads from the button as a growing circle (section 6, theme switch exception) while the shown icon turns 90 degrees and shrinks out and the other turns and grows in (`duration-theme`, `ease-standard`, transform and opacity only); without the View Transitions API the colours cross-fade over `duration-slow` and the icons turn over `duration-slow`; reduced motion: both are instant. Before the page is interactive the button is invisible and out of the tab order, with its space kept.
 
 ## 8. Patterns
 

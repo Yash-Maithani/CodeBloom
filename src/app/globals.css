@@ -118,6 +118,8 @@
   --duration-fast: 120ms;
   --duration-base: 200ms;
   --duration-slow: 300ms;
+  /* The theme switch only (DESIGN.md section 6, exception): the circle reveal. */
+  --duration-theme: 560ms;
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --ease-bloom: cubic-bezier(0.3, 0, 0, 1.3);
   --tilt-card: -0.5deg;
@@ -363,6 +365,34 @@
   transform: none;
 }
 
+/* Theme switch (DESIGN.md section 6, exception). With the View Transitions
+   API the browser shows the old page as a still picture and the new page above
+   it; the toggle clips the new page to a growing circle. The default crossfade
+   is turned off so only the circle moves. While it runs, the icon turns for the
+   same time as the circle, and the usual colour transitions are off, because
+   the new page must already be in its final colours inside the circle. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+:root.theme-reveal {
+  --duration-fast: 0ms;
+}
+:root.theme-reveal .theme-icon-moon,
+:root.theme-reveal .theme-icon-sun {
+  transition-duration: var(--duration-theme);
+}
+
+/* Fallback without the View Transitions API: a soft colour crossfade over
+   duration-slow, never a hard snap. The icons keep their own transition. */
+:root.theme-fade *:not(.theme-icon-moon, .theme-icon-sun),
+:root.theme-fade *::before,
+:root.theme-fade *::after {
+  transition-property: background-color, color, border-color, outline-color, fill, stroke, text-decoration-color;
+  transition-duration: var(--duration-slow);
+  transition-timing-function: var(--ease-standard);
+}
 /* Reduced motion (DESIGN.md section 6): every duration is 0 and every
    transform-based animation is off. Components take their timing from these
    tokens, so this one rule covers them. */
@@ -376,6 +406,7 @@
     --duration-fast: 0ms;
     --duration-base: 0ms;
     --duration-slow: 0ms;
+    --duration-theme: 0ms;
   }
 }
 
