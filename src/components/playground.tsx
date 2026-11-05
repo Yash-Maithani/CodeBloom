@@ -210,8 +210,14 @@ export function Playground({ starter, starterInput = "", downloadBytes }: { star
         />
 
         {/* The buttons only work once React runs in the browser, so until then
-            they are invisible and out of the tab order; their space is kept. */}
-        <div data-controls className={`mt-6 flex flex-wrap items-center gap-2 ${ready ? "" : "invisible"}`} inert={!ready}>
+            they are invisible and out of the tab order, and a message in the
+            same place says the playground is getting ready (same grid cell,
+            so nothing moves when the buttons appear). */}
+        <div className="mt-6 grid grid-cols-1">
+        <p data-playground-loading aria-hidden={ready} className={`col-start-1 row-start-1 self-center text-ui text-ink-muted ${ready ? "invisible" : ""}`}>
+          Getting the playground ready...
+        </p>
+        <div data-controls className={`col-start-1 row-start-1 flex flex-wrap items-center gap-2 ${ready ? "" : "invisible"}`} inert={!ready}>
           <button ref={runButton} type="button" onClick={run} aria-disabled={busy} className={`${buttonStyles.primary} aria-disabled:bg-ink-muted`}>
             Run
           </button>
@@ -237,6 +243,7 @@ export function Playground({ starter, starterInput = "", downloadBytes }: { star
           >
             Reset code
           </button>
+        </div>
         </div>
         {!downloaded && (
           <p data-download-note className={`mt-2 text-ui text-ink-muted ${ready ? "" : "invisible"}`}>

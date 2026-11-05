@@ -411,3 +411,27 @@ test("before the first run, Your run shows an empty state that says what will ap
   await expect(page.locator("[data-run-empty]")).toHaveCount(0);
   await expect(page.locator("[data-run-output]")).toHaveText("Fruit: 7\n");
 });
+
+test("until the page is interactive, the place of the Run button says the playground is getting ready", async ({ page }) => {
+  // Hold back the page's scripts, so the server-rendered state stays on screen.
+  await page.route(/\/_next\/static\/chunks\/.*\.js$/, (route) => route.abort());
+  await page.goto("/playground");
+  await expect(page.locator("[data-playground-loading]")).toHaveText("Getting the playground ready...");
+  await expect(page.locator("[data-playground-loading]")).toBeVisible();
+  await expect(page.locator("[data-controls]")).toHaveCSS("visibility", "hidden");
+});
+
+test("once ready, the message gives way to Run in the same place, without moving anything", async ({ page }) => {
+  await page.goto("/playground", { waitUntil: "networkidle" });
+  await expect(page.locator("[data-playground-loading]")).toHaveCSS("visibility", "hidden");
+  await expect(page.getByRole("button", { name: "Run" })).toBeVisible();
+});
+
+test.describe("without JavaScript", () => {
+  test.use({ javaScriptEnabled: false });
+  test("the playground does not claim to be getting ready", async ({ page }) => {
+    await page.goto("/playground");
+    await expect(page.locator("[data-playground-loading]")).toBeHidden();
+    await expect(page.getByText("Running code needs JavaScript.")).toBeVisible();
+  });
+});
