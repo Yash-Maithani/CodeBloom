@@ -15,6 +15,10 @@ const bricolage = Bricolage_Grotesque({
   weight: ["700", "800"],
   display: "swap",
   variable: "--font-bricolage",
+  // Next's own fallback is measured on the regular weight, 15% too narrow for
+  // these bold headings; globals.css defines one per weight instead.
+  adjustFontFallback: false,
+  fallback: ["Bricolage Grotesque Fallback"],
 });
 
 const atkinson = Atkinson_Hyperlegible_Next({
@@ -22,6 +26,10 @@ const atkinson = Atkinson_Hyperlegible_Next({
   weight: ["400", "700"],
   display: "swap",
   variable: "--font-atkinson",
+  // next/font has no metrics for this font, so it cannot build a fallback; the
+  // matched fallback is defined in globals.css (see the comment there).
+  adjustFontFallback: false,
+  fallback: ["Atkinson Hyperlegible Next Fallback"],
 });
 
 // Italic is loaded because code comments are italic (DESIGN.md section 3).
@@ -31,6 +39,8 @@ const atkinsonMono = Atkinson_Hyperlegible_Mono({
   style: ["normal", "italic"],
   display: "swap",
   variable: "--font-atkinson-mono",
+  adjustFontFallback: false,
+  fallback: ["Atkinson Hyperlegible Mono Fallback"],
 });
 
 // Pages set their own title; the template adds "| CodeBloom" to it.

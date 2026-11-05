@@ -133,7 +133,7 @@ Rules:
 
 - **Scale (4px base):** 0, 4, 8, 12, 16, 24, 32, 40, 48, 64, 96. Class names count 4px steps (`p-4` is 16px); nothing else exists.
 - **Section spacing:** 96 from 1024px, 64 below.
-- **Widths:** `page` 1240px; `measure` 68ch for prose; `lesson-main` 880px; `rail` 260px.
+- **Widths:** `page` 1240px; `measure` 68ch of the body font for prose (written as 44.06em, so it does not change while a fallback font shows); `lesson-main` 880px; `rail` 260px.
 - **Grid:** 12 columns, 24px gutters; page margins 40px from 1024px, 24px from 768px, 16px below.
 - **Breakpoints:** base 360, `md` 768, `lg` 1024, `xl` 1440. Every template is checked at 360, 768, 1024 and 1440. No horizontal page scroll at 320.
 
