@@ -382,6 +382,14 @@
   }
 }
 
+/* The step-through highlight slides between lines (DESIGN.md section 6,
+   duration-base). Reduced motion makes the duration 0, so it jumps. */
+.step-highlight {
+  transition-property: transform, opacity;
+  transition-duration: var(--duration-base);
+  transition-timing-function: var(--ease-standard);
+}
+
 /* Feedback and hints fade in and settle 4px (DESIGN.md section 6, duration-base). */
 @utility appear {
   animation: appear var(--duration-base) var(--ease-standard);

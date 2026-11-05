@@ -66,7 +66,7 @@ export function Explorer({
           <label htmlFor={id} className="text-ui font-bold">
             Change <code className="font-mono">{data.name}</code>
           </label>
-          <output htmlFor={id} aria-hidden="true" className="rounded-chip bg-primary-tint px-2 py-1 font-mono text-code">
+          <output key={run.value} htmlFor={id} aria-hidden="true" className={`rounded-chip bg-primary-tint px-2 py-1 font-mono text-code ${index === data.initial ? "" : "appear"}`}>
             {run.value}
           </output>
         </div>
