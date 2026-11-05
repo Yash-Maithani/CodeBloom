@@ -276,7 +276,7 @@ export function Playground({ starter, starterInput = "", downloadBytes }: { star
             role="region"
             aria-label="Output of your run"
             data-run-output
-            className="min-h-24 overflow-x-auto px-4 py-3 font-mono text-code whitespace-pre"
+            className="output-wrap min-h-24 px-4 py-3 font-mono text-code"
           >
             <code>
               {chunks.map((chunk, index) => (
@@ -293,7 +293,7 @@ export function Playground({ starter, starterInput = "", downloadBytes }: { star
                 <CircleX aria-hidden="true" size={20} strokeWidth={1.75} className="shrink-0 text-error" />
                 Error message
               </p>
-              <pre tabIndex={0} role="region" aria-label="Error message of your run" data-run-error className="mt-2 overflow-x-auto font-mono text-code">
+              <pre tabIndex={0} role="region" aria-label="Error message of your run" data-run-error className="output-wrap mt-2 font-mono text-code">
                 <code>{error.text}</code>
               </pre>
             </div>

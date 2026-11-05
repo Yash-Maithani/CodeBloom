@@ -49,11 +49,13 @@ test("the figure's path and chip come from the vote trace, and predict then run 
   await expect(figure.locator('[data-predict="shown"] pre')).toHaveText("Not yet");
 });
 
-test("the explorer with one verified run is unavailable and says why", async ({ page }) => {
+test("the gallery explorers are the lessons' verified variants: four ages and three pointer targets", async ({ page }) => {
   await page.goto("/dev/components", { waitUntil: "networkidle" });
-  const explorer = page.locator('section:has(h2#explorer) [data-theme="light"] [data-explorer]');
-  await expect(explorer.getByRole("slider", { name: "age" })).toBeDisabled();
-  await expect(explorer).toContainText("Only one verified run is available, so the value cannot change yet.");
+  const light = page.locator('section:has(h2#explorer) [data-theme="light"]');
+  const slider = light.locator('[data-explorer="python/vote"]').getByRole("slider");
+  await expect(slider).toBeEnabled();
+  await expect(slider).toHaveAttribute("max", "3");
+  await expect(light.locator('[data-explorer="c/explore_target"]').getByRole("radio")).toHaveCount(3);
 });
 
 test("nothing links to the gallery", async ({ page }) => {

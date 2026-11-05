@@ -133,7 +133,7 @@ Rules:
 
 - **Scale (4px base):** 0, 4, 8, 12, 16, 24, 32, 40, 48, 64, 96. Class names count 4px steps (`p-4` is 16px); nothing else exists.
 - **Section spacing:** 96 from 1024px, 64 below.
-- **Widths:** `page` 1240px; `measure` 68ch for prose; `lesson-main` 880px; `rail` 260px.
+- **Widths:** `page` 1240px; `measure` 68ch of the body font for prose (written as 44.06em, so it does not change while a fallback font shows); `lesson-main` 880px; `rail` 260px.
 - **Grid:** 12 columns, 24px gutters; page margins 40px from 1024px, 24px from 768px, 16px below.
 - **Breakpoints:** base 360, `md` 768, `lg` 1024, `xl` 1440. Every template is checked at 360, 768, 1024 and 1440. No horizontal page scroll at 320.
 
@@ -163,13 +163,16 @@ Motion shows what changed or answers an action. Nothing moves on its own; nothin
 |---|---|---|
 | `duration-fast` | 120ms | Colour, background, press |
 | `duration-base` | 200ms | Hints, feedback, step highlight, values, card lift |
-| `duration-slow` | 300ms | Ink connector, highlighter mark, bloom (the maximum) |
+| `duration-slow` | 300ms | Ink connector, highlighter mark, bloom (the maximum, with one exception below) |
+| `duration-theme` | 560ms | The theme switch reveal only (exception below) |
 | `ease-standard` | `cubic-bezier(0.2, 0, 0, 1)` | Everything except the bloom |
 | `ease-bloom` | `cubic-bezier(0.3, 0, 0, 1.3)` | The bloom only (a small overshoot) |
 | `tilt-card` | `-0.5deg` | How far a course card turns when it lifts |
 
 - Only `transform` and `opacity` animate, plus colour transitions. Nothing changes layout; CLS stays 0.
 - With `prefers-reduced-motion: reduce`: every duration token is 0ms, every transform and animation is off, and all information stays.
+- **Exception, the theme switch (requested by the owner on 2026-11-05):** pressing the theme toggle reveals the new theme as a circle that grows from the toggle's centre until it covers the farthest corner of the screen, over `duration-theme` with `ease-standard`, the same in both directions, while the icon turns for the same time. It uses the browser's View Transitions API (`document.startViewTransition`) and a `clip-path` circle; no library. It is the only motion longer than `duration-slow`, because the whole screen changes and a short reveal reads as a flash. Where the API is missing, all colours cross-fade over `duration-slow` instead, never a hard snap. With reduced motion the switch is instant. Layout never moves (CLS 0) and focus stays on the toggle.
+- **Page transitions:** on navigation the page content (inside `main`) cross-fades over `duration-base` with `ease-standard`; the header and footer stay still and nothing slides. Built on React's `ViewTransition`, which Next.js supports in the App Router without configuration or a library. Without the View Transitions API the page changes at once; with reduced motion, too.
 - The only motion not caused by a click, key or hover is the highlighter mark, which draws once when a marked term first enters the viewport and never again.
 
 ## 7. Components
@@ -180,20 +183,22 @@ Every interactive component defines: default, hover, focus-visible, pressed, dis
 - **Button, secondary:** `surface` fill, `ink` text, 2px `edge` border; hover `primary-tint`.
 - **Link:** `primary`, always underlined; hover thickens the underline.
 - **Course card:** `surface`, `card` radius, 8px top band (`primary` published, `rule` planned), name in `h3`, one-line description, a chip "13 lessons" or "Planned". Hover and focus-within: lifts 4px and turns by `tilt-card` with the `lift` shadow (`duration-base`, `ease-standard`); reduced motion: the shadow appears, nothing moves.
-- **Step rail:** sticky from 1024px; numbered steps (round markers); current step `surface` row with a 4px `primary` bar and `aria-current="location"`; links jump to sections; below 1024px it becomes a "Steps in this lesson" disclosure at the top.
+- **Step rail:** from 1024px it stays beside the lesson while it scrolls (sticky, `6` below the top of the screen) and scrolls inside itself if it is taller than the screen; numbered steps (round markers); the current step, worked out from the scroll position with an IntersectionObserver, has a `surface` row with a 4px `primary` bar and `aria-current="step"`; steps above it are "passed": a `primary-tint` marker, which says where the learner is, never that a step is done. Below 1024px it is a slim sticky bar at the top of the screen, "Step N of M" and the step title, a button that opens and closes the full list (a disclosure; Escape closes it and returns focus to the bar). Choosing a step scrolls smoothly to it (instantly with reduced motion) and moves focus to its heading.
+- **Output and error text** (lesson output panels, figure and explorer output, practice options, step-through output, the playground's run): long lines wrap (`white-space: pre-wrap`, `overflow-wrap: anywhere`) with a 2ch hanging indent on the wrapped part, so a wrap never looks like a new line of output. The text stays exactly as the verified run printed it. Code panels and the Typed input panel keep their lines and scroll sideways. Changed by the owner on 2026-11-05 (round 3 review), because at 360px the end of an error such as "IndexError: list index out of range" was out of view.
 - **Code block:** `sunken`, `panel` radius, 1px `rule` border, line numbers `ink-muted` unselectable; current or hovered line `primary-tint` with a 4px `primary` bar; Copy code button (secondary, small).
 - **Figure (two-pane):** title in `h3`, code pane left, explanation pane right: "Path taken", "Output of the real run", the note for the active line. Stacks below 1024px with the explanation under the code.
 - **Value chip:** `small` mono on `primary-tint`, `chip` radius, shown only on lines a note or an explorer is about.
 - **Path taken:** a row of steps ("line 2: False", "line 3 skipped", "line 5 runs"): runs in `primary-tint` with a `primary` border, skipped with a dashed `edge` border and the word "skipped".
 - **Callout:** analogy (`primary-tint`, lightbulb icon), mistake (`warning-tint`, triangle icon), each with a 4px left bar.
 - **Practice question:** fieldset of options (radio rows, 2px `edge`, selected `primary-tint` with `primary` border); "Check answer" primary; feedback panel in `success-tint` or `error-tint` with icon and word; hints one at a time.
-- **Explorer:** a figure with a labelled native control (slider or select) above the code; results only from verified variants; announced in words.
+- **Step-through motion:** the current-line highlight (`primary-tint` with a 4px `primary` bar) is one shape behind the code that slides from the previous line to the current one with `transform` (`duration-base`, `ease-standard`); a variable whose value changed on this step fades in and settles 4px (`appear`, `duration-base`); the explorer's value chip does the same. Reduced motion: both instant.
+- **Explorer:** a figure with a labelled native control above the code: a slider with its values written under the track for ordered values, or radio buttons styled as 48px option boxes for a choice (the C pointer target). Results only from verified variants (code, path, True or False chip, output or error message, all from that value's real run); each change is announced in words, with the lines that ran and the output. Heading, one line of instructions ("Change the value and watch what happens..."), and an "Every result as a table" disclosure; without JavaScript the control is hidden and the table is shown open. **Pointer boxes:** one box per variable with its value after the run and "was N" when it changed, a `primary` arrow from the pointer box (`&name`) to the variable that changed in the verified output; never an address. The arrow and box colours change over `duration-base`; reduced motion: at once. On the homepage the explorer keeps predict then run for the first value, and moving the slider reveals the output.
 - **Typed input panel:** `sunken`, heading "Typed input", the typed lines in mono.
 - **Ink connector:** 1.6px `primary` curve with a 3px dot at the code end, from a note or prose term to its line; from 1024px only; grows from the note in `slow`; reduced motion: appears at once; `aria-hidden`.
 - **Highlighter mark:** `mark` band under up to three defined terms per lesson; draws once (`slow`); reduced motion: shown at once.
 - **Bloom:** Lucide `flower-2` in `primary` beside "Correct", grows from 60% to 100% and turns 15 degrees with `ease-bloom` over `slow`, once per correct check; reduced motion: shown at once; `aria-hidden`.
 - **Header:** `surface`, wordmark left, Courses and Playground right; current page marked with a 3px `primary` underline and `aria-current`; the theme toggle at the end.
-- **Theme toggle:** a 48px square button with a Lucide moon (in light mode, it switches to dark) or sun (in dark mode). Its accessible name says what pressing does, "Switch to dark mode" or "Switch to light mode", and changes on each press. Default: `ink` icon on transparent; hover and pressed: `primary-tint` background; focus: the standard ring; it has no disabled, loading or error state. Without a stored choice the site follows `prefers-color-scheme`; pressing stores "light" or "dark" in localStorage (if storage is blocked, the choice still applies until the page is left), and a tiny script in `<head>` applies a stored choice before the first paint, so the wrong theme never flashes. Pressing: the shown icon turns 90 degrees and shrinks out while the other turns and grows in (`duration-slow`, `ease-standard`, transform and opacity only), and colours change with the `duration-fast` colour transition; reduced motion: both are instant. Before the page is interactive the button is invisible and out of the tab order, with its space kept.
+- **Theme toggle:** a 48px square button with a Lucide moon (in light mode, it switches to dark) or sun (in dark mode). Its accessible name says what pressing does, "Switch to dark mode" or "Switch to light mode", and changes on each press. Default: `ink` icon on transparent; hover and pressed: `primary-tint` background; focus: the standard ring; it has no disabled, loading or error state. Without a stored choice the site follows `prefers-color-scheme`; pressing stores "light" or "dark" in localStorage (if storage is blocked, the choice still applies until the page is left), and a tiny script in `<head>` applies a stored choice before the first paint, so the wrong theme never flashes. Pressing: the new theme spreads from the button as a growing circle (section 6, theme switch exception) while the shown icon turns 90 degrees and shrinks out and the other turns and grows in (`duration-theme`, `ease-standard`, transform and opacity only); without the View Transitions API the colours cross-fade over `duration-slow` and the icons turn over `duration-slow`; reduced motion: both are instant. Before the page is interactive the button is invisible and out of the tab order, with its space kept.
 
 ## 8. Patterns
 
@@ -215,7 +220,7 @@ Every interactive component defines: default, hover, focus-visible, pressed, dis
 
 ## 10. Icons and imagery
 
-Lucide outline icons, 20px (16px inline), 1.75 stroke, always with a text label or an accessible name. No emoji, photos or stock illustration. Concept diagrams are inline SVG in a hand-drawn ink style using tokens, each with a caption that carries the same information.
+Lucide outline icons, 20px (16px inline), 1.75 stroke, always with a text label or an accessible name. No emoji, photos or stock illustration. Concept diagrams are inline SVG in a hand-drawn ink style using tokens, each with a caption that carries the same information. Every shared concept has one (13). Each drawing is 300 units wide with labels in the `ui` size, shown at up to 1.2 times its size, so labels are about 16px on a 360px phone and about 19px on a wide screen; never scaled below what fits.
 
 ## 11. Prohibited
 

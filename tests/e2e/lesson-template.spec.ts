@@ -15,10 +15,10 @@ test("the step rail lists every step in order and marks the one being read", asy
   const links = rail.locator("a").filter({ visible: true });
   await expect(links).toHaveCount(cards.length);
   for (const [index, title] of cards.entries()) await expect(links.nth(index)).toHaveAccessibleName(title);
-  await expect(rail.locator('a[aria-current="location"]').filter({ visible: true })).toHaveAccessibleName("The idea");
+  await expect(rail.locator('a[aria-current="step"]').filter({ visible: true })).toHaveAccessibleName("The idea");
   await rail.getByRole("link", { name: "Common mistakes" }).filter({ visible: true }).click();
   await expect(page).toHaveURL(/#common-mistakes$/);
-  await expect(rail.locator('a[aria-current="location"]').filter({ visible: true })).toHaveAccessibleName("Common mistakes");
+  await expect(rail.locator('a[aria-current="step"]').filter({ visible: true })).toHaveAccessibleName("Common mistakes");
 });
 
 test("a variable named in the prose links to its lines, highlights them and says which lines for screen readers", async ({ page }) => {
@@ -41,7 +41,22 @@ test("at most three defined terms get a highlighter mark, each once", async ({ p
   await expect(marks).toHaveText(["program", "variable", "value"]);
 });
 
-for (const [path, concept] of [["/courses/python/variables", "variables"], ["/courses/c/decisions", "decisions"], ["/courses/python/loops", "repetition"]]) {
+const DIAGRAMS = [
+  ["/courses/python/first-program", "first-program"],
+  ["/courses/python/variables", "variables"],
+  ["/courses/python/input-output", "input-output"],
+  ["/courses/python/numbers", "arithmetic"],
+  ["/courses/c/decisions", "decisions"],
+  ["/courses/python/elif", "several-choices"],
+  ["/courses/python/conditions", "combined-conditions"],
+  ["/courses/python/loops", "repetition"],
+  ["/courses/c/functions", "functions"],
+  ["/courses/python/lists", "many-values"],
+  ["/courses/c/strings", "text"],
+  ["/courses/python/dictionaries", "key-value"],
+  ["/courses/python/files", "files"],
+];
+for (const [path, concept] of DIAGRAMS) {
   test(`${path} shows the ${concept} diagram with a caption that serves as its text`, async ({ page }) => {
     await page.goto(path);
     const diagram = page.locator(`[data-concept-diagram="${concept}"]`);
@@ -51,6 +66,22 @@ for (const [path, concept] of [["/courses/python/variables", "variables"], ["/co
     await expect(diagram.getByRole("img")).toHaveAccessibleName(caption);
   });
 }
+
+test("every concept diagram has labels of at least 14.5px at 360px and fits the screen", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 740 });
+  for (const [path, concept] of DIAGRAMS) {
+    await page.goto(path);
+    const sizes = await page.locator(`[data-concept-diagram="${concept}"] svg`).evaluate((svg) => {
+      const scale = svg.getBoundingClientRect().width / (svg as SVGSVGElement).viewBox.baseVal.width;
+      return {
+        smallest: Math.min(...[...svg.querySelectorAll("text")].map((t) => parseFloat(getComputedStyle(t).fontSize) * scale)),
+        right: svg.getBoundingClientRect().right,
+      };
+    });
+    expect(sizes.smallest, concept).toBeGreaterThanOrEqual(14.5);
+    expect(sizes.right, concept).toBeLessThanOrEqual(360);
+  }
+});
 
 test("lesson outputs wait for Show; the trace names the line that prints when only one line prints", async ({ page }) => {
   await page.goto("/courses/python/decisions", { waitUntil: "networkidle" });

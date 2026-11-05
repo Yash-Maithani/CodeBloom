@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "explore_index.py", line 3, in <module>
+    print(fruits[position])
+          ~~~~~~^^^^^^^^^^
+IndexError: list index out of range

@@ -103,6 +103,16 @@ How to make one:
 
 On the page, the learner starts at "Start. Nothing has run yet.", and moves with Back, Next step and Start again; nothing plays by itself. Each step is announced to screen readers, and "All steps as a table" gives the same information as text. Without JavaScript the table is shown open instead.
 
+### 3d. Explorers and their verified variants
+
+An explorer lets the learner change one value and see what the program does. Every value is a real run.
+
+1. Pick a base example the lesson already explains, and the one value on one line that the learner may change.
+2. Write `<name>.variants.json` next to it, for example `{ "line": 1, "name": "age", "base": "17", "values": ["16", "17", "18", "19"] }`. `base` must appear exactly once on that line and be one of `values`. Values use letters, digits, underscores and a leading minus only.
+3. For every value except the base, run the program with that value and save the real result as `<name>@<value>.expected.txt` (or `.run-error.txt` or `.compile-error.txt`). If the base has a `.trace.json`, save `<name>@<value>.trace.json` from the tracer too. Never type a result by hand.
+4. Run `npm run check:examples`. It writes each variant with the value replaced, runs it under the base file name in a fresh folder, compares the result exactly, and records the hashes of the base source, the variants file, the code that ran, the result and the trace. If any variant differs, it fails and the record is not written.
+5. The build checks those hashes again for every explorer on a page, and stops if anything changed.
+
 ### 3c. Playground links
 
 Every runnable Python example and fix in a published lesson gets "Try it in the playground" automatically, and its own page at `/playground/python/<name>` that starts from the verified file. Nothing to write. Practice questions never get a link, because their output is the answer. For an example with an input file, the Input box starts filled with that file's lines, and "Reset code" restores both the code and the input. In the prose, say what is in the Input box, and that the typed line appears after the prompt in the output. C, C++ and Java examples get no link until the playground supports them.

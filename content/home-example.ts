@@ -22,7 +22,7 @@ export const homeExample = {
     {
       startLine: 2,
       endLine: 2,
-      text: '`if` asks a yes-or-no question. `age >= 18` means "is age 18 or more?" For 17, the answer is no.',
+      text: '`if` asks a yes-or-no question. `age >= 18` means "is age 18 or more?" The chip on line 2 shows the answer for this run.',
     },
     {
       startLine: 4,

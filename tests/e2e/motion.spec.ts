@@ -32,3 +32,33 @@ test("with reduced motion the bloom and the feedback appear without animating", 
   expect(await q.locator("[data-bloom]").evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
   expect(await q.locator("[data-feedback=correct]").evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
 });
+
+test("step-through: the highlight slides to the line that ran, and a changed value fades in; reduced motion makes both instant", async ({ page }) => {
+  await page.goto("/courses/python/loops", { waitUntil: "networkidle" });
+  const visual = page.locator('[data-visual="count"]');
+  const bar = visual.locator("[data-highlight-bar]");
+  await expect(bar).toHaveClass(/opacity-0/);
+  const next = visual.getByRole("button", { name: "Next step" });
+  await next.click();
+  // Step 1 gives count its first value: it fades and settles in.
+  const changed = visual.locator("[data-variable] .appear");
+  await expect(changed.first()).toBeVisible();
+  expect(await changed.first().evaluate((el) => getComputedStyle(el).animationName)).toBe("appear");
+  await next.click();
+  // The bar sits on the current line, moved with transform only.
+  const current = visual.locator("[data-trace-line][data-current]");
+  await expect.poll(async () => {
+    const [barTop, lineTop] = await Promise.all([bar.evaluate((el) => el.getBoundingClientRect().top), current.evaluate((el) => el.getBoundingClientRect().top)]);
+    return Math.round(barTop - lineTop);
+  }).toBe(0);
+  const style = await bar.evaluate((el) => ({ property: getComputedStyle(el).transitionProperty, duration: getComputedStyle(el).transitionDuration, transform: getComputedStyle(el).transform }));
+  expect(style.property).toBe("transform, opacity");
+  expect(style.duration).toBe("0.2s");
+  expect(style.transform).toMatch(/^matrix\(1, 0, 0, 1, 0, [\d.]+\)$/);
+
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  expect(await bar.evaluate((el) => getComputedStyle(el).transitionDuration)).toBe("0s");
+  await visual.getByRole("button", { name: "Start again" }).click();
+  await next.click();
+  expect(await visual.locator("[data-variable] .appear").first().evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
+});

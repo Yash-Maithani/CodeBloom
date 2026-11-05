@@ -119,6 +119,9 @@ export const cPointers: LessonSource = {
       ],
     },
   },
+  explorers: {
+    target: { variants: "c/explore_target", title: "Follow p to the variable it changes", display: "pointer" },
+  },
   mistakes: [
     {
       title: "Leaving out the & in the call",

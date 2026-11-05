@@ -95,6 +95,9 @@ export const pythonDecisions: LessonSource = {
       branches: { 2: false },
     },
   },
+  explorers: {
+    vote: { variants: "python/vote", title: "Change age and see which line runs" },
+  },
   mistakes: [
     {
       title: "Using = instead of ==",

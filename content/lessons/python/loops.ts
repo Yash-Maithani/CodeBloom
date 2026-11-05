@@ -90,6 +90,9 @@ export const pythonLoops: LessonSource = {
       },
     },
   },
+  explorers: {
+    range: { variants: "python/explore_range", title: "Change count and see how many times the loop runs" },
+  },
   mistakes: [
     {
       title: "Expecting range to include the stop value",

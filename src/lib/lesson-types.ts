@@ -91,6 +91,19 @@ export type Visual = {
   branches?: Record<number, boolean>;
 };
 
+/**
+ * An explorer (DESIGN.md section 7): the learner changes one value of an
+ * example and sees each verified result. The values come from
+ * content/examples/<variants>.variants.json and are checked by check:examples.
+ */
+export type LessonExplorer = {
+  /** "<language>/<name>": an example that has a .variants.json */
+  variants: string;
+  title: string;
+  /** "pointer" draws C pointer boxes from the output; default "slider" */
+  display?: "slider" | "pointer";
+};
+
 export type LessonSource = {
   /** Course slug from content/courses.ts, which is also the code language */
   course: string;
@@ -107,6 +120,8 @@ export type LessonSource = {
   examples: Record<string, LessonExample>;
   /** Step-through visuals, placed in the .md with {{visual <key>}} */
   visuals?: Record<string, Visual>;
+  /** Explorers, placed in the .md with {{explorer <key>}} */
+  explorers?: Record<string, LessonExplorer>;
   mistakes: Mistake[];
   practice: PracticeQuestion[];
   /** At least two short points */

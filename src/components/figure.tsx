@@ -42,9 +42,12 @@ export function Figure({
   output,
   note,
   predict,
+  outputFailed = false,
+  aside,
   children,
 }: {
-  title: string;
+  /** Left out when a heading just above already names the figure */
+  title?: string;
   /** Names the code for screen readers, for example "Python code: Figure 1" */
   regionLabel: string;
   lines: FigureLine[];
@@ -53,19 +56,29 @@ export function Figure({
   output: string;
   note?: { line: number; text: string };
   /** Hide the output until the learner presses Show; `line` names the line that prints, when the trace shows it */
-  predict?: { line?: number };
+  predict?: { line?: number; revealed?: boolean };
+  /** The run stopped with an error: `output` is its error message */
+  outputFailed?: boolean;
+  /** Extra content above the output in the right pane, for an explorer */
+  aside?: React.ReactNode;
   /** A control above the code, for an explorer */
   children?: React.ReactNode;
 }) {
   const outputPanel = (
-    <pre tabIndex={0} role="region" aria-label={`Output of the real run for ${regionLabel}`} className="overflow-x-auto rounded-control bg-sunken px-3 py-2 font-mono text-code">
+    <pre
+      tabIndex={0}
+      role="region"
+      aria-label={`${outputFailed ? "Error message" : "Output"} of the real run for ${regionLabel}`}
+      data-output-failed={outputFailed || undefined}
+      className={`output-wrap rounded-control bg-sunken px-3 py-2 font-mono text-code ${outputFailed ? "border-l-4 border-error" : ""}`}
+    >
       <code>{output}</code>
     </pre>
   );
   return (
     <figure data-figure className="rounded-panel border border-rule bg-surface">
-      <figcaption className="rounded-t-panel border-b border-rule bg-sunken px-4 py-3 font-heading text-h3">{title}</figcaption>
-      {children && <div className="border-b border-rule px-4 py-3">{children}</div>}
+      {title && <figcaption className="rounded-t-panel border-b border-rule bg-sunken px-4 py-3 font-heading text-h3">{title}</figcaption>}
+      {children && <div className={`border-b border-rule px-4 py-3 ${title ? "" : "rounded-t-panel"}`}>{children}</div>}
       <div className="lg:grid lg:grid-cols-[minmax(0,6fr)_minmax(0,5fr)]">
         <pre tabIndex={0} role="region" aria-label={regionLabel} className="overflow-x-auto bg-sunken py-4 font-mono text-code lg:rounded-bl-panel">
           <code className="block">
@@ -106,10 +119,17 @@ export function Figure({
               </div>
             </div>
           )}
+          {aside}
           <div>
-            <p className="text-small font-bold text-ink-muted">Output of the real run</p>
+            <p className="text-small font-bold text-ink-muted">{outputFailed ? "Error message from the real run" : "Output of the real run"}</p>
             <div className="mt-2">
-              {predict ? <PredictReveal line={predict.line}>{outputPanel}</PredictReveal> : outputPanel}
+              {predict ? (
+                <PredictReveal line={predict.line} revealed={predict.revealed}>
+                  {outputPanel}
+                </PredictReveal>
+              ) : (
+                outputPanel
+              )}
             </div>
           </div>
           {note && (

@@ -6,10 +6,12 @@
 //
 // Every line number, value and output here comes from the example's verified
 // trace (src/lib/lessons.ts); only the notes are written by hand. Nothing plays
-// by itself. The only motion is the existing 120ms colour change of the current
-// line, which is instant when the reader asks for reduced motion.
+// by itself. Motion only explains a step (DESIGN.md section 6): the highlight
+// slides from the line that ran before to the line that runs now, and a value
+// that changed fades and settles in (both duration-base). With reduced motion
+// both are instant.
 
-import { Fragment, useState, useSyncExternalStore } from "react";
+import { Fragment, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ArrowRight } from "lucide-react";
 import { PathTaken, type PathStep } from "@/components/figure";
 import { tokenStyles } from "@/components/token-styles";
@@ -63,6 +65,20 @@ export function StepThrough({
     setPosition(next);
   }
 
+  // The highlight bar sits behind the code and moves to the current line,
+  // measured from the page, so a taller line (one with a chip) still fits.
+  const code = useRef<HTMLElement>(null);
+  const [bar, setBar] = useState<{ top: number; height: number } | null>(null);
+  useLayoutEffect(() => {
+    const line = step ? code.current?.querySelector<HTMLElement>(`[data-trace-line="${step.line}"]`) : null;
+    if (!line) return setBar(null);
+    const measure = () => setBar({ top: line.offsetTop, height: line.offsetHeight });
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(line);
+    return () => observer.disconnect();
+  }, [step]);
+
   const heading = step ? `Step ${position} of ${total}. Line ${step.line} ran: ${step.code}` : "Start. Nothing has run yet.";
   const label = plainText(visual.title);
 
@@ -75,7 +91,13 @@ export function StepThrough({
         aria-label={`${visual.languageLabel} code: ${label}`}
         className="overflow-x-auto rounded-t-panel bg-sunken py-4 font-mono text-code lg:rounded-l-panel lg:rounded-tr-none"
       >
-        <code className="block">
+        <code ref={code} className="relative block">
+          <span
+            aria-hidden="true"
+            data-highlight-bar
+            className={`step-highlight absolute inset-x-0 top-0 border-l-4 border-primary bg-primary-tint ${bar ? "opacity-100" : "opacity-0"}`}
+            style={bar ? { transform: `translateY(${bar.top}px)`, height: bar.height } : undefined}
+          />
           {visual.lines.map((tokens, index) => {
             const current = step?.line === index + 1;
             return (
@@ -83,7 +105,7 @@ export function StepThrough({
                 key={index}
                 data-trace-line={index + 1}
                 data-current={current || undefined}
-                className={`flex border-l-4 pr-4 transition-colors motion-reduce:transition-none ${current ? "border-primary bg-primary-tint" : "border-transparent"}`}
+                className="relative flex border-l-4 border-transparent pr-4 transition-colors motion-reduce:transition-none"
               >
                 <span aria-hidden="true" className="w-8 shrink-0 select-none text-right text-ink-muted">
                   {index + 1}
@@ -130,7 +152,9 @@ export function StepThrough({
                 <li key={variable.name} data-variable={variable.name} className="flex flex-col gap-1">
                   <span className="text-ui">{variable.name}</span>
                   <span
-                    className={`min-w-12 rounded-control border px-3 py-2 font-mono text-code ${
+                    // A new key when the value changes, so it fades and settles in once.
+                    key={`${position}-${variable.value}`}
+                    className={`min-w-12 rounded-control border px-3 py-2 font-mono text-code ${variable.changed ? "appear" : ""} ${
                       variable.changed ? "border-2 border-primary bg-primary-tint" : "border-edge bg-surface"
                     }`}
                   >

@@ -25,6 +25,8 @@ Indentation is how Python knows which lines belong to the `if` and which belong 
 
 {{visual vote}}
 
+{{explorer vote}}
+
 ## When there is no else
 
 An `else` is optional. Without one, Python either runs the indented lines or skips them, then carries on.
