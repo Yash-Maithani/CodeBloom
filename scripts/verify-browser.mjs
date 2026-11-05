@@ -25,8 +25,10 @@ import { chromium } from "@playwright/test";
 const ROOT = fileURLToPath(new URL("../", import.meta.url));
 const PORT = 3101;
 const BASE = `http://127.0.0.1:${PORT}/`;
-// The token page moved here from / in Milestone 1, when / became the homepage.
-const TOKENS_PAGE = `${BASE}dev/tokens`;
+// Checked on the homepage, which uses all three fonts. The probes for colours
+// and contrast are made inside the page, so no special page is needed (the
+// development token page was removed for launch, Milestone 7).
+const TOKENS_PAGE = BASE;
 const SCREENSHOTS = `${ROOT}screenshots/`;
 const WIDTHS = [360, 1440];
 const THEMES = ["light", "dark"];

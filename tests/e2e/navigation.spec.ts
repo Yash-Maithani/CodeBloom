@@ -4,6 +4,8 @@ import { expect, test, type Page } from "@playwright/test";
 const EXPECTED_PAGES = [
   "/",
   "/playground",
+  "/privacy",
+  "/terms",
   "/playground/python/variables_change",
   "/playground/python/variables_types",
   "/playground/python/type_error_fixed",
@@ -191,9 +193,9 @@ for (const path of ["/courses/rust", "/no-such-page"]) {
   });
 }
 
-test("no public page links to the development token page", async ({ page }) => {
+test("no public page links to a development address", async ({ page }) => {
   for (const path of EXPECTED_PAGES) {
     await page.goto(path);
-    expect(await internalLinks(page), path).not.toContain("/dev/tokens");
+    expect((await internalLinks(page)).filter((link) => link.startsWith("/dev")), path).toEqual([]);
   }
 });

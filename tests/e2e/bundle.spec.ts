@@ -26,7 +26,7 @@ const ROUTES = [
   "/courses/python",
   "/courses/c/first-program",
   "/courses/python/variables",
-  "/dev/tokens",
+  "/privacy",
   "/no-such-page",
 ];
 

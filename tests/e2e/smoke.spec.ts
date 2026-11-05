@@ -39,9 +39,9 @@ test("home route opens, shows its heading and loads the three fonts", async ({
   expect(problems).toEqual([]);
 });
 
-test("the token check page still opens and asks not to be indexed", async ({ page }) => {
-  const response = await page.goto("/dev/tokens");
-  expect(response?.status()).toBe(200);
-  await expect(page.getByRole("heading", { level: 1, name: "Design tokens check" })).toBeVisible();
-  await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex, nofollow");
+test("the development pages are not part of the site (removed for launch)", async ({ page }) => {
+  for (const path of ["/dev/tokens", "/dev/components", "/dev/current-lesson-1440.jpg"]) {
+    const response = await page.goto(path);
+    expect(response?.status(), path).toBe(404);
+  }
 });

@@ -4,7 +4,6 @@ import { SiteHeader } from "@/components/site-header";
 
 // Layout for every public page. "(site)" is a route group: the brackets keep it
 // out of the address, so this folder groups pages without adding /site to URLs.
-// The development page in app/dev/ sits outside this group and gets no header.
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
