@@ -24,8 +24,8 @@ export function Explorer({
   predict = false,
 }: {
   data: ExplorerData;
-  /** Defaults to the explorer's title */
-  title?: string;
+  /** Defaults to the explorer's title; null when a heading above already names it */
+  title?: string | null;
   regionLabel: string;
   note?: { line: number; text: string };
   /** Hide the first output until Show (the homepage hero); changing the value reveals it */
@@ -93,7 +93,7 @@ export function Explorer({
   return (
     <div data-explorer={data.id} data-explorer-value={run.value}>
       <Figure
-        title={title ?? data.title}
+        title={title === null ? undefined : (title ?? data.title)}
         regionLabel={regionLabel}
         lines={run.lines}
         path={run.path}

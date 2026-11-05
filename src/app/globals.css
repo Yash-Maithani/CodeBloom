@@ -390,6 +390,19 @@
   transition-timing-function: var(--ease-standard);
 }
 
+/* Program output and error messages wrap long lines instead of scrolling
+   sideways, so a whole line such as "IndexError: list index out of range" is
+   visible on a phone. Only the display wraps: spaces, blank lines and every
+   character stay exactly as the verified run printed them. A wrapped part
+   is indented 2ch (a hanging indent), so it never looks like a new line of
+   output; each real line still starts at the edge. Code keeps its lines and
+   scrolls sideways. */
+@utility output-wrap {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  text-indent: 2ch hanging each-line;
+}
+
 /* Feedback and hints fade in and settle 4px (DESIGN.md section 6, duration-base). */
 @utility appear {
   animation: appear var(--duration-base) var(--ease-standard);

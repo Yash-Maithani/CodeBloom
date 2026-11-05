@@ -13,8 +13,8 @@ const headings: Record<ExpectationKind, string> = {
 
 /**
  * `of` names the code this result belongs to, for example "Python code: The fix".
- * The panel is a focusable, named region like the code above it, so keyboard
- * users can scroll a long error message sideways (WCAG 2.1.1).
+ * The panel is a focusable, named region like the code above it. Long lines
+ * wrap (output-wrap in globals.css); the text itself is never changed.
  */
 export function OutputPanel({ kind, text, of }: { kind: ExpectationKind; text: string; of: string }) {
   const isError = kind !== "output";
@@ -29,7 +29,7 @@ export function OutputPanel({ kind, text, of }: { kind: ExpectationKind; text: s
         role="region"
         aria-label={`${headings[kind]} for ${of}`}
         data-output={kind}
-        className="overflow-x-auto px-4 pt-1 pb-4 font-mono text-code"
+        className="output-wrap px-4 pt-1 pb-4 font-mono text-code"
       >
         <code>{text}</code>
       </pre>

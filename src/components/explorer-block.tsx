@@ -61,7 +61,7 @@ export function ExplorerBlock({ data, headingLevel = 3 }: { data: ExplorerData; 
       </Heading>
       <p className="mt-2 max-w-measure text-ui text-ink-muted">Change the value and watch what happens. Every result shown comes from really running this program with that value.</p>
       <div className="mt-4">
-        <Explorer data={data} title={`${data.languageLabel} program`} regionLabel={`${data.languageLabel} code: ${data.title}`} />
+        <Explorer data={data} title={null} regionLabel={`${data.languageLabel} code: ${data.title}`} />
       </div>
       <details data-explorer-details className="mt-4">
         <summary className={`${buttonStyles.secondary} cursor-pointer list-none [&::-webkit-details-marker]:hidden`}>Every result as a table</summary>

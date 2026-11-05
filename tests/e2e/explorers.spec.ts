@@ -149,3 +149,44 @@ test.describe("without JavaScript", () => {
     await expect(page.locator('[data-explorer="python/vote"] [data-explorer-control]')).toBeHidden();
   });
 });
+
+// Output and error panels wrap long lines; only the display changes, never the text.
+for (const width of [360, 1440]) {
+  test(`at ${width}px output and error panels show whole lines by wrapping, with the text exactly as verified`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    const cases = [
+      { path: "/courses/python/lists", block: "python/explore_index", choose: async () => { await page.locator('[data-explorer-block="python/explore_index"]').getByRole("slider").focus(); await page.keyboard.press("End"); }, file: "python/explore_index@3.run-error.txt", key: "IndexError: list index out of range" },
+      { path: "/courses/c/pointers", block: "c/explore_target", choose: async () => {}, file: "c/explore_target.expected.txt", key: "c = 30" },
+    ];
+    for (const { path, block, choose, file: verified, key } of cases) {
+      await page.goto(path, { waitUntil: "networkidle" });
+      await choose();
+      const panel = page.locator(`[data-explorer-block="${block}"] [data-figure] pre[role=region]`).last();
+      await expect(panel).toContainText(key);
+      const shown = await panel.evaluate((el) => ({
+        text: el.textContent,
+        whiteSpace: getComputedStyle(el).whiteSpace,
+        indent: getComputedStyle(el).textIndent,
+        overflows: el.scrollWidth > el.clientWidth,
+      }));
+      // Character for character the verified file, without its final newline.
+      expect(shown.text, block).toBe(file(verified));
+      expect(shown.whiteSpace, block).toBe("pre-wrap");
+      // A wrapped part is indented, so it cannot be mistaken for a new line of output.
+      expect(shown.indent, block).toMatch(/hanging/);
+      expect(shown.indent, block).toMatch(/each-line/);
+      expect(shown.overflows, `${block} hides part of a line`).toBe(false);
+      // The code above keeps its lines and scrolls sideways instead.
+      const code = page.locator(`[data-explorer-block="${block}"] [data-figure] pre[role=region]`).first();
+      expect(await code.locator("[data-code-text]").first().evaluate((el) => getComputedStyle(el).whiteSpace)).toBe("pre");
+    }
+  });
+}
+
+test("explorers in lessons have no repeated figure title under their heading; the hero keeps its own", async ({ page }) => {
+  await page.goto("/courses/python/lists", { waitUntil: "networkidle" });
+  await expect(page.locator('[data-explorer-block="python/explore_index"] figcaption')).toHaveCount(0);
+  await expect(page.locator('[data-explorer-block="python/explore_index"]').getByText("Python program", { exact: true })).toHaveCount(0);
+  await page.goto("/", { waitUntil: "networkidle" });
+  await expect(page.locator('[data-explorer="python/vote"] figcaption')).toHaveText("Your turn: what does this print?");
+});
