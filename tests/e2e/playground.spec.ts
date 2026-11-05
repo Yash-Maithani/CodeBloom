@@ -432,6 +432,7 @@ test.describe("without JavaScript", () => {
   test("the playground does not claim to be getting ready", async ({ page }) => {
     await page.goto("/playground");
     await expect(page.locator("[data-playground-loading]")).toBeHidden();
-    await expect(page.getByText("Running code needs JavaScript.")).toBeVisible();
+    // getByText does not look inside noscript, so read the note directly (as the test above does).
+    await expect(page.locator("noscript p")).toContainText("Running code needs JavaScript.");
   });
 });

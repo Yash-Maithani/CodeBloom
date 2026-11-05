@@ -20,7 +20,8 @@ test("the privacy policy names the one stored value, and the site sets no cookie
   await expect(page.locator("main")).toContainText("codebloom-theme");
   await expect(page.locator("[data-review-note]")).toContainText("not legal advice");
   await page.getByRole("button", { name: /Switch to (dark|light) mode/ }).click();
-  expect(await page.evaluate(() => Object.keys(localStorage))).toEqual(["codebloom-theme"]);
+  // The choice is saved inside the theme switch, a frame after the click.
+  await expect.poll(() => page.evaluate(() => Object.keys(localStorage))).toEqual(["codebloom-theme"]);
   expect(await context.cookies()).toEqual([]);
   expect([...hosts]).toEqual([new URL(page.url()).host]);
 });
