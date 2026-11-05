@@ -42,6 +42,8 @@ export function Figure({
   output,
   note,
   predict,
+  outputFailed = false,
+  aside,
   children,
 }: {
   title: string;
@@ -53,12 +55,22 @@ export function Figure({
   output: string;
   note?: { line: number; text: string };
   /** Hide the output until the learner presses Show; `line` names the line that prints, when the trace shows it */
-  predict?: { line?: number };
+  predict?: { line?: number; revealed?: boolean };
+  /** The run stopped with an error: `output` is its error message */
+  outputFailed?: boolean;
+  /** Extra content above the output in the right pane, for an explorer */
+  aside?: React.ReactNode;
   /** A control above the code, for an explorer */
   children?: React.ReactNode;
 }) {
   const outputPanel = (
-    <pre tabIndex={0} role="region" aria-label={`Output of the real run for ${regionLabel}`} className="overflow-x-auto rounded-control bg-sunken px-3 py-2 font-mono text-code">
+    <pre
+      tabIndex={0}
+      role="region"
+      aria-label={`${outputFailed ? "Error message" : "Output"} of the real run for ${regionLabel}`}
+      data-output-failed={outputFailed || undefined}
+      className={`overflow-x-auto rounded-control bg-sunken px-3 py-2 font-mono text-code ${outputFailed ? "border-l-4 border-error" : ""}`}
+    >
       <code>{output}</code>
     </pre>
   );
@@ -106,10 +118,17 @@ export function Figure({
               </div>
             </div>
           )}
+          {aside}
           <div>
-            <p className="text-small font-bold text-ink-muted">Output of the real run</p>
+            <p className="text-small font-bold text-ink-muted">{outputFailed ? "Error message from the real run" : "Output of the real run"}</p>
             <div className="mt-2">
-              {predict ? <PredictReveal line={predict.line}>{outputPanel}</PredictReveal> : outputPanel}
+              {predict ? (
+                <PredictReveal line={predict.line} revealed={predict.revealed}>
+                  {outputPanel}
+                </PredictReveal>
+              ) : (
+                outputPanel
+              )}
             </div>
           </div>
           {note && (

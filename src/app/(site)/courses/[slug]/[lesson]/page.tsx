@@ -6,6 +6,7 @@ import { ConceptDiagram } from "@/components/concept-diagram";
 import { Container } from "@/components/container";
 import { LessonCodeBlock, LessonNav, Mistakes, Practice, VisualBlock } from "@/components/lesson-parts";
 import { InlineText, ProseBlocks, type ProseExtras } from "@/components/prose";
+import { ExplorerBlock } from "@/components/explorer-block";
 import { StepRail } from "@/components/step-rail";
 import { backLinkStyles, textLinkStyles } from "@/components/styles";
 import { lineAnchor } from "@/lib/anchors";
@@ -131,6 +132,13 @@ export default async function LessonPage(props: LessonPageProps) {
         return (
           <div key={index} className="mt-8">
             <VisualBlock visual={block.visual} />
+          </div>
+        );
+      }
+      if (block.type === "explorer") {
+        return (
+          <div key={index} className="mt-8">
+            <ExplorerBlock data={block.explorer} />
           </div>
         );
       }

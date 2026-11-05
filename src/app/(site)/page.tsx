@@ -2,12 +2,14 @@ import { courses } from "@content/courses";
 import { homeExample } from "@content/home-example";
 import { Container } from "@/components/container";
 import { CourseCard } from "@/components/course-card";
-import { Figure } from "@/components/figure";
+import { Explorer } from "@/components/explorer";
+import { ExplorerTable } from "@/components/explorer-block";
 import { buttonStyles, textLinkStyles } from "@/components/styles";
 import { Trail } from "@/components/trail";
 import { checkNotes } from "@/lib/code-notes";
 import { CODE_LANGUAGES, readExample } from "@/lib/examples";
-import { figureFromVisual } from "@/lib/figure-data";
+import { explorerData } from "@/lib/explorer-data";
+import { loadVariants } from "@/lib/variants";
 import { highlight } from "@/lib/highlight";
 import { allLessons, courseStatusSentence, publishedByCourse, publishedStatusLine } from "@/lib/site-lessons";
 import { assertVerified, readRecord } from "@/lib/verified";
@@ -73,7 +75,9 @@ export default async function HomePage() {
   // The lesson that teaches with this example, and its recorded trace (step-through visual).
   const exampleLesson = lessons.find((lesson) => lesson.source.status === "published" && lesson.body.some((block) => block.type === "example" && block.example.id === exampleId));
   const visual = exampleLesson?.body.flatMap((block) => (block.type === "visual" && block.visual.steps.length > 0 ? [block.visual] : [])).find((v) => v.lines.length === lines.length);
-  const figure = visual ? figureFromVisual(visual) : { lines: lines.map((tokens) => ({ tokens })), path: undefined, output: example.expectedOutput, predictLine: undefined };
+  if (!visual) throw new Error(`Homepage: ${exampleId} needs a step-through visual in the lesson that shows it`);
+  // The slider's values are verified variants (content/examples/python/vote.variants.json).
+  const explorer = explorerData(await loadVariants(exampleId), { title: "Change age and see which line runs" });
   const conditionNote = homeExample.notes.find((note) => note.startLine === 2);
 
   return (
@@ -104,18 +108,23 @@ export default async function HomePage() {
               </div>
             </div>
             <div className="mt-12 min-w-0 lg:col-span-6 lg:mt-0">
-              <Figure
+              <Explorer
+                data={explorer}
                 title="Your turn: what does this print?"
                 regionLabel={`${CODE_LANGUAGES[example.language].label} code: ${homeExample.caption}`}
-                lines={figure.lines}
-                path={figure.path}
-                output={figure.output}
                 note={conditionNote ? { line: 2, text: conditionNote.text } : undefined}
-                predict={{ line: figure.predictLine }}
+                predict
               />
+              {/* Without JavaScript the slider cannot work, so every result is listed instead. */}
+              <noscript>
+                <style>{`[data-explorer="${explorer.id}"] [data-explorer-control] { display: none; }`}</style>
+                <div className="mt-4">
+                  <ExplorerTable data={explorer} />
+                </div>
+              </noscript>
               {exampleLesson && (
                 <p className="mt-4 text-small text-ink-muted">
-                  The path and output come from a recorded run of this program, from the lesson{" "}
+                  Every path and output comes from a recorded run of this program with that age. The program is from the lesson{" "}
                   <Link href={exampleLesson.href} className={textLinkStyles}>
                     {exampleLesson.source.title}
                   </Link>

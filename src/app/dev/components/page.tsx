@@ -8,7 +8,7 @@ import type { Metadata } from "next";
 import { courses } from "@content/courses";
 import { AnalogyCallout, NoteCallout } from "@/components/callout";
 import { CourseCard } from "@/components/course-card";
-import { Explorer } from "@/components/explorer";
+import { ExplorerBlock } from "@/components/explorer-block";
 import { Figure, PathTaken } from "@/components/figure";
 import { HighlighterMark } from "@/components/highlighter-mark";
 import { LessonCodeBlock, Mistakes, Practice } from "@/components/lesson-parts";
@@ -83,6 +83,13 @@ export default async function ComponentGallery() {
   const byCourse = await publishedByCourse();
   const vote = bodyVisual(decisions, "vote");
   const voteFigure = figureFromVisual(vote);
+  const explorerIn = (href: string) => {
+    const found = lessons.find((l) => l.href === href)?.body.flatMap((b) => (b.type === "explorer" ? [b.explorer] : []))[0];
+    if (!found) throw new Error(`gallery: no explorer in ${href}`);
+    return found;
+  };
+  const voteExplorer = explorerIn("/courses/python/decisions");
+  const pointerExplorer = explorerIn("/courses/c/pointers");
   const compare = bodyExample(decisions, "python/compare");
   const typed = arrays.body.flatMap((b) => (b.type === "example" && b.example.typedInput !== undefined ? [b.example] : []))[0];
   const voteNote = vote.steps.find((step) => step.note && step.line === 2)?.note;
@@ -228,15 +235,13 @@ export default async function ComponentGallery() {
 
       <Section id="explorer" title="Explorer">
         <p className="mb-4 max-w-measure text-ui text-ink-muted">
-          Explorers show only verified variants. Until round 3 adds them, the vote program has one verified run, so the explorer shows its unavailable state.
+          Explorers show only verified variants: every value is a real run that check:examples reran. The slider from the Decisions lesson and the pointer boxes from the C Pointers lesson.
         </p>
         <Both stack>
-          <Explorer
-            title="Change age and see which line runs"
-            regionLabel={`${vote.languageLabel} code: explorer`}
-            name="age"
-            variants={[{ value: "17", lines: voteFigure.lines, path: voteFigure.path, output: voteFigure.output, summary: "age 17: line 5 runs and prints Not yet." }]}
-          />
+          <div className="flex flex-col gap-8">
+            <ExplorerBlock data={voteExplorer} />
+            <ExplorerBlock data={pointerExplorer} />
+          </div>
         </Both>
       </Section>
 

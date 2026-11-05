@@ -51,6 +51,9 @@ export const pythonLists: LessonSource = {
       ],
     },
   },
+  explorers: {
+    index: { variants: "python/explore_index", title: "Change position and see which item is printed" },
+  },
   mistakes: [
     {
       title: "Using an index that does not exist",

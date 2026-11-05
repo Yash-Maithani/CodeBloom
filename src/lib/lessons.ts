@@ -15,6 +15,8 @@ import { CODE_LANGUAGES, readExample, type CodeLanguage } from "./examples.ts";
 import { highlight, type CodeToken } from "./highlight.ts";
 import type { Analogy, LessonExample, LessonSource, Mistake, PracticeQuestion, Visual } from "./lesson-types.ts";
 import { linksIn, parseInline, parseProse, type ProseBlock } from "./prose.ts";
+import { explorerData, type ExplorerData } from "./explorer-data.ts";
+import { loadVariants } from "./variants.ts";
 import { assertTraceVerified, assertVerified, readRecord, type ExpectationKind, type VerificationRecord } from "./verified.ts";
 
 /** An example ready for CodeBlock: code split into tokens, notes, and the recorded result. */
@@ -77,6 +79,7 @@ export type LessonBlock =
   | { type: "prose"; block: Exclude<ProseBlock, { type: "placeholder" }> }
   | { type: "example"; example: RenderedExample }
   | { type: "visual"; visual: RenderedVisual }
+  | { type: "explorer"; explorer: ExplorerData }
   | { type: "analogy"; analogy: Analogy };
 
 export type LoadedLesson = {
@@ -267,6 +270,7 @@ export async function buildLessons({ courses, sources, contentRoot, recordPath }
     });
     const placed = new Set<string>();
     const visualsPlaced = new Set<string>();
+    const explorersPlaced = new Set<string>();
     let analogyPlaced = false;
     const body: LessonBlock[] = [];
     for (const block of parseProse(markdown, mdFile, { headings: true, placeholders: true })) {
@@ -277,6 +281,17 @@ export async function buildLessons({ courses, sources, contentRoot, recordPath }
         if (analogyPlaced) throw new Error(`${mdFile}: {{analogy}} is placed more than once`);
         analogyPlaced = true;
         body.push({ type: "analogy", analogy: source.analogy });
+      } else if (block.kind === "explorer") {
+        const explorer = source.explorers?.[block.id];
+        if (!explorer) throw new Error(`${mdFile}: {{explorer ${block.id}}} has no matching entry in explorers`);
+        if (explorersPlaced.has(block.id)) throw new Error(`${mdFile}: {{explorer ${block.id}}} is placed more than once`);
+        explorersPlaced.add(block.id);
+        const where = `${name}, explorer "${block.id}"`;
+        plainOnly(explorer.title, `${where}, title`);
+        if (explorer.variants.split("/")[0] !== course.slug) throw new Error(`${where}: variants must be "${course.slug}/<name>", not "${explorer.variants}"`);
+        record ??= await readRecord(recordPath);
+        const set = await loadVariants(explorer.variants, { examplesFolder, record });
+        body.push({ type: "explorer", explorer: explorerData(set, { title: explorer.title, display: explorer.display }) });
       } else if (block.kind === "visual") {
         const visual = source.visuals?.[block.id];
         if (!visual) throw new Error(`${mdFile}: {{visual ${block.id}}} has no matching entry in visuals`);
@@ -292,6 +307,8 @@ export async function buildLessons({ courses, sources, contentRoot, recordPath }
       }
     }
     if (source.analogy && !analogyPlaced) throw new Error(`${mdFile}: the lesson has an analogy, so the prose must place it once with {{analogy}}`);
+    const unplacedExplorers = Object.keys(source.explorers ?? {}).filter((id) => !explorersPlaced.has(id));
+    if (unplacedExplorers.length > 0) throw new Error(`${mdFile}: explorers never placed with {{explorer <id>}}: ${unplacedExplorers.join(", ")}`);
     const unplacedVisuals = Object.keys(source.visuals ?? {}).filter((id) => !visualsPlaced.has(id));
     if (unplacedVisuals.length > 0) throw new Error(`${mdFile}: visuals never placed with {{visual <id>}}: ${unplacedVisuals.join(", ")}`);
     const unplaced = Object.keys(source.examples).filter((id) => !placed.has(id));

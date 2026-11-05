@@ -12,6 +12,8 @@ Address numbers are not shown on this site. You can print one with `%p`, but it 
 
 The `*` does two jobs. In a declaration, `int *p` means: `p` is a pointer to an `int`. Anywhere else, `*p` means "the thing `p` points to": reading `*p` gives the `int`, and `*p = 25;` stores into it. This is called **dereferencing**. In `int *p = &score;` the `*` belongs to the type and nothing is dereferenced. Write one pointer per declaration: in `int *a, b;` only `a` is a pointer, and `b` is a plain `int` (gcc reports `b = &y;` as a warning, `-Wint-conversion`).
 
+{{explorer target}}
+
 ## Letting a function change a variable
 
 In [Functions](/courses/c/functions), a function got a copy of each argument and could not change the caller's variable. If the argument is an address, the function gets a copy of the address, and the copy points to the same variable. Writing through it changes the caller's variable.

@@ -13,11 +13,21 @@ import { buttonStyles } from "@/components/styles";
 
 const noSubscription = () => () => {};
 
-export function PredictReveal({ line, children }: { /** The line that prints, when the trace shows it */ line?: number; children: React.ReactNode }) {
+export function PredictReveal({
+  line,
+  revealed = false,
+  children,
+}: {
+  /** The line that prints, when the trace shows it */
+  line?: number;
+  /** Set by an explorer once the learner changes the value: the prediction is over */
+  revealed?: boolean;
+  children: React.ReactNode;
+}) {
   const ready = useSyncExternalStore(noSubscription, () => true, () => false);
   const [shown, setShown] = useState(false);
   const output = useRef<HTMLDivElement>(null);
-  const hidden = ready && !shown;
+  const hidden = ready && !shown && !revealed;
 
   function show() {
     setShown(true);

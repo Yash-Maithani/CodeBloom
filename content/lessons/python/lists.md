@@ -8,6 +8,8 @@ A **list** is written with square brackets, with the items inside separated by c
 
 Positions start at 0. The last index is one less than the number of items, so a list of three items has indexes 0, 1 and 2. This is the same counting from zero that `range` uses in [Loops: while and for](/courses/python/loops).
 
+{{explorer index}}
+
 ## Changing a list
 
 A list can change after it is made. The variable keeps referring to the same list while items are added or replaced.

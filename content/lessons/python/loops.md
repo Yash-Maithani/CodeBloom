@@ -34,6 +34,8 @@ Often you know how many passes you need. A `for` loop runs its group once for ea
 
 The rule is: `range(start, stop)` starts at `start` and stops before `stop`. The stop value is never included. The number of values is stop minus start, so `range(1, 4)` gives three. With one number, `range(stop)`, the start is 0. If stop is not greater than start, there are no values and the group runs zero times.
 
+{{explorer range}}
+
 Being one too high or one too low is such a common mistake that it has a name: an **off-by-one error**.
 
 Loops are often used to build up a result, one pass at a time.
