@@ -40,7 +40,7 @@
 
 import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
-import { mkdtemp, readdir, realpath, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readdir, realpath, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join, sep } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -115,6 +115,21 @@ const TRACER = fileURLToPath(new URL("./python-trace.py", import.meta.url));
 // An optional input file: name.input.txt next to a Python example, one line per input() call.
 export const INPUT_SUFFIX = ".input.txt";
 const INPUT_RUNNER = fileURLToPath(new URL("./python-input.py", import.meta.url));
+
+// Verified variants, for explorers (DESIGN.md section 7). name.variants.json
+// next to an example says which value on which line the learner may change:
+//   { "line": 1, "name": "age", "base": "17", "values": ["15", "17", "18", "21"] }
+// "base" must appear exactly once on that line of name.<ext>, and "values" must
+// include it. Every other value is a separate real run: the check writes the
+// example with "base" replaced by that value on that line (nothing else
+// changes), runs it in a fresh folder under the same file name, and compares
+// the result exactly with name@<value>.expected.txt (or .run-error.txt or
+// .compile-error.txt), and its trace with name@<value>.trace.json when the base
+// example has a trace (then every variant must have one). The record stores, for
+// each variant, the hashes of the base source, the variants file and its result
+// files, so the build refuses a variant whose result changed.
+export const VARIANTS_SUFFIX = ".variants.json";
+const VALUE_PATTERN = /^-?[A-Za-z0-9_]+$/;
 
 // Windows line endings (\r\n) and old Mac ones (\r) become \n before output is
 // compared, so an expected file saved on Windows still matches. Nothing else is
@@ -212,6 +227,13 @@ async function discover(root, languages) {
     const expectations = new Map();
     const traces = new Map();
     const inputs = new Map();
+    const manifests = new Map();
+    // "name@value" -> { kind/file pairs, trace file }
+    const variantFiles = new Map();
+    const variantSlot = (key) => {
+      if (!variantFiles.has(key)) variantFiles.set(key, { found: [], trace: undefined });
+      return variantFiles.get(key);
+    };
     for (const entry of entries) {
       const id = `${key}/${entry.name}`;
       if (entry.isSymbolicLink() || !entry.isFile()) {
@@ -224,7 +246,13 @@ async function discover(root, languages) {
         continue;
       }
       const expectation = SUFFIXES.find(([, suffix]) => entry.name.endsWith(suffix));
-      if (entry.name.endsWith(TRACE_SUFFIX)) {
+      if (entry.name.includes("@") && entry.name.endsWith(TRACE_SUFFIX)) {
+        variantSlot(entry.name.slice(0, -TRACE_SUFFIX.length)).trace = entry.name;
+      } else if (entry.name.includes("@") && expectation) {
+        variantSlot(entry.name.slice(0, -expectation[1].length)).found.push([expectation[0], entry.name]);
+      } else if (entry.name.endsWith(VARIANTS_SUFFIX)) {
+        manifests.set(entry.name.slice(0, -VARIANTS_SUFFIX.length), entry.name);
+      } else if (entry.name.endsWith(TRACE_SUFFIX)) {
         traces.set(entry.name.slice(0, -TRACE_SUFFIX.length), entry.name);
       } else if (entry.name.endsWith(INPUT_SUFFIX)) {
         inputs.set(entry.name.slice(0, -INPUT_SUFFIX.length), entry.name);
@@ -239,7 +267,7 @@ async function discover(root, languages) {
         }
         sources.push({ key, language, name, file: entry.name, source: join(dir, entry.name) });
       } else {
-        problems.push(`${id}: unexpected file (expected ${language.extension}, ${[...SUFFIXES.map(([, suffix]) => suffix), TRACE_SUFFIX, INPUT_SUFFIX].join(", ")} files only)`);
+        problems.push(`${id}: unexpected file (expected ${language.extension}, ${[...SUFFIXES.map(([, suffix]) => suffix), TRACE_SUFFIX, INPUT_SUFFIX, VARIANTS_SUFFIX].join(", ")} files, and name@value result files, only)`);
       }
     }
     if (sources.length === 0) problems.push(`${key}: no examples found, so nothing would be checked`);
@@ -286,6 +314,97 @@ async function discover(root, languages) {
         });
       }
     }
+    for (const [name, manifestFile] of manifests) {
+      manifests.delete(name);
+      const base = examples.find((example) => example.key === key && example.name === name);
+      const where = `${key}/${manifestFile}`;
+      if (!base) {
+        problems.push(`${where}: no checked example named ${name}${language.extension}`);
+        continue;
+      }
+      if (base.input) {
+        problems.push(`${where}: an example with an input file cannot have variants`);
+        continue;
+      }
+      let manifest;
+      try {
+        manifest = JSON.parse(await readFile(join(dir, manifestFile), "utf8"));
+      } catch (error) {
+        problems.push(`${where}: not valid JSON (${error.message})`);
+        continue;
+      }
+      const { line, base: baseValue, values } = manifest ?? {};
+      const lines = normalizeLineEndings(await readFile(base.source, "utf8")).split("\n");
+      if (!Number.isInteger(line) || line < 1 || line > lines.length) {
+        problems.push(`${where}: "line" must be a line number of ${base.file}`);
+        continue;
+      }
+      if (typeof manifest.name !== "string" || manifest.name === "") {
+        problems.push(`${where}: "name" must say what the learner changes`);
+        continue;
+      }
+      if (typeof baseValue !== "string" || lines[line - 1].split(baseValue).length !== 2) {
+        problems.push(`${where}: "base" must appear exactly once on line ${line} of ${base.file}`);
+        continue;
+      }
+      if (!Array.isArray(values) || values.length < 2 || !values.includes(baseValue) || new Set(values).size !== values.length) {
+        problems.push(`${where}: "values" must list at least two different values, including the base value ${JSON.stringify(baseValue)}`);
+        continue;
+      }
+      const bad = values.find((value) => typeof value !== "string" || !VALUE_PATTERN.test(value));
+      if (bad !== undefined) {
+        problems.push(`${where}: value ${JSON.stringify(bad)} must use only letters, digits, underscores and a leading minus`);
+        continue;
+      }
+      if (variantFiles.has(`${name}@${baseValue}`)) {
+        problems.push(`${key}/${name}@${baseValue}: the base value uses ${name}'s own files, not name@value files`);
+        variantFiles.delete(`${name}@${baseValue}`);
+      }
+      for (const value of values) {
+        if (value === baseValue) continue;
+        const slot = variantFiles.get(`${name}@${value}`);
+        variantFiles.delete(`${name}@${value}`);
+        const label = `${key}/${name}@${value}`;
+        if (!slot || slot.found.length === 0) {
+          problems.push(`${label}: missing ${name}@${value}${EXPECTATIONS.output} (or a .compile-error.txt or .run-error.txt file)`);
+          continue;
+        }
+        if (slot.found.length > 1) {
+          problems.push(`${label}: has ${slot.found.map(([, file]) => file).join(" and ")}; a variant has exactly one result file`);
+          continue;
+        }
+        const [kind, file] = slot.found[0];
+        if (kind === "compile-error" && !language.compiles) {
+          problems.push(`${key}/${file}: ${language.label} has no separate compile step; use ${name}@${value}${EXPECTATIONS["run-error"]}`);
+          continue;
+        }
+        if (base.trace && kind === "output" && !slot.trace) {
+          problems.push(`${label}: ${name} has a trace, so this variant needs ${name}@${value}${TRACE_SUFFIX}`);
+          continue;
+        }
+        if (slot.trace && kind !== "output") {
+          problems.push(`${key}/${slot.trace}: only a variant with ${name}@${value}${EXPECTATIONS.output} can have a trace`);
+          continue;
+        }
+        const changed = [...lines];
+        changed[line - 1] = changed[line - 1].replace(baseValue, value);
+        examples.push({
+          key,
+          language,
+          name,
+          file: `${name}@${value}`,
+          variant: { value, baseSource: base.source, manifest: join(dir, manifestFile), code: changed.join("\n") },
+          kind,
+          expected: join(dir, file),
+          ...(slot.trace ? { trace: join(dir, slot.trace) } : {}),
+        });
+      }
+    }
+    for (const [label, slot] of variantFiles) {
+      for (const file of [...slot.found.map(([, f]) => f), ...(slot.trace ? [slot.trace] : [])]) {
+        problems.push(`${key}/${file}: ${label.split("@")[0]}${VARIANTS_SUFFIX} does not list the value ${JSON.stringify(label.split("@")[1])}`);
+      }
+    }
     for (const [name, file] of traces) problems.push(`${key}/${file}: no example file named ${name}${language.extension}`);
     for (const [name, file] of inputs) problems.push(`${key}/${file}: no example file named ${name}${language.extension}`);
     for (const [name, found] of expectations) {
@@ -307,6 +426,14 @@ async function checkOne(example, timeoutMs) {
   const id = `${example.key}/${example.file}`;
   const started = Date.now();
   const workDir = await mkdtemp(join(tmpdir(), "codebloom-example-"));
+  // A variant runs from a copy written in its own folder, under the base file name.
+  if (example.variant) {
+    const sourceDir = join(workDir, "source");
+    await mkdir(sourceDir);
+    const source = join(sourceDir, `${example.name}${example.language.extension}`);
+    await writeFile(source, example.variant.code);
+    example = { ...example, source };
+  }
   const finishedWith = (ok, message) => ({ id, ok, message, ms: Date.now() - started });
   const describe = (step) => `${step.command} ${step.args[0] ?? ""}`.trim();
   try {
@@ -398,6 +525,20 @@ export const RECORD_ABOUT =
 async function buildRecord(examples) {
   const entries = [];
   for (const example of examples) {
+    if (example.variant) {
+      entries.push([
+        `${example.key}/${example.file}`,
+        {
+          kind: example.kind,
+          base: sha256(await readFile(example.variant.baseSource, "utf8")),
+          variants: sha256(await readFile(example.variant.manifest, "utf8")),
+          source: sha256(example.variant.code),
+          expected: sha256(await readFile(example.expected, "utf8")),
+          ...(example.trace ? { trace: sha256(await readFile(example.trace, "utf8")) } : {}),
+        },
+      ]);
+      continue;
+    }
     entries.push([
       `${example.key}/${example.name}`,
       {

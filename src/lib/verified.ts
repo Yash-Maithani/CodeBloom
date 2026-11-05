@@ -12,7 +12,16 @@ import { normalizeLineEndings } from "./line-endings.ts";
 
 export type ExpectationKind = "output" | "compile-error" | "run-error";
 
-type RecordEntry = { kind: ExpectationKind; source: string; expected: string; trace?: string; input?: string };
+type RecordEntry = {
+  kind: ExpectationKind;
+  source: string;
+  expected: string;
+  trace?: string;
+  input?: string;
+  /** Variants only: hashes of the base example's source and of its .variants.json */
+  base?: string;
+  variants?: string;
+};
 export type VerificationRecord = { examples: Record<string, RecordEntry> };
 
 export const RECORD_PATH = path.join(process.cwd(), "content", "verified-examples.json");
@@ -67,4 +76,29 @@ export async function assertVerified(
   if (recordedInput !== currentInput) {
     throw new Error(`The input of example ${id} has changed since it was last verified (an input file was edited, added or removed). ${fix}`);
   }
+}
+
+/**
+ * Stops the build unless a variant (an explorer value, "<language>/<name>@<value>")
+ * matches the record: the base source and the variants file it was made from,
+ * the code it ran (rebuilt here by the same one-line replacement), its result
+ * file and, when it has one, its trace.
+ */
+export async function assertVariantVerified(
+  record: VerificationRecord,
+  id: string,
+  files: { kind: ExpectationKind; code: string; baseSourceFile: string; variantsFile: string; expectationFile: string; traceFile?: string },
+): Promise<void> {
+  const entry = record.examples[id];
+  const fix = "Run npm run check:examples, review the changed result, and commit the updated content/verified-examples.json.";
+  if (!entry || entry.base === undefined) throw new Error(`Variant ${id} has never been verified. ${fix}`);
+  if (entry.kind !== files.kind) throw new Error(`Variant ${id} was verified as ${entry.kind} but is now ${files.kind}. ${fix}`);
+  const [base, variants, expected] = await Promise.all(
+    [files.baseSourceFile, files.variantsFile, files.expectationFile].map((file) => readFile(/*turbopackIgnore: true*/ file, "utf8")),
+  );
+  if (sha256(base) !== entry.base || sha256(variants) !== entry.variants) throw new Error(`The base example or variants file of ${id} has changed since it was last verified. ${fix}`);
+  if (sha256(files.code) !== entry.source) throw new Error(`Variant ${id}: the code rebuilt for the page differs from the code that was run. ${fix}`);
+  if (sha256(expected) !== entry.expected) throw new Error(`Variant ${id} has a changed result since it was last verified. ${fix}`);
+  const trace = files.traceFile === undefined ? undefined : sha256(await readFile(/*turbopackIgnore: true*/ files.traceFile, "utf8"));
+  if (trace !== entry.trace) throw new Error(`The trace of variant ${id} has changed, or was added or removed, since it was last verified. ${fix}`);
 }

@@ -14,6 +14,7 @@ async function fixture(files, languages = { python: LANGUAGES.python }) {
   const root = await mkdtemp(join(tmpdir(), "codebloom-runner-test-"));
   created.push(root);
   for (const [path, content] of Object.entries(files)) {
+    if (content === undefined) continue;
     await mkdir(join(root, path, ".."), { recursive: true });
     await writeFile(join(root, path), content);
   }
@@ -528,4 +529,71 @@ test("c input: a program that stops reading early does not make the check fail",
   const { root, languages } = await fixture({ "c/early.c": program, "c/early.input.txt": lots, "c/early.expected.txt": "0\n" }, { c: LANGUAGES.c });
   const result = await checkExamples({ root, languages });
   assert.equal(result.ok, true, JSON.stringify(result.results));
+});
+
+// ---------- verified variants (explorers) ----------
+
+const voteFiles = {
+  "python/vote.py": 'age = 17\nif age >= 18:\n    print("Yes")\nelse:\n    print("No")\n',
+  "python/vote.expected.txt": "No\n",
+  "python/vote.variants.json": '{ "line": 1, "name": "age", "base": "17", "values": ["17", "18"] }\n',
+  "python/vote@18.expected.txt": "Yes\n",
+};
+
+test("variants: each value is rerun from the base with one value replaced, and recorded with its hashes", async () => {
+  const result = await checkExamples(await fixture(voteFiles));
+  assert.deepEqual(result.problems, []);
+  assert.equal(result.ok, true);
+  assert.deepEqual(result.results.map((r) => r.id).sort(), ["python/vote.py", "python/vote@18"]);
+  const entry = result.record.examples["python/vote@18"];
+  assert.deepEqual(Object.keys(entry).sort(), ["base", "expected", "kind", "source", "variants"]);
+  assert.equal(entry.kind, "output");
+});
+
+test("variants, negative control: a variant result that differs from the real run fails and writes no record", async () => {
+  const result = await checkExamples(await fixture({ ...voteFiles, "python/vote@18.expected.txt": "No\n" }));
+  assert.equal(result.ok, false);
+  assert.match(result.results.find((r) => r.id === "python/vote@18").message, /output differs/);
+  assert.equal(result.record, undefined);
+});
+
+test("variants: a variant may be meant to fail, and its error is matched exactly under the base file name", async () => {
+  const result = await checkExamples(await fixture({
+    "python/pick.py": 'items = ["a"]\nposition = 0\nprint(items[position])\n',
+    "python/pick.expected.txt": "a\n",
+    "python/pick.variants.json": '{ "line": 2, "name": "position", "base": "0", "values": ["0", "1"] }\n',
+    "python/pick@1.run-error.txt": 'Traceback (most recent call last):\n  File "pick.py", line 3, in <module>\n    print(items[position])\n          ~~~~~^^^^^^^^^^\nIndexError: list index out of range\n',
+  }));
+  assert.deepEqual(result.problems, []);
+  assert.equal(result.ok, true, JSON.stringify(result.results));
+});
+
+test("variants: missing, unlisted and base-value result files are problems", async () => {
+  const missing = await checkExamples(await fixture({ ...voteFiles, "python/vote@18.expected.txt": undefined }));
+  assert.ok(missing.problems.some((p) => /vote@18: missing/.test(p)));
+  const unlisted = await checkExamples(await fixture({ ...voteFiles, "python/vote@30.expected.txt": "Yes\n" }));
+  assert.ok(unlisted.problems.some((p) => /does not list the value "30"/.test(p)));
+  const baseFile = await checkExamples(await fixture({ ...voteFiles, "python/vote@17.expected.txt": "No\n" }));
+  assert.ok(baseFile.problems.some((p) => /base value uses vote's own files/.test(p)));
+});
+
+test("variants: the base value must appear exactly once on the named line, and be one of the values", async () => {
+  const twice = await checkExamples(await fixture({ ...voteFiles, "python/vote.variants.json": '{ "line": 2, "name": "age", "base": " ", "values": [" ", "x"] }' }));
+  assert.ok(twice.problems.some((p) => /must appear exactly once on line 2/.test(p)), twice.problems.join("\n"));
+  const notListed = await checkExamples(await fixture({ ...voteFiles, "python/vote.variants.json": '{ "line": 1, "name": "age", "base": "17", "values": ["18", "19"] }' }));
+  assert.ok(notListed.problems.some((p) => /including the base value/.test(p)));
+});
+
+test("variants: when the base has a trace, every output variant needs one, and it must match the rerun", async () => {
+  const dir = await fixture({ "python/t.py": "x = 1\nprint(x)\n", "python/t.expected.txt": "1\n" });
+  const trace = execFileSync("python3", ["-I", "-B", fileURLToPath(new URL("./lib/python-trace.py", import.meta.url)), join(dir.root, "python/t.py")], { encoding: "utf8" });
+  await writeFile(join(dir.root, "python/t.trace.json"), trace);
+  await writeFile(join(dir.root, "python/t.variants.json"), '{ "line": 1, "name": "x", "base": "1", "values": ["1", "2"] }');
+  await writeFile(join(dir.root, "python/t@2.expected.txt"), "2\n");
+  const noTrace = await checkExamples(dir);
+  assert.ok(noTrace.problems.some((p) => /needs t@2.trace.json/.test(p)));
+  await writeFile(join(dir.root, "python/t@2.trace.json"), trace); // the trace of x = 1, not x = 2
+  const wrongTrace = await checkExamples(dir);
+  assert.equal(wrongTrace.ok, false);
+  assert.match(wrongTrace.results.find((r) => r.id === "python/t@2").message, /trace differs/);
 });
