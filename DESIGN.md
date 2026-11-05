@@ -218,7 +218,7 @@ Every interactive component defines: default, hover, focus-visible, pressed, dis
 
 ## 10. Icons and imagery
 
-Lucide outline icons, 20px (16px inline), 1.75 stroke, always with a text label or an accessible name. No emoji, photos or stock illustration. Concept diagrams are inline SVG in a hand-drawn ink style using tokens, each with a caption that carries the same information.
+Lucide outline icons, 20px (16px inline), 1.75 stroke, always with a text label or an accessible name. No emoji, photos or stock illustration. Concept diagrams are inline SVG in a hand-drawn ink style using tokens, each with a caption that carries the same information. Every shared concept has one (13). Each drawing is 300 units wide with labels in the `ui` size, shown at up to 1.2 times its size, so labels are about 16px on a 360px phone and about 19px on a wide screen; never scaled below what fits.
 
 ## 11. Prohibited
 
