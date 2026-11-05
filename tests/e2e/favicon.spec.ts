@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-// The provisional favicon: an SVG plus a 32px PNG, linked from every page,
+// The final favicon: an SVG plus a 32px PNG, linked from every page,
 // including the 404 page. Without these links the browser asks for
 // /favicon.ico, gets a 404 and logs an error.
 

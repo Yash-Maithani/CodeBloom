@@ -4,7 +4,7 @@ import {
   Atkinson_Hyperlegible_Next,
   Bricolage_Grotesque,
 } from "next/font/google";
-import { DEFAULT_DESCRIPTION, DEFAULT_TITLE, SITE_NAME, SITE_URL } from "@/lib/site";
+import { DEFAULT_DESCRIPTION, DEFAULT_TITLE, SHARE_IMAGE, SITE_NAME, SITE_URL } from "@/lib/site";
 import { THEME_BOOT_SCRIPT } from "@/lib/theme";
 import "./globals.css";
 
@@ -48,20 +48,22 @@ const atkinsonMono = Atkinson_Hyperlegible_Mono({
 export const metadata: Metadata = {
   // Canonical and Open Graph paths are resolved against the one site address.
   metadataBase: new URL(SITE_URL),
-  // Provisional icon: an SVG for modern browsers and a 32px PNG as fallback,
-  // both in public/. The final favicon is a launch item (brief Section 16).
+  // The final favicon (Milestone 7): an SVG for modern browsers, a 32px PNG as
+  // fallback and a 180px square for phone home screens, all in public/.
   icons: {
     icon: [
       { url: "/icon.svg", type: "image/svg+xml" },
       { url: "/icon-32.png", type: "image/png", sizes: "32x32" },
     ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
   },
   title: {
     default: DEFAULT_TITLE,
     template: "%s | CodeBloom",
   },
   description: DEFAULT_DESCRIPTION,
-  openGraph: { type: "website", siteName: SITE_NAME, title: DEFAULT_TITLE, description: DEFAULT_DESCRIPTION },
+  openGraph: { type: "website", siteName: SITE_NAME, title: DEFAULT_TITLE, description: DEFAULT_DESCRIPTION, images: [SHARE_IMAGE] },
+  twitter: { card: "summary_large_image", title: DEFAULT_TITLE, description: DEFAULT_DESCRIPTION, images: [SHARE_IMAGE] },
 };
 
 export default function RootLayout({
