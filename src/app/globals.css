@@ -365,6 +365,20 @@
   transform: none;
 }
 
+/* Step rail (DESIGN.md section 7): the full list never runs off the screen.
+   From 1024px it scrolls inside itself if it is taller than the screen; the
+   list opened from the small-screen bar does the same below 60% of it. */
+@utility rail-scroll {
+  max-height: calc(100dvh - var(--spacing-6) * 2);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+@utility rail-panel {
+  max-height: 60dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
 /* Theme switch (DESIGN.md section 6, exception). With the View Transitions
    API the browser shows the old page as a still picture and the new page above
    it; the toggle clips the new page to a growing circle. The default crossfade

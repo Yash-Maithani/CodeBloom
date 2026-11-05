@@ -15,10 +15,10 @@ test("the step rail lists every step in order and marks the one being read", asy
   const links = rail.locator("a").filter({ visible: true });
   await expect(links).toHaveCount(cards.length);
   for (const [index, title] of cards.entries()) await expect(links.nth(index)).toHaveAccessibleName(title);
-  await expect(rail.locator('a[aria-current="location"]').filter({ visible: true })).toHaveAccessibleName("The idea");
+  await expect(rail.locator('a[aria-current="step"]').filter({ visible: true })).toHaveAccessibleName("The idea");
   await rail.getByRole("link", { name: "Common mistakes" }).filter({ visible: true }).click();
   await expect(page).toHaveURL(/#common-mistakes$/);
-  await expect(rail.locator('a[aria-current="location"]').filter({ visible: true })).toHaveAccessibleName("Common mistakes");
+  await expect(rail.locator('a[aria-current="step"]').filter({ visible: true })).toHaveAccessibleName("Common mistakes");
 });
 
 test("a variable named in the prose links to its lines, highlights them and says which lines for screen readers", async ({ page }) => {

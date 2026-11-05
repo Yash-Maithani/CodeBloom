@@ -2,9 +2,11 @@
 
 Current status and handoff. Requirements are in `SPEC.md`, design in `DESIGN.md`, working rules in `CLAUDE.md`. Status words are defined in `CLAUDE.md`.
 
-Last updated: 2026-11-03
+Last updated: 2026-11-05
 
 ## Current milestone
+
+**UI redesign (Trailhead), round 3** (branch `claude/ui-round-3`, started from `main` at `f27a88f`, which includes round 2 merged as pull request 17). Steps 0a (theme switch reveal, D108) and 0b (sticky step rail fix, D109) are Implemented and Tested (Chromium only; 360 and 1440px; keyboard; reduced motion; the fallback without the View Transitions API). Waiting for the owner's approval before steps 1 to 6 (verified variants, explorers, remaining motion, diagrams, round 2 should-fix items, page transitions). Nothing is Deployed.
 
 **UI redesign (Trailhead), round 2 of 3: templates and every page** (branch `claude/ui-polish`, started from `main` at `3cc2219`). The owner chose direction C, Trailhead, with B Bench's figure system inside lessons (D97). Round 1 (tokens, fonts, components, gallery at `/dev/components`) and the warmer light palette (D102) were approved. Round 2 is Implemented and Tested (Chromium only; light and dark; 360 and 1440px; keyboard; reduced motion): the homepage, courses, course page, lesson, playground and 404 templates, the theme toggle, the step rail, two-pane step-through figures, predict then run, prose term links, highlighter marks and the first three concept diagrams. Round 3 (explorers from verified variants and the remaining motion) waits for the owner's review of round 2. Nothing is Deployed.
 
@@ -133,7 +135,7 @@ Windows, Narrator (Windows key + Ctrl + Enter) or NVDA, in Edge or Chrome, on `/
 
 ## In progress
 
-UI redesign round 3 (explorers from verified variants and the remaining motion), after the owner reviews round 2. Also open: owner review of Milestone 5 and the Milestone 3 screen reader walkthrough.
+UI redesign round 3: 0a and 0b done and waiting for owner approval; steps 1 to 6 not started. Also open: owner review of Milestone 5 and the Milestone 3 screen reader walkthrough.
 
 ## Outstanding tasks
 
@@ -435,6 +437,11 @@ Scenarios: light and dark forced with `data-theme` while the browser preference 
 - No horizontal overflow, focus ring is 2px solid `ink` with 2px offset, no console errors, warnings, failed requests or HTTP errors.
 
 Screenshots are saved to `screenshots/` (`light-360.png`, `light-1440.png`, `dark-360.png`, `dark-1440.png`). The folder is ignored by Git and not committed.
+| 2026-11-05 | Round 3, 0a and 0b: `lint`, `typecheck`, `build` | Exit 0. Same two font fallback warnings as before. |
+| 2026-11-05 | Round 3, 0a and 0b: `test:e2e` | 342 passed, 8 of them new (5 rail tests, 3 theme reveal and fallback tests); the existing rail test now expects `aria-current="step"`. Full suite run twice, the second time after the heading scroll margin fix. |
+| 2026-11-05 | Round 3, 0a and 0b: `check:examples`, `test:runner`, `test:unit`, `verify:browser` | 316 of 316 examples; 45 and 102 tests pass; 114 of 114 browser checks. |
+| 2026-11-05 | Step rail root cause | The sticky element was a `div` inside a `<nav>` exactly as tall as itself, so it had no room to move. The rail `<nav>` is now the grid child and sticks (`self-start`), at every width. No ancestor has `overflow`. |
+| 2026-11-05 | Homepage CLS at 1280 by 720 (found while testing 0a) | One layout shift of 0.056 at page load (287 ms) in the hero columns and status line, before any input; likely the font swap. Already on `main`; not caused by the theme switch (which measures 0). Open, to fix with the round 3 CLS work. |
 
 ## Decisions
 
@@ -544,6 +551,8 @@ Screenshots are saved to `screenshots/` (`light-360.png`, `light-1440.png`, `dar
 | D105 | 2026-11-04 | Step-through visuals are two-pane figures (code with chips on the left; step text, variables, output and the path taken on the right). Lesson outputs use predict then run (pause version) and name a line only when exactly one line prints | D101 honesty rule; no new lesson text. |
 | D106 | 2026-11-04 | Prose term links: a variable an example assigns links to its lines in the prose that follows that example in the same step, once per variable, reset at each step. Highlighter marks go on the first three bold terms a lesson defines, once each | Keeps the added tab stops few (10 across 27 lessons) and the marks rare enough to mean something. |
 | D107 | 2026-11-04 | Concept diagrams for variables, decisions and repetition: inline SVG in token colours, labelled by a caption that says everything the drawing shows | Works in both themes; nothing is only in the picture. |
+| D108 | 2026-11-05 | Theme switch: the new theme spreads from the toggle as a growing `clip-path` circle using the View Transitions API, over a new `duration-theme` token (560ms, `ease-standard`), with the icon turning for the same time. Without the API, colours cross-fade over `duration-slow`; with reduced motion, instant. Recorded as the one exception to the 300ms maximum in `DESIGN.md` section 6. No dependency | Owner request (round 3, 0a): the old switch felt abrupt. |
+| D109 | 2026-11-05 | Step rail: sticky from 1024px with internal scroll; below 1024px a sticky "Step N of M" bar that opens the list over the page (so nothing moves). `aria-current="step"`; steps above the current one look "passed", which means position only. Choosing a step scrolls (smooth unless reduced motion) and focuses its heading; that step stays current until the learner scrolls | Owner request (round 3, 0b), fixing the rail scrolling away. |
 | D82 | 2026-10-31 | C batch 2 on a new branch `claude/c-batch-2` from `main` at `2285be6` (C batch 1 had been merged as pull request 12). Three lessons in the approved C order, each linked to its shared concept (and so to its Python lesson). Pointer sentences added to two published C lessons: Numbers (safe division is shown in the conditions lesson) and Decisions (the next lesson is else if and switch). No visuals: the tracer supports Python only | Owner approved the text, with three fixes, and the pointer changes W1 and W2. |
 | D83 | 2026-10-31 | `switch` works on whole numbers only in these lessons, because `char` and text come later. The fall-through and semicolon mistakes are gcc reports (`-Wextra`, and `-Wall` for the misleading indentation) that CodeBloom's `-Werror` makes errors, shown with the flags that produce each message; their consequence is described in words, not printed, because the runner cannot verify it | Owner approved. Fall-through is defined behavior in C, hand-tested with plain gcc: it runs through every instruction below the matching label until a `break`. |
 | D84 | 2026-10-31 | The infinite loop in C is taught in prose and in no example: gcc says nothing about it with any flags, nothing in C stops it, and Ctrl+C ends it in a terminal. The `scanf` guess loop is shown with enough typed input, and the text says it would repeat for ever on text or at the end of the input (both measured) | Owner approved, including the Ctrl+C advice. |

@@ -54,7 +54,7 @@ function StepCard({ step, number, children }: { step: Step; number: number; chil
   return (
     <section aria-labelledby={step.id} data-step={step.id} className="mt-8 rounded-card border border-rule bg-surface p-4 text-body md:p-8 lg:p-10">
       <p className="text-small font-bold text-primary">Step {number}</p>
-      <h2 id={step.id} className="mt-1 scroll-mt-6 font-heading text-h2">
+      <h2 id={step.id} className="mt-1 scroll-mt-24 font-heading text-h2 lg:scroll-mt-16">
         {step.title}
       </h2>
       {children}
@@ -163,9 +163,12 @@ export default async function LessonPage(props: LessonPageProps) {
   return (
     <Container className="py-12 lg:py-16">
       <div className="lg:grid lg:grid-cols-12 lg:gap-10">
-        <div className="lg:col-span-3">
-          <StepRail title={`${lesson.course.name}, lesson ${inCourse.indexOf(lesson) + 1} of ${inCourse.length}`} steps={allSteps.map((s) => ({ id: s.id, label: s.title }))} />
-        </div>
+        {/* The rail itself is the grid child, so it can stick for the whole height of the lesson. */}
+        <StepRail
+          className="sticky top-0 z-10 lg:top-6 lg:col-span-3 lg:self-start"
+          title={`${lesson.course.name}, lesson ${inCourse.indexOf(lesson) + 1} of ${inCourse.length}`}
+          steps={allSteps.map((s) => ({ id: s.id, label: s.title }))}
+        />
 
         <div data-lesson-main className="relative mt-8 min-w-0 lg:col-span-9 lg:mt-0">
           <div className="max-w-measure">
