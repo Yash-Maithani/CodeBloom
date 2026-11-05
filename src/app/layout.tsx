@@ -4,6 +4,7 @@ import {
   Atkinson_Hyperlegible_Next,
   Bricolage_Grotesque,
 } from "next/font/google";
+import { DEFAULT_DESCRIPTION, DEFAULT_TITLE, SITE_NAME, SITE_URL } from "@/lib/site";
 import { THEME_BOOT_SCRIPT } from "@/lib/theme";
 import "./globals.css";
 
@@ -45,6 +46,8 @@ const atkinsonMono = Atkinson_Hyperlegible_Mono({
 
 // Pages set their own title; the template adds "| CodeBloom" to it.
 export const metadata: Metadata = {
+  // Canonical and Open Graph paths are resolved against the one site address.
+  metadataBase: new URL(SITE_URL),
   // Provisional icon: an SVG for modern browsers and a 32px PNG as fallback,
   // both in public/. The final favicon is a launch item (brief Section 16).
   icons: {
@@ -54,11 +57,11 @@ export const metadata: Metadata = {
     ],
   },
   title: {
-    default: "CodeBloom: programming explained line by line",
+    default: DEFAULT_TITLE,
     template: "%s | CodeBloom",
   },
-  description:
-    "Beginner programming lessons in C, C++, Java and Python, with plain-English notes beside the code and the output it really prints.",
+  description: DEFAULT_DESCRIPTION,
+  openGraph: { type: "website", siteName: SITE_NAME, title: DEFAULT_TITLE, description: DEFAULT_DESCRIPTION },
 };
 
 export default function RootLayout({

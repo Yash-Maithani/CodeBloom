@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { courses, findCourse } from "@content/courses";
@@ -24,7 +25,7 @@ export async function generateMetadata({ params }: CoursePageProps): Promise<Met
   if (!course) return {};
   const count = (await publishedByCourse()).get(course.slug)?.length ?? 0;
   const status = count === 0 ? "No lessons are published yet." : `${count} ${count === 1 ? "lesson is" : "lessons are"} published.`;
-  return { title: `${course.name} course`, description: `${course.description} ${status}` };
+  return pageMetadata({ path: `/courses/${course.slug}`, title: `${course.name} course`, description: `${course.description} ${status}` });
 }
 
 export default async function CoursePage({ params }: CoursePageProps) {

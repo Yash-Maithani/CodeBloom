@@ -13,7 +13,11 @@ import { loadVariants } from "@/lib/variants";
 import { highlight } from "@/lib/highlight";
 import { allLessons, courseStatusSentence, publishedByCourse, publishedStatusLine } from "@/lib/site-lessons";
 import { assertVerified, readRecord } from "@/lib/verified";
+import { DEFAULT_DESCRIPTION, DEFAULT_TITLE, pageMetadata } from "@/lib/site";
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = { ...pageMetadata({ path: "/", description: DEFAULT_DESCRIPTION }), title: { absolute: DEFAULT_TITLE } };
 
 // A real sequence, so the steps are numbered (DESIGN.md: numbering only for sequences).
 const lessonSteps = [

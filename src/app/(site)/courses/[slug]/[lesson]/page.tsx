@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AnalogyCallout } from "@/components/callout";
@@ -40,10 +41,7 @@ async function findPublished({ params }: LessonPageProps): Promise<{ lessons: Lo
 export async function generateMetadata(props: LessonPageProps): Promise<Metadata> {
   const { lesson } = await findPublished(props);
   if (!lesson) return {};
-  return {
-    title: `${lesson.source.title} in ${lesson.course.name}`,
-    description: plainText(lesson.source.objective),
-  };
+  return pageMetadata({ path: lesson.href, title: `${lesson.source.title} in ${lesson.course.name}`, description: plainText(lesson.source.objective) });
 }
 
 const slugify = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");

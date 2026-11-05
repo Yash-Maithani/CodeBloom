@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site";
 import { courses } from "@content/courses";
 import { Container } from "@/components/container";
 import { CourseCard } from "@/components/course-card";
 import { courseStatusSentence, publishedByCourse } from "@/lib/site-lessons";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return { title: "Courses", description: `Beginner courses in C, C++, Java and Python. ${await courseStatusSentence()}` };
+  return pageMetadata({ path: "/courses", title: "Courses", description: `Beginner courses in C, C++, Java and Python. ${await courseStatusSentence()}` });
 }
 
 export default async function CoursesPage() {

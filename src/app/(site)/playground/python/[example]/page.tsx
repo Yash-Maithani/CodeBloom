@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site";
 import { notFound } from "next/navigation";
 import { PlaygroundPage } from "@/components/playground-page";
 import { playgroundExamples } from "@/lib/site-lessons";
@@ -19,10 +20,11 @@ async function find(params: Props["params"]) {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const entry = await find(params);
-  return {
+  return pageMetadata({
+    path: `/playground/python/${(await params).example}`,
     title: entry ? `Python playground: ${entry.lesson.source.title}` : "Python playground",
     description: "Run and change a lesson example in your browser. Your code stays on your device.",
-  };
+  });
 }
 
 export default async function Page({ params }: Props) {
