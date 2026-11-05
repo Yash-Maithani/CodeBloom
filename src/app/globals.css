@@ -475,6 +475,21 @@
   transition-duration: var(--duration-theme);
 }
 
+/* Page transitions: the content of the page cross-fades on navigation
+   ((site)/layout.tsx). Only the old and new content move; nothing slides. */
+::view-transition-old(.page-change),
+::view-transition-new(.page-change) {
+  animation-duration: var(--duration-base);
+  animation-timing-function: var(--ease-standard);
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none;
+  }
+}
+
 /* Fallback without the View Transitions API: a soft colour crossfade over
    duration-slow, never a hard snap. The icons keep their own transition. */
 :root.theme-fade *:not(.theme-icon-moon, .theme-icon-sun),
