@@ -94,7 +94,7 @@ export default async function HomePage() {
                 Learn to program with patient, line-by-line explanations
               </h1>
               <p className="mt-6 max-w-measure text-lead">
-                CodeBloom is a learning site for beginners studying C, C++, Java or Python. Lessons explain code in plain English, with a note beside each line that
+                CodeBloom is a learning site for beginners learning C and Python, with C++ and Java planned. Lessons explain code in plain English, with a note beside each line that
                 matters and the output the code really prints.
               </p>
               <p data-status-line className="mt-4 text-ui text-ink-muted">

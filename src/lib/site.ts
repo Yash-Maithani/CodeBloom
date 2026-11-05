@@ -10,7 +10,7 @@ export const CONTACT_URL = "https://github.com/Yash-Maithani/CodeBloom/issues";
 
 export const DEFAULT_TITLE = "CodeBloom: programming explained line by line";
 export const DEFAULT_DESCRIPTION =
-  "Beginner programming lessons in C, C++, Java and Python, with plain-English notes beside the code and the output it really prints.";
+  "Programming lessons for beginners learning C and Python, with C++ and Java planned: plain-English notes beside the code and the output it really prints.";
 
 /**
  * Metadata for one page: its title, description and canonical path, repeated
