@@ -215,7 +215,7 @@ Playground support for C, C++ and Java, typing input while a program runs, a sec
 
 1. Lesson file format. Decided in Milestone 2: typed lesson files with prose in a Markdown subset (`PROGRESS.md` D32).
 2. Which language or languages the first lessons use. Decided in Milestone 2: C and Python (`PROGRESS.md` D33).
-3. Whether the first release remembers completed lessons in browser storage.
+3. Whether the first release remembers completed lessons in browser storage. Decided for launch: no (`PROGRESS.md` D122).
 4. When the light and dark theme toggle ships (tokens for both are already defined).
-5. Hosting provider for previews and launch.
-6. Whether to use any analytics. Default: none until the privacy policy covers it.
+5. Hosting provider for previews and launch. Decided: Vercel Hobby, on `codebloom.vercel.app` until a custom domain is added (`PROGRESS.md` D115, D122).
+6. Whether to use any analytics. Decided: none; the privacy policy says so (`PROGRESS.md` D118, D122).
