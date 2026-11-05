@@ -8,12 +8,15 @@ const nextConfig: NextConfig = {
     return [
       {
         // Every page: basic protections that need no script nonces, so pages stay static.
+        // Framing is blocked with X-Frame-Options, not a page-wide Content-Security-Policy:
+        // with that header the Next.js router fell back to full page loads (measured
+        // 2026-11-05), which also turned off the page transitions.
         source: "/:path*",
         headers: [
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
-          { key: "Content-Security-Policy", value: "frame-ancestors 'none'" },
+          { key: "X-Frame-Options", value: "DENY" },
         ],
       },
       {

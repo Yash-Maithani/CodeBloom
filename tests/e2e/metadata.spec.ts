@@ -50,7 +50,9 @@ test("no framework or host badge: no X-Powered-By header, and the security heade
   expect(headers["x-powered-by"]).toBeUndefined();
   expect(headers["x-content-type-options"]).toBe("nosniff");
   expect(headers["referrer-policy"]).toBe("strict-origin-when-cross-origin");
-  expect(headers["content-security-policy"]).toBe("frame-ancestors 'none'");
+  expect(headers["x-frame-options"]).toBe("DENY");
+  // A page-wide CSP made the router fall back to full page loads (D115), so pages have none.
+  expect(headers["content-security-policy"]).toBeUndefined();
   // The Python worker keeps its own policy.
   const worker = await request.get("/python-worker.mjs");
   expect(worker.headers()["content-security-policy"]).toBe("default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'");
